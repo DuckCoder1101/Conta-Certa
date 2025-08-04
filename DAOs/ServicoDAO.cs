@@ -7,34 +7,42 @@ namespace Conta_Certa.DAOs;
 
 public static class ServicoDAO
 {
-    public static void InsertServico(params ServicoCadDTO[] servicos)
-    {
-        try
+        public static List<long?> InsertServicos(params ServicoCadDTO[] servicos)
         {
-            using var conn = new SQLiteConnection(Database.ConnStr);
-            conn.Open();
-
-            using var transaction = conn.BeginTransaction();
-
-            string sql = @"INSERT INTO Servicos (nome, valor) VALUES (@nome, @valor);";
-
-            foreach (var servico in servicos)
+            try
             {
+                using var conn = new SQLiteConnection(Database.ConnStr);
+                conn.Open();
+
+                using var transaction = conn.BeginTransaction();
+                string sql = @"INSERT INTO Servicos (nome, valor) 
+                               VALUES (@nome, @valor)
+                               RETURNING idServico;";
+
                 using var cmd = new SQLiteCommand(sql, conn, transaction);
+                List<long?> ids = [];
 
-                cmd.Parameters.AddWithValue("@nome", servico.Nome);
-                cmd.Parameters.AddWithValue("@valor", servico.Valor);
+                foreach (var servico in servicos)
+                {
+                    cmd.Parameters.AddWithValue("@nome", servico.Nome);
+                    cmd.Parameters.AddWithValue("@valor", servico.Valor);
 
-                cmd.ExecuteNonQuery();
+                    long idServico = (long) cmd.ExecuteScalar();
+                    ids.Add(idServico);
+
+                    cmd.Parameters.Clear();
+                }
+
+                transaction.Commit();
+                conn.Close();
+
+                return ids;
             }
-
-            transaction.Commit();
-            conn.Close();
-        }
 
         catch (Exception ex)
         {
             Logger.LogException(ex);
+            return [];
         }
     }
 
@@ -104,7 +112,7 @@ public static class ServicoDAO
 
             while (reader.Read())
             {
-                var id = reader.GetInt32(0);
+                var id = reader.GetInt64(0);
                 var nome = reader.GetString(1);
                 var valor = reader.GetFloat(2);
 

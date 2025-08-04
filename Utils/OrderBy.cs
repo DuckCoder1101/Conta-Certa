@@ -5,5 +5,5 @@ public enum OrderBy
 {
     ID,
     Nome,
-    Vencimento
+    Valor
 }

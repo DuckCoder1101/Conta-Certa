@@ -29,13 +29,13 @@ public partial class ClientesList : Form
         switch (order)
         {
             case OrderBy.Nome:
-                return clientes.OrderBy(c => c.Nome).ToList();
+                return [.. clientes.OrderBy(c => c.Nome)];
 
-            case OrderBy.Vencimento:
-                return clientes.OrderBy(c => c.VencimentoHonorario).ToList();
+            case OrderBy.Valor:
+                return [.. clientes.OrderBy(c => c.Honorario)];
 
             default:
-                return clientes.OrderBy(c => c.IdCliente).ToList();
+                return [.. clientes.OrderBy(c => c.IdCliente)];
         }
     }
 
@@ -49,6 +49,7 @@ public partial class ClientesList : Form
     {
         clientesPanel.Controls.Clear();
 
+        // Guia
         ClienteControl guide = new(null)
         {
             Dock = DockStyle.Top
@@ -59,7 +60,7 @@ public partial class ClientesList : Form
 
         foreach (var cliente in GetSortedClientes())
         {
-            if (cliente.Nome.ToUpper().StartsWith(filter))
+            if (cliente.Nome.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase))
             {
                 ClienteControl control = new(cliente)
                 {
@@ -88,19 +89,24 @@ public partial class ClientesList : Form
 
     private void Excluir_Menu_Click(object sender, EventArgs e)
     {
-        var message = @"Deseja mesmo excluir este cliente?
-Esta ação é irreversível e apagará também as outras informações associadas a ele";
-
-        DialogResult result = MessageBox.Show(
-            message,
-            "Excluir cliente?",
-            MessageBoxButtons.YesNo,
-            MessageBoxIcon.Warning);
-
-        if (result == DialogResult.Yes && currentControl?.Cliente != null)
+        if (currentControl?.Cliente != null)
         {
-            ClienteDAO.DeleteCliente(currentControl.Cliente);
-            UpdateClientesList();
+            var message = 
+                "Deseja mesmo excluir este cliente?\nEsta ação é irreversível e apagará também as outras informações associadas a ele";
+
+            DialogResult result = MessageBox.Show(
+                message,
+                "Excluir cliente?",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                ClienteDAO.DeleteCliente(currentControl.Cliente);
+
+                clientes.Remove(currentControl.Cliente);
+                currentControl.Dispose();
+            }
         }
     }
 
@@ -114,9 +120,9 @@ Esta ação é irreversível e apagará também as outras informações associad
         }
     }
 
-    private void OnSearchbarFilterChanged(string newFilter)
+    private void OnSearchbarFilterChanged(string filter)
     {
-        filter = newFilter;
+        this.filter = filter;
         UpdateClientesPanel();
     }
 

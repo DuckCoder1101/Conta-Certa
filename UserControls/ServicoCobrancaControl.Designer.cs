@@ -30,6 +30,7 @@
         {
             tableLayoutPanel1 = new TableLayoutPanel();
             nomeServicoTxt = new Label();
+            valorServicoTxt = new Label();
             quantidadeServicoNb = new NumericUpDown();
             tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)quantidadeServicoNb).BeginInit();
@@ -37,40 +38,55 @@
             // 
             // tableLayoutPanel1
             // 
-            tableLayoutPanel1.ColumnCount = 2;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70F));
+            tableLayoutPanel1.ColumnCount = 3;
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel1.Controls.Add(nomeServicoTxt, 0, 0);
-            tableLayoutPanel1.Controls.Add(quantidadeServicoNb, 1, 0);
+            tableLayoutPanel1.Controls.Add(valorServicoTxt, 1, 0);
+            tableLayoutPanel1.Controls.Add(quantidadeServicoNb, 2, 0);
             tableLayoutPanel1.Dock = DockStyle.Fill;
-            tableLayoutPanel1.Location = new Point(0, 0);
+            tableLayoutPanel1.Location = new Point(0, 2);
             tableLayoutPanel1.Margin = new Padding(0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel1.Size = new Size(200, 23);
+            tableLayoutPanel1.Size = new Size(250, 27);
             tableLayoutPanel1.TabIndex = 0;
             // 
             // nomeServicoTxt
             // 
             nomeServicoTxt.AutoSize = true;
             nomeServicoTxt.Dock = DockStyle.Fill;
-            nomeServicoTxt.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            nomeServicoTxt.Font = new Font("Arial", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             nomeServicoTxt.Location = new Point(3, 0);
             nomeServicoTxt.Name = "nomeServicoTxt";
-            nomeServicoTxt.Size = new Size(134, 23);
+            nomeServicoTxt.Size = new Size(119, 27);
             nomeServicoTxt.TabIndex = 0;
             nomeServicoTxt.Text = "label1";
             nomeServicoTxt.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // valorServicoTxt
+            // 
+            valorServicoTxt.AutoSize = true;
+            valorServicoTxt.Dock = DockStyle.Fill;
+            valorServicoTxt.FlatStyle = FlatStyle.Flat;
+            valorServicoTxt.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            valorServicoTxt.Location = new Point(128, 0);
+            valorServicoTxt.Name = "valorServicoTxt";
+            valorServicoTxt.Size = new Size(69, 27);
+            valorServicoTxt.TabIndex = 2;
+            valorServicoTxt.Text = "label1";
+            valorServicoTxt.TextAlign = ContentAlignment.MiddleLeft;
+            // 
             // quantidadeServicoNb
             // 
+            quantidadeServicoNb.BorderStyle = BorderStyle.FixedSingle;
             quantidadeServicoNb.Dock = DockStyle.Fill;
-            quantidadeServicoNb.Location = new Point(140, 0);
+            quantidadeServicoNb.Location = new Point(200, 0);
             quantidadeServicoNb.Margin = new Padding(0);
             quantidadeServicoNb.Name = "quantidadeServicoNb";
-            quantidadeServicoNb.Size = new Size(60, 23);
+            quantidadeServicoNb.Size = new Size(50, 23);
             quantidadeServicoNb.TabIndex = 1;
             quantidadeServicoNb.ValueChanged += QuantidadeServicoNb_ValueChanged;
             // 
@@ -79,9 +95,9 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(tableLayoutPanel1);
-            Margin = new Padding(0);
             Name = "ServicoCobrancaControl";
-            Size = new Size(200, 23);
+            Padding = new Padding(0, 2, 0, 2);
+            Size = new Size(250, 31);
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)quantidadeServicoNb).EndInit();
@@ -93,5 +109,6 @@
         private TableLayoutPanel tableLayoutPanel1;
         private Label nomeServicoTxt;
         private NumericUpDown quantidadeServicoNb;
+        private Label valorServicoTxt;
     }
 }

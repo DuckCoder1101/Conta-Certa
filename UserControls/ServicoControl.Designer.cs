@@ -53,7 +53,7 @@
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(770, 45);
+            tableLayoutPanel1.Size = new Size(768, 43);
             tableLayoutPanel1.TabIndex = 1;
             // 
             // idTxt
@@ -63,7 +63,7 @@
             idTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
             idTxt.Location = new Point(3, 0);
             idTxt.Name = "idTxt";
-            idTxt.Size = new Size(250, 45);
+            idTxt.Size = new Size(250, 43);
             idTxt.TabIndex = 0;
             idTxt.Text = "ID";
             idTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -76,7 +76,7 @@
             nomeTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
             nomeTxt.Location = new Point(259, 0);
             nomeTxt.Name = "nomeTxt";
-            nomeTxt.Size = new Size(250, 45);
+            nomeTxt.Size = new Size(250, 43);
             nomeTxt.TabIndex = 1;
             nomeTxt.Text = "NOME";
             nomeTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -89,7 +89,7 @@
             valorTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
             valorTxt.Location = new Point(515, 0);
             valorTxt.Name = "valorTxt";
-            valorTxt.Size = new Size(252, 45);
+            valorTxt.Size = new Size(250, 43);
             valorTxt.TabIndex = 2;
             valorTxt.Text = "VALOR";
             valorTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -99,9 +99,10 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BorderStyle = BorderStyle.FixedSingle;
             Controls.Add(tableLayoutPanel1);
             Name = "ServicoControl";
-            Size = new Size(770, 45);
+            Size = new Size(768, 43);
             MouseClick += ServicoControl_MouseClick;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();

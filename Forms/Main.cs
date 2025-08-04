@@ -25,12 +25,27 @@ namespace Conta_Certa
             form.ShowDialog();
         }
 
-        private void Exportar_JSON_Click(object sender, EventArgs e)
+        private void ImportFromJSON_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new()
+            {
+                Title = "Importar JSON",
+                Filter = "Arquivo JSON (*.json)|*.json",
+                DefaultExt = "json"
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                ExportImportData.ImportFromJson(dialog.FileName);
+            }
+        }
+
+        private void ExportToJSON_Click(object sender, EventArgs e)
         {
             SaveFileDialog dialog = new()
             {
                 Title = "Exportar para JSON",
-                Filter = "Arquivo JSON (*.json)|.json",
+                Filter = "Arquivo JSON (*.json)|*.json",
                 DefaultExt = "json",
                 FileName = "Conta Certa.json"
             };
@@ -41,10 +56,37 @@ namespace Conta_Certa
             }
         }
 
-        private void CobrancasPendentesToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ImportFromExcelBtn_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new()
+            {
+                Title = "Importar tabela Excel",
+                Filter = "Arquivo JSON (*.xls;*.xlsx)|*.xls;*.xlsx",
+                DefaultExt = "json"
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                ExportImportData.ImportFromTable(dialog.FileName);
+            }
+        }
+
+        private void CobrancasPendentes_Menu_Click(object sender, EventArgs e)
         {
             using CobrancasList form = new(CobrancaStatus.Pendente);
             form.ShowDialog();
+        }
+
+        private void ListaServicos_Menu_Click(object sender, EventArgs e)
+        {
+            using ServicosList form = new();
+            form.ShowDialog();
+        }
+
+        private void CadastrarSevico_Menu_Click(object sender, EventArgs e)
+        {
+            using ManageServico manageServico = new ManageServico();
+            manageServico.ShowDialog();
         }
     }
 }

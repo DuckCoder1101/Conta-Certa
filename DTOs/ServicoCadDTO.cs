@@ -1,7 +1,8 @@
-﻿
+﻿using Conta_Certa.Models;
+
 namespace Conta_Certa.DTOs;
 
-public class ServicoCadDTO
+public record ServicoCadDTO
 {
     public string Nome { get; }
     public float Valor { get; }
@@ -10,5 +11,11 @@ public class ServicoCadDTO
     {
         Nome = nome;
         Valor = valor;
+    }
+
+    public ServicoCadDTO(Servico servico)
+    {
+        Nome = servico.Nome;
+        Valor = servico.Valor;
     }
 }

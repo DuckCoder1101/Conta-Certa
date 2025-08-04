@@ -47,6 +47,9 @@
             cobrancasPendentes = new ToolStripMenuItem();
             cobrancasPagas = new ToolStripMenuItem();
             cobrarTodos = new ToolStripMenuItem();
+            serviçosToolStripMenuItem = new ToolStripMenuItem();
+            listaDeServiçosToolStripMenuItem = new ToolStripMenuItem();
+            cadastrarServiçoToolStripMenuItem = new ToolStripMenuItem();
             menu.SuspendLayout();
             SuspendLayout();
             // 
@@ -54,7 +57,7 @@
             // 
             menu.BackColor = SystemColors.ControlLight;
             menu.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            menu.Items.AddRange(new ToolStripItem[] { arquivoToolStripMenuItem, relatToolStripMenuItem, cobrançasToolStripMenuItem, cobrançasToolStripMenuItem1 });
+            menu.Items.AddRange(new ToolStripItem[] { arquivoToolStripMenuItem, relatToolStripMenuItem, cobrançasToolStripMenuItem, cobrançasToolStripMenuItem1, serviçosToolStripMenuItem });
             menu.Location = new Point(0, 0);
             menu.Name = "menu";
             menu.Size = new Size(800, 24);
@@ -72,26 +75,28 @@
             // 
             importarDadosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importFromExelBtn, importFromJSONBtn });
             importarDadosToolStripMenuItem.Name = "importarDadosToolStripMenuItem";
-            importarDadosToolStripMenuItem.Size = new Size(156, 22);
+            importarDadosToolStripMenuItem.Size = new Size(180, 22);
             importarDadosToolStripMenuItem.Text = "Importar";
             // 
             // importFromExelBtn
             // 
             importFromExelBtn.Name = "importFromExelBtn";
-            importFromExelBtn.Size = new Size(148, 22);
+            importFromExelBtn.Size = new Size(180, 22);
             importFromExelBtn.Text = "Tabela Excel";
+            importFromExelBtn.Click += ImportFromExcelBtn_Click;
             // 
             // importFromJSONBtn
             // 
             importFromJSONBtn.Name = "importFromJSONBtn";
-            importFromJSONBtn.Size = new Size(148, 22);
+            importFromJSONBtn.Size = new Size(180, 22);
             importFromJSONBtn.Text = "JSON";
+            importFromJSONBtn.Click += ImportFromJSON_Click;
             // 
             // exportToJSONBtn
             // 
             exportToJSONBtn.DropDownItems.AddRange(new ToolStripItem[] { tabelaExelToolStripMenuItem, jSONToolStripMenuItem });
             exportToJSONBtn.Name = "exportToJSONBtn";
-            exportToJSONBtn.Size = new Size(156, 22);
+            exportToJSONBtn.Size = new Size(180, 22);
             exportToJSONBtn.Text = "Exportar";
             // 
             // tabelaExelToolStripMenuItem
@@ -105,12 +110,12 @@
             jSONToolStripMenuItem.Name = "jSONToolStripMenuItem";
             jSONToolStripMenuItem.Size = new Size(141, 22);
             jSONToolStripMenuItem.Text = "JSON";
-            jSONToolStripMenuItem.Click += Exportar_JSON_Click;
+            jSONToolStripMenuItem.Click += ExportToJSON_Click;
             // 
             // openSetingsBtn
             // 
             openSetingsBtn.Name = "openSetingsBtn";
-            openSetingsBtn.Size = new Size(156, 22);
+            openSetingsBtn.Size = new Size(180, 22);
             openSetingsBtn.Text = "Configurações";
             // 
             // relatToolStripMenuItem
@@ -165,7 +170,7 @@
             cobrancasPendentes.Name = "cobrancasPendentes";
             cobrancasPendentes.Size = new Size(200, 22);
             cobrancasPendentes.Text = "Cobranças pendentes";
-            cobrancasPendentes.Click += CobrancasPendentesToolStripMenuItem_Click;
+            cobrancasPendentes.Click += CobrancasPendentes_Menu_Click;
             // 
             // cobrancasPagas
             // 
@@ -178,6 +183,27 @@
             cobrarTodos.Name = "cobrarTodos";
             cobrarTodos.Size = new Size(200, 22);
             cobrarTodos.Text = "Cobrar todos";
+            // 
+            // serviçosToolStripMenuItem
+            // 
+            serviçosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { listaDeServiçosToolStripMenuItem, cadastrarServiçoToolStripMenuItem });
+            serviçosToolStripMenuItem.Name = "serviçosToolStripMenuItem";
+            serviçosToolStripMenuItem.Size = new Size(68, 20);
+            serviçosToolStripMenuItem.Text = "Serviços";
+            // 
+            // listaDeServiçosToolStripMenuItem
+            // 
+            listaDeServiçosToolStripMenuItem.Name = "listaDeServiçosToolStripMenuItem";
+            listaDeServiçosToolStripMenuItem.Size = new Size(174, 22);
+            listaDeServiçosToolStripMenuItem.Text = "Lista de serviços";
+            listaDeServiçosToolStripMenuItem.Click += ListaServicos_Menu_Click;
+            // 
+            // cadastrarServiçoToolStripMenuItem
+            // 
+            cadastrarServiçoToolStripMenuItem.Name = "cadastrarServiçoToolStripMenuItem";
+            cadastrarServiçoToolStripMenuItem.Size = new Size(174, 22);
+            cadastrarServiçoToolStripMenuItem.Text = "Cadastrar serviço";
+            cadastrarServiçoToolStripMenuItem.Click += CadastrarSevico_Menu_Click;
             // 
             // Main
             // 
@@ -215,5 +241,8 @@
         private ToolStripMenuItem cobrarTodos;
         private ToolStripMenuItem tabelaExelToolStripMenuItem;
         private ToolStripMenuItem jSONToolStripMenuItem;
+        private ToolStripMenuItem serviçosToolStripMenuItem;
+        private ToolStripMenuItem listaDeServiçosToolStripMenuItem;
+        private ToolStripMenuItem cadastrarServiçoToolStripMenuItem;
     }
 }

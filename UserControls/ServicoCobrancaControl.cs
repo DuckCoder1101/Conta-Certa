@@ -1,5 +1,4 @@
-﻿
-using Conta_Certa.Models;
+﻿using Conta_Certa.Models;
 
 namespace Conta_Certa.UserControls;
 
@@ -16,6 +15,7 @@ public partial class ServicoCobrancaControl : UserControl
         Quantidade = quantidade;
 
         nomeServicoTxt.Text = Servico.Nome;
+        valorServicoTxt.Text = servico.Valor.ToString("c");
         quantidadeServicoNb.Value = Quantidade;
     }
 

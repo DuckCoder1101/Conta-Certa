@@ -2,7 +2,7 @@
 
 namespace Conta_Certa.DTOs;
 
-public class ServicoCobrancaCadDTO
+public record ServicoCobrancaCadDTO
 {
     public long IdCobranca { get; }
     public long IdServico { get; }
@@ -23,5 +23,13 @@ public class ServicoCobrancaCadDTO
         IdServico = servico.IdServico;
         Valor = servico.Valor;
         Quantidade = quantidade;
+    }
+
+    public ServicoCobrancaCadDTO(ServicoCobranca servicoCobranca, long idCobranca, long idServico)
+    {
+        IdCobranca = idCobranca;
+        IdServico = idServico;
+        Valor = servicoCobranca.Servico.Valor;
+        Quantidade = servicoCobranca.Quantidade;
     }
 }

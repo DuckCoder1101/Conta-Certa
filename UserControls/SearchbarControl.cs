@@ -15,6 +15,7 @@ public partial class SearchbarControl : UserControl
         orderCB.DataSource = Enum.GetNames<OrderBy>();
     }
 
+
     private void SearchboxTxt_TextChanged(object sender, EventArgs e)
     {
         FilterChanged?.Invoke(searchboxTxt.Text.Trim().ToUpper());

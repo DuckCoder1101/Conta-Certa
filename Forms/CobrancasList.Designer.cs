@@ -43,6 +43,12 @@
             // 
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
             tableLayoutPanel1.Controls.Add(cobrancasPanel, 0, 1);
             tableLayoutPanel1.Controls.Add(searchbar, 0, 0);
             tableLayoutPanel1.Dock = DockStyle.Fill;
@@ -104,6 +110,7 @@
             Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Name = "CobrancasList";
             Text = "Cobranças";
+            FormClosing += CobrancasList_FormClosing;
             tableLayoutPanel1.ResumeLayout(false);
             menu.ResumeLayout(false);
             ResumeLayout(false);

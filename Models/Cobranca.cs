@@ -19,14 +19,7 @@ public class Cobranca
 
     public List<ServicoCobranca> Servicos { get; private set; } = [];
 
-    public Cobranca(
-        long idCobranca,
-        ClienteResumoDTO cliente, 
-        float honorario, 
-        CobrancaStatus status,
-        DateTime vencimento,
-        DateTime? pagoEm = null,
-        List<ServicoCobranca>? servicosExtras = null)
+    public Cobranca(long idCobranca, ClienteResumoDTO cliente, float honorario, CobrancaStatus status, DateTime vencimento, DateTime? pagoEm, List<ServicoCobranca>? servicos = null)
     {
         IdCobranca = idCobranca;
         Cliente = cliente;
@@ -34,10 +27,10 @@ public class Cobranca
         Status = status;
         Vencimento = vencimento;
         PagoEm = pagoEm;
-
-        if (servicosExtras != null)
+        
+        if (servicos != null)
         {
-            Servicos = servicosExtras;
+            Servicos = servicos;
         }
     }
 }

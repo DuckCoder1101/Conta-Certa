@@ -39,6 +39,21 @@ public partial class CobrancasList : Form
         UpdateCobrancasList();
     }
 
+    private List<Cobranca> GetSortedCobrancas()
+    {
+        switch (order)
+        {
+            case OrderBy.Nome:
+                return [.. cobrancas.OrderBy(c => c.Cliente.Nome)];
+
+            case OrderBy.Valor:
+                return [.. cobrancas.OrderBy(c => c.Honorario)];
+
+            default:
+                return [.. cobrancas.OrderBy(c => c.IdCobranca)];
+        }
+    }
+
     private void UpdateCobrancasList()
     {
         if (statusFilter != null)
@@ -66,9 +81,9 @@ public partial class CobrancasList : Form
         cobrancasPanel.Controls.Add(guide);
         cobrancasPanel.Controls.SetChildIndex(guide, 0);
 
-        foreach (var cobranca in cobrancas)
+        foreach (var cobranca in GetSortedCobrancas())
         {
-            if (cobranca.Cliente.Nome.ToUpper().StartsWith(filter))
+            if (cobranca.Cliente.Nome.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase))
             {
                 CobrancaControl control = new(cobranca)
                 {
@@ -83,7 +98,7 @@ public partial class CobrancasList : Form
 
     private void OnSearchbarFilterChanged(string filter)
     {
-        this.filter = filter.ToUpper();
+        this.filter = filter;
         UpdateCobrancasPanel();
     }
 
@@ -122,18 +137,12 @@ public partial class CobrancasList : Form
         }
     }
 
-    public void OpenContextMenu(CobrancaControl control)
-    {
-        currentCobranca = control;
-        menu.Show(Cursor.Position);
-    }
-
     private void ExcluirToolStripMenuItem_Click(object sender, EventArgs e)
     {
         if (currentCobranca?.Cobranca != null)
         {
-            var message = @"Deseja mesmo excluir esta cobrança?
-Esta ação é irreversível e apagará também todas as informações associadas a ela.";
+            var message =
+                "Deseja mesmo excluir esta cobrança?\nEsta ação é irreversível e apagará também todas as informações associadas a ela.";
 
             DialogResult result = MessageBox.Show(
                 message,
@@ -144,8 +153,23 @@ Esta ação é irreversível e apagará também todas as informações associada
             if (result == DialogResult.Yes)
             {
                 CobrancaDAO.DeleteCobranca(currentCobranca.Cobranca);
+
                 cobrancasPanel.Controls.Remove(currentCobranca);
+                currentCobranca.Dispose();
             }
         }
+    }
+
+    public void OpenContextMenu(CobrancaControl control)
+    {
+        currentCobranca = control;
+        menu.Show(Cursor.Position);
+    }
+
+    private void CobrancasList_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        searchbar.FilterChanged -= OnSearchbarFilterChanged;
+        searchbar.OrderChanged -= OnSearchbarOrderValueChanged;
+        searchbar.AddButtonClicked -= OnAddButtonClicked;
     }
 }

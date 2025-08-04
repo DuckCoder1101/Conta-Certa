@@ -7,24 +7,26 @@ namespace Conta_Certa.Forms;
 
 public partial class ManageCobranca : Form
 {
-    public Cobranca? Cobranca { get; } = null;
+    public Cobranca? Cobranca { get; private set; } = null;
+
+    private ClienteResumoDTO[] clientes = [];
+
+    private System.Windows.Forms.Timer? debounceTimer;
 
     public ManageCobranca(Cobranca? cobranca = null)
     {
         InitializeComponent();
-
-        // Carrega os status
-        statusCb.DataSource = Enum.GetNames<CobrancaStatus>();
-        statusCb.SelectedIndex = 0;
+        LoadData();
 
         // Carrega a cobrança
         if (cobranca != null)
         {
             cadastrarBtn.Text = "ALTERAR";
 
-            Cobranca = cobranca;
+            var cliente = clientes.First(c => c.IdCliente == cobranca.Cliente.IdCliente);
+            clientesCb.SelectedItem = cliente;
 
-            idClienteNb.Value = cobranca.Cliente.Id;
+            Cobranca = cobranca;
             honorarioNb.Value = (decimal)cobranca.Honorario;
             statusCb.SelectedIndex = (int)cobranca.Status;
             vencimentoTxt.Text = cobranca.Vencimento.ToString("dd/MM/yyyy");
@@ -38,7 +40,7 @@ public partial class ManageCobranca : Form
             foreach (var servicoCobranca in cobranca.Servicos)
             {
                 ServicoCobrancaControl control = new(
-                    servicoCobranca.Servico, 
+                    servicoCobranca.Servico,
                     servicoCobranca.Quantidade)
                 {
                     Dock = DockStyle.Top,
@@ -49,7 +51,60 @@ public partial class ManageCobranca : Form
             }
         }
 
-        // Carrega todos os servicos restantes
+        LoadServicos();
+    }
+
+    public ManageCobranca(CobrancaCadDTO cobrancaDTO)
+    {
+        InitializeComponent();
+        LoadData();
+
+        var cliente = clientes.First(c => c.IdCliente == cobrancaDTO.IdCliente);
+        clientesCb.SelectedItem = cliente;
+
+        if (cobrancaDTO.Honorario != null)
+        {
+            honorarioNb.Value = (decimal)cobrancaDTO.Honorario;
+            honorarioNb.ReadOnly = true;
+        }
+
+        if (cobrancaDTO.Status != null)
+        {
+            statusCb.SelectedIndex = (int)cobrancaDTO.Status;
+            statusCb.Enabled = false;
+        }
+
+        if (cobrancaDTO.Vencimento != null)
+        {
+            vencimentoTxt.Text = ((DateTime)cobrancaDTO.Vencimento!).ToString("dd/MM/yyyy");
+            vencimentoTxt.ReadOnly = true;
+        }
+
+        LoadServicos();
+    }
+
+    private void LoadData()
+    {
+        // Timer
+        debounceTimer = new()
+        {
+            Interval = 200
+        };
+
+        debounceTimer.Tick += DebounceTimer_Tick;
+
+        // Carrega o status
+        statusCb.DataSource = Enum.GetNames<CobrancaStatus>();
+        statusCb.SelectedIndex = 0;
+
+        // Carrega a lista de clientes
+        clientes = [.. ClienteDAO.SelectAllClientesResumos()];
+        clientesCb.Items.AddRange(clientes);
+    }
+
+    private void LoadServicos()
+    {
+        // Carrega todos os servicos
         foreach (var servico in ServicoDAO.SelectAllServicos())
         {
             bool exists = servicosPanel.Controls
@@ -69,16 +124,17 @@ public partial class ManageCobranca : Form
         }
     }
 
-    private void StatusCb_SelectedIndexChanged_1(object sender, EventArgs e)
+    private void StatusCb_SelectedIndexChanged(object sender, EventArgs e)
     {
-        CobrancaStatus status = Enum.Parse<CobrancaStatus>(statusCb.Text);
+        var status = Enum.Parse<CobrancaStatus>(statusCb.Text);
         pagoEmTxt.ReadOnly = !(status == CobrancaStatus.Paga);
     }
 
     private void CadastrarBtn_Click(object sender, EventArgs e)
     {
-        // Vefica os campos obrigatorios
-        if (idClienteNb.Value == 0 ||
+        // Verifica os campos obrigatórios
+        if (
+            clientesCb.SelectedItem is not ClienteResumoDTO clienteResumoDTO ||
             honorarioNb.Value == 0 ||
             !vencimentoTxt.MaskCompleted)
         {
@@ -91,10 +147,9 @@ public partial class ManageCobranca : Form
             return;
         }
 
-        int idCliente = (int)idClienteNb.Value;
-        float honorario = (float)honorarioNb.Value;
-        CobrancaStatus status = Enum.Parse<CobrancaStatus>(statusCb.Text);
-        DateTime vencimento = DateTime.Parse(vencimentoTxt.Text);
+        var honorario = (float)honorarioNb.Value;
+        var status = Enum.Parse<CobrancaStatus>(statusCb.Text);
+        var vencimento = DateTime.Parse(vencimentoTxt.Text.Trim());
         DateTime? pagoEm = null;
 
         // Verifica o status
@@ -115,65 +170,117 @@ public partial class ManageCobranca : Form
             pagoEm = DateTime.Parse(vencimentoTxt.Text);
         }
 
+        long? idCobranca;
+
         if (Cobranca != null)
         {
-            Cobranca cobranca = new(
+            idCobranca = Cobranca.IdCobranca;
+
+            CobrancaDAO.UpdateCobranca(new(
                 Cobranca.IdCobranca,
                 Cobranca.Cliente,
                 honorario,
                 status,
                 vencimento,
-                pagoEm);
-
-            CobrancaDAO.UpdateCobranca(cobranca);
+                pagoEm));
         }
 
         else
         {
             CobrancaCadDTO cobranca = new(
-                idCliente,
+                clienteResumoDTO.IdCliente,
                 honorario,
                 status,
                 vencimento,
                 pagoEm);
 
-            CobrancaDAO.InsertCobrancas(cobranca);
+            idCobranca = CobrancaDAO.InsertCobrancas(cobranca)[0];
+        }
+
+        // Salva os serviços da cobrança
+        var controls = servicosPanel.Controls.OfType<ServicoCobrancaControl>();
+        var servicosCobrancaBase = Cobranca?.Servicos.ToDictionary(sc => sc.Servico.IdServico);
+
+        foreach (var servicoCobrancaControl in controls)
+        {
+            var servico = servicoCobrancaControl.Servico;
+            var quantidade = servicoCobrancaControl.Quantidade;
+
+            if (servicosCobrancaBase != null &&
+                servicosCobrancaBase.TryGetValue(servico.IdServico, out var sc))
+            {
+                if (sc.Quantidade != quantidade)
+                {
+                    if (quantidade > 0)
+                    {
+                        ServicoCobrancaDAO.UpdateServicoCobranca(new(
+                            sc.IdServicoCobranca,
+                            sc.IdCobranca,
+                            sc.Servico,
+                            quantidade));
+                    }
+
+                    else
+                    {
+                        ServicoCobrancaDAO.DeleteSerivocCobranca(sc);
+                    }
+                }
+            }
+
+            else if (quantidade > 0 && idCobranca != null)
+            {
+                ServicoCobrancaCadDTO servicoCobranca = new(
+                    servico,
+                    (long)idCobranca,
+                    quantidade);
+
+                ServicoCobrancaDAO.InsertServicosCobranca(servicoCobranca);
+            }
         }
 
         DialogResult = DialogResult.OK;
         Close();
     }
 
-    private void IdClienteNb_ValueChanged(object sender, EventArgs e)
+    private void ClientesCb_TextUpdate(object sender, EventArgs e)
     {
-        nomeClienteTxt.Text = "";
+        debounceTimer?.Stop();
+        debounceTimer?.Start();
+    }
 
-        if (idClienteNb.Value > 0)
+    private void DebounceTimer_Tick(object? sender, EventArgs e)
+    {
+        debounceTimer?.Stop();
+
+        string filter = clientesCb.Text;
+        string digits = new([.. filter.Where(char.IsDigit)]);
+
+        var filteredClientes = clientes
+            .Where(c =>
+                c.Nome.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
+                c.Documento.Contains(digits) ||
+                c.IdCliente.ToString().Contains(filter))
+            .ToArray();
+
+        clientesCb.BeginUpdate();
+        
+        if (!clientesCb.DroppedDown)
         {
-            var cliente = ClienteDAO.GetClienteByID((long)idClienteNb.Value);
-            if (cliente != null)
-            {
-                nomeClienteTxt.Text = cliente.Nome;
-                honorarioNb.Value = (decimal) cliente.Honorario;
-
-                DateTime vencimento = new(
-                    DateTime.Now.Year, 
-                    DateTime.Now.Month, 
-                    cliente.VencimentoHonorario);
-
-                vencimentoTxt.Text = vencimento.ToString("dd/MM/yyyy");
-            }
-
-            else
-            {
-                idClienteNb.Value = 0;
-
-                MessageBox.Show(
-                    "O ID digitado não corresponde a um cliente existente!",
-                    "Usuário não encontrado!",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
+            clientesCb.DroppedDown = false;
         }
+
+        clientesCb.Items.Clear();
+
+        if (filteredClientes.Length > 0)
+        {
+            clientesCb.Items.AddRange(filteredClientes);
+            
+            clientesCb.Text = filter;
+            clientesCb.SelectionStart = clientesCb.SelectionStart;
+            clientesCb.SelectionLength = 0;
+        }
+
+        clientesCb.DroppedDown = true;
+        clientesCb.EndUpdate();
     }
 }

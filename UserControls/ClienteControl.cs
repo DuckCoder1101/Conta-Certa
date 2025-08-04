@@ -17,6 +17,7 @@ public partial class ClienteControl : UserControl
 
             idTxt.Text = Cliente.IdCliente.ToString();
             nomeTxt.Text = Cliente.Nome;
+            documentoTxt.Text = Cliente.Documento;
             telefoneTxt.Text = Cliente.Telefone;
             emailTxt.Text = Cliente.Email;
             honorarioTxt.Text = Cliente.Honorario.ToString("C");

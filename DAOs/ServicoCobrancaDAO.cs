@@ -5,9 +5,9 @@ using Conta_Certa.Utils;
 
 namespace Conta_Certa.DAOs;
 
-public static class ServicosCobrancaDAO
+public static class ServicoCobrancaDAO
 {
-    public static List<long> InsertServicosCobranca(params ServicoCobrancaCadDTO[] servicos)
+    public static List<long?> InsertServicosCobranca(params ServicoCobrancaCadDTO[] servicos)
     {
         try
         {
@@ -17,25 +17,28 @@ public static class ServicosCobrancaDAO
             using var transaction = conn.BeginTransaction();
 
             string sql = @"INSERT INTO ServicosCobranca 
-                            (idCobranca, nome, valor, quantidade) 
-                           VALUES (@idCobranca, @nome, @valor, @quantidade);";
+                                (idCobranca, idServico, valor, quantidade) 
+                           VALUES (@idCobranca, @idServico, @valor, @quantidade)
+                           ON CONFLICT (idCobranca, idServico) DO UPDATE SET 
+                                valor = excluded.valor,
+                                quantidade = excluded.quantidade
+                           RETURNING idServicoCobranca;";
 
-            List<long> ids = [];
+            using var cmd = new SQLiteCommand(sql, conn, transaction);
+            List<long?> ids = [];
 
             foreach (var servico in servicos)
             {
-                using var cmd = new SQLiteCommand(sql, conn, transaction);
 
                 cmd.Parameters.AddWithValue("@idCobranca", servico.IdCobranca);
                 cmd.Parameters.AddWithValue("@idServico", servico.IdServico);
                 cmd.Parameters.AddWithValue("@valor", servico.Valor);
                 cmd.Parameters.AddWithValue("@quantidade", servico.Quantidade);
 
-                cmd.ExecuteNonQuery();
+                long idServicoCobranca = (long) cmd.ExecuteScalar();
+                ids.Add(idServicoCobranca);
 
-                using var getIdCmd = new SQLiteCommand("SELECT last_insert_rowid();", conn, transaction);
-                long id = (long)getIdCmd.ExecuteScalar();
-                ids.Add(id);
+                cmd.Parameters.Clear();
             }
 
             transaction.Commit();
@@ -59,12 +62,14 @@ public static class ServicosCobrancaDAO
             conn.Open();
 
             string sql = @"UPDATE ServicosCobranca 
-                           SET valor = @valor, quantidade = @quantidade";
+                           SET valor = @valor, quantidade = @quantidade 
+                           WHERE idServicoCobranca = @idServicoCobranca;";
 
             using var cmd = new SQLiteCommand(sql, conn);
 
             cmd.Parameters.AddWithValue("@valor", servicoCobranca.Servico.Valor);
             cmd.Parameters.AddWithValue("@quantidade", servicoCobranca.Quantidade);
+            cmd.Parameters.AddWithValue("@idServicoCobranca", servicoCobranca.IdServicoCobranca);
 
             cmd.ExecuteNonQuery();
             conn.Close();
@@ -83,7 +88,7 @@ public static class ServicosCobrancaDAO
             using var conn = new SQLiteConnection(Database.ConnStr);
             conn.Open();
 
-            string sql = @"DELETE FROM ServicosCobrancas 
+            string sql = @"DELETE FROM ServicosCobranca 
                        WHERE idServicoCobranca = @idServicoCobranca";
 
             using var cmd = new SQLiteCommand(sql, conn);

@@ -31,6 +31,7 @@
             tableLayoutPanel1 = new TableLayoutPanel();
             idTxt = new Label();
             nomeTxt = new Label();
+            documentoTxt = new Label();
             telefoneTxt = new Label();
             emailTxt = new Label();
             honorarioTxt = new Label();
@@ -40,26 +41,29 @@
             // 
             // tableLayoutPanel1
             // 
-            tableLayoutPanel1.ColumnCount = 6;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
+            tableLayoutPanel1.CellBorderStyle = TableLayoutPanelCellBorderStyle.Outset;
+            tableLayoutPanel1.ColumnCount = 7;
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.2857141F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.2857141F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.2857141F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.2857141F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.2857141F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.2857141F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.2857141F));
             tableLayoutPanel1.Controls.Add(idTxt, 0, 0);
             tableLayoutPanel1.Controls.Add(nomeTxt, 1, 0);
-            tableLayoutPanel1.Controls.Add(telefoneTxt, 2, 0);
-            tableLayoutPanel1.Controls.Add(emailTxt, 3, 0);
-            tableLayoutPanel1.Controls.Add(honorarioTxt, 4, 0);
-            tableLayoutPanel1.Controls.Add(vencimentoTxt, 5, 0);
+            tableLayoutPanel1.Controls.Add(documentoTxt, 2, 0);
+            tableLayoutPanel1.Controls.Add(telefoneTxt, 3, 0);
+            tableLayoutPanel1.Controls.Add(emailTxt, 4, 0);
+            tableLayoutPanel1.Controls.Add(honorarioTxt, 5, 0);
+            tableLayoutPanel1.Controls.Add(vencimentoTxt, 6, 0);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Margin = new Padding(0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(770, 45);
+            tableLayoutPanel1.Size = new Size(912, 47);
             tableLayoutPanel1.TabIndex = 0;
             tableLayoutPanel1.Click += ClienteUserControl_Click;
             // 
@@ -68,35 +72,48 @@
             idTxt.AutoSize = true;
             idTxt.Dock = DockStyle.Fill;
             idTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            idTxt.Location = new Point(3, 0);
+            idTxt.Location = new Point(5, 2);
             idTxt.Name = "idTxt";
-            idTxt.Size = new Size(122, 45);
+            idTxt.Size = new Size(122, 43);
             idTxt.TabIndex = 0;
             idTxt.Text = "ID";
             idTxt.TextAlign = ContentAlignment.MiddleCenter;
             idTxt.Click += ClienteUserControl_Click;
             // 
-            // clienteTxt
+            // nomeTxt
             // 
             nomeTxt.AutoSize = true;
             nomeTxt.Dock = DockStyle.Fill;
             nomeTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            nomeTxt.Location = new Point(131, 0);
+            nomeTxt.Location = new Point(135, 2);
             nomeTxt.Name = "nomeTxt";
-            nomeTxt.Size = new Size(122, 45);
+            nomeTxt.Size = new Size(122, 43);
             nomeTxt.TabIndex = 1;
             nomeTxt.Text = "NOME";
             nomeTxt.TextAlign = ContentAlignment.MiddleCenter;
             nomeTxt.Click += ClienteUserControl_Click;
+            // 
+            // documentoTxt
+            // 
+            documentoTxt.AutoSize = true;
+            documentoTxt.Dock = DockStyle.Fill;
+            documentoTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
+            documentoTxt.Location = new Point(265, 2);
+            documentoTxt.Name = "documentoTxt";
+            documentoTxt.Size = new Size(122, 43);
+            documentoTxt.TabIndex = 6;
+            documentoTxt.Text = "CPF/CPNJ";
+            documentoTxt.TextAlign = ContentAlignment.MiddleCenter;
+            documentoTxt.Click += ClienteUserControl_Click;
             // 
             // telefoneTxt
             // 
             telefoneTxt.AutoSize = true;
             telefoneTxt.Dock = DockStyle.Fill;
             telefoneTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            telefoneTxt.Location = new Point(259, 0);
+            telefoneTxt.Location = new Point(395, 2);
             telefoneTxt.Name = "telefoneTxt";
-            telefoneTxt.Size = new Size(122, 45);
+            telefoneTxt.Size = new Size(122, 43);
             telefoneTxt.TabIndex = 2;
             telefoneTxt.Text = "TELEFONE";
             telefoneTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -107,9 +124,9 @@
             emailTxt.AutoSize = true;
             emailTxt.Dock = DockStyle.Fill;
             emailTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            emailTxt.Location = new Point(387, 0);
+            emailTxt.Location = new Point(525, 2);
             emailTxt.Name = "emailTxt";
-            emailTxt.Size = new Size(122, 45);
+            emailTxt.Size = new Size(122, 43);
             emailTxt.TabIndex = 3;
             emailTxt.Text = "EMAIL";
             emailTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -120,9 +137,9 @@
             honorarioTxt.AutoSize = true;
             honorarioTxt.Dock = DockStyle.Fill;
             honorarioTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            honorarioTxt.Location = new Point(515, 0);
+            honorarioTxt.Location = new Point(655, 2);
             honorarioTxt.Name = "honorarioTxt";
-            honorarioTxt.Size = new Size(122, 45);
+            honorarioTxt.Size = new Size(122, 43);
             honorarioTxt.TabIndex = 4;
             honorarioTxt.Text = "HONORÁRIO";
             honorarioTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -133,9 +150,9 @@
             vencimentoTxt.AutoSize = true;
             vencimentoTxt.Dock = DockStyle.Fill;
             vencimentoTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            vencimentoTxt.Location = new Point(643, 0);
+            vencimentoTxt.Location = new Point(785, 2);
             vencimentoTxt.Name = "vencimentoTxt";
-            vencimentoTxt.Size = new Size(124, 45);
+            vencimentoTxt.Size = new Size(122, 43);
             vencimentoTxt.TabIndex = 5;
             vencimentoTxt.Text = "DIA VENCIMENTO";
             vencimentoTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -145,10 +162,9 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BorderStyle = BorderStyle.FixedSingle;
             Controls.Add(tableLayoutPanel1);
             Name = "ClienteControl";
-            Size = new Size(770, 45);
+            Size = new Size(912, 47);
             Click += ClienteUserControl_Click;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
@@ -164,5 +180,6 @@
         private Label emailTxt;
         private Label honorarioTxt;
         private Label vencimentoTxt;
+        private Label documentoTxt;
     }
 }

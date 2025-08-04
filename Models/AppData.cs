@@ -1,13 +1,12 @@
-﻿
-using Conta_Certa.DAOs;
+﻿using Conta_Certa.DAOs;
 
 namespace Conta_Certa.Models;
 
 public class AppData
 {
-    public List<Cliente> Clientes { get; }
-    public List<Cobranca> Cobrancas { get; }
-    public List<Servico> Servicos { get; }
+    public List<Cliente> Clientes { set; get; }
+    public List<Cobranca> Cobrancas { set; get; }
+    public List<Servico> Servicos { set; get; }
 
     public AppData()
     {

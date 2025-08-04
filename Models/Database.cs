@@ -5,7 +5,7 @@ namespace Conta_Certa.Models;
 
 public static class Database
 {
-    public static string ConnStr { get; } = "Data Source=ContaCerta.db;Version=3;";
+    public static string ConnStr { get; } = "Data Source=ContaCerta.db;Version=3;Foreign keys=true;";
 
     private static readonly bool isDev = false;
 
@@ -35,10 +35,11 @@ public static class Database
         using var conn = new SQLiteConnection(ConnStr);
         conn.Open();
 
-        string sql = @"DROP TABLE IF EXISTS Clientes; 
-                       DROP TABLE IF EXISTS Cobrancas; 
-                       DROP TABLE IF EXISTS Servicos; 
-                       DROP TABLE IF EXISTS ServicosCobranca;";
+        string sql = @"
+                       DROP TABLE IF EXISTS ServicosCobranca; 
+                       DROP TABLE IF EXISTS Servicos;
+                       DROP TABLE IF EXISTS Cobrancas;
+                       DROP TABLE IF EXISTS Clientes;";
 
         foreach (var line in sql.Split(";"))
         {
@@ -57,6 +58,7 @@ public static class Database
         string sql = @"CREATE TABLE IF NOT EXISTS Clientes (
                             idCliente INTEGER PRIMARY KEY AUTOINCREMENT,
                             nome TEXT NOT NULL,
+                            documento TEXT UNIQUE NOT NULL,
                             telefone TEXT NOT NULL,
                             email TEXT,
                             honorario NUMERIC NOT NULL,
@@ -82,11 +84,18 @@ public static class Database
                             pagoEm TEXT, 
                                         
                             FOREIGN KEY (idCliente) REFERENCES Clientes(idCliente)
-                            ON DELETE CASCADE);";
+                            ON DELETE CASCADE 
+                            UNIQUE (idCliente, vencimento));";
 
         using var cmd = new SQLiteCommand(sql, conn);
-
         cmd.ExecuteNonQuery();
+
+        string indexSql = @"CREATE UNIQUE INDEX IF NOT EXISTS idx_cliente_vencimento 
+                            ON Cobrancas(idCliente, vencimento);";
+
+        cmd.CommandText = indexSql;
+        cmd.ExecuteNonQuery();
+
         conn.Close();
     }
 
@@ -119,11 +128,20 @@ public static class Database
                             quantidade INTEGER NOT NULL DEFAULT 0,
 
                             FOREIGN KEY (idCobranca) REFERENCES Cobrancas(idCobranca)
-                            ON DELETE CASCADE);";
+                            ON DELETE CASCADE 
+                            FOREIGN KEY (idServico) REFERENCES Servicos(idServico) 
+                            ON DELETE CASCADE
+                            UNIQUE (idCobranca, idServico));";
 
         using var cmd = new SQLiteCommand(sql, conn);
-
         cmd.ExecuteNonQuery();
+
+        string uniqueSql = @"CREATE UNIQUE INDEX IF NOT EXISTS idx_cobranca_servico
+                            ON ServicosCobranca(idCobranca, idServico);";
+
+        cmd.CommandText = uniqueSql;
+        cmd.ExecuteNonQuery();
+
         conn.Close();
     }
 }

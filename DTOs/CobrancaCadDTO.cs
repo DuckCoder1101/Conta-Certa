@@ -4,11 +4,16 @@ namespace Conta_Certa.DTOs;
 
 public record CobrancaCadDTO
 {
-    public long IdCliente { get; }
-    public float Honorario { get; }
-    public CobrancaStatus Status { get; }
-    public DateTime Vencimento { get; }
-    public DateTime? PagoEm { get; }
+    public long? IdCliente { get; set; }
+    public float? Honorario { get; set; }
+    public CobrancaStatus? Status { get; set; }
+    public DateTime? Vencimento { get; set; }
+    public DateTime? PagoEm { get; set; }
+
+    public CobrancaCadDTO()
+    {
+
+    }
 
     public CobrancaCadDTO(long idCliente, float honorario, CobrancaStatus status, DateTime vencimento, DateTime? pagoEm)
     {
@@ -17,5 +22,24 @@ public record CobrancaCadDTO
         Status = status;
         Vencimento = vencimento;
         PagoEm = pagoEm;
+    }
+
+    public CobrancaCadDTO(Cobranca cobranca, long idCliente)
+    {
+        IdCliente = idCliente;
+        Honorario = cobranca.Honorario;
+        Status = cobranca.Status;
+        Vencimento = cobranca.Vencimento;
+        PagoEm = cobranca.PagoEm;
+    }
+
+    public bool IsFull()
+    {
+        return (
+            IdCliente != null &&
+            Honorario != null &&
+            Status != null &&
+            Vencimento != null &&
+            (Status != CobrancaStatus.Paga || PagoEm != null));
     }
 }

@@ -7,7 +7,7 @@ namespace Conta_Certa.DAOs;
 
 public static class CobrancaDAO
 {
-    public static void InsertCobrancas(params CobrancaCadDTO[] cobrancas)
+    public static List<long?> InsertCobrancas(params CobrancaCadDTO[] cobrancas)
     {
         try
         {
@@ -17,34 +17,55 @@ public static class CobrancaDAO
             using var transaction = conn.BeginTransaction();
 
             string sql = @"INSERT INTO Cobrancas 
-                        (idCliente, honorario, status, vencimento, pagoEm)
-                       VALUES (@idCliente, @honorario, @status, @vencimento, @pagoEm);";
+                                (idCliente, honorario, status, vencimento, pagoEm)
+                           VALUES (@idCliente, @honorario, @status, @vencimento, @pagoEm) 
+                           ON CONFLICT (idCliente, vencimento) DO UPDATE SET 
+                                honorario = excluded.honorario, 
+                                status = excluded.status,
+                                pagoEm = excluded.pagoEm
+                           RETURNING idCobranca;";
+
+            using var cmd = new SQLiteCommand(sql, conn, transaction);
+            List<long?> ids = [];
 
             foreach (var cobranca in cobrancas)
             {
-                using var cmd = new SQLiteCommand(sql, conn, transaction);
+                if (cobranca.IsFull())
+                {
+                    cmd.Parameters.AddWithValue("@idCliente", cobranca.IdCliente);
+                    cmd.Parameters.AddWithValue("@honorario", cobranca.Honorario);
+                    cmd.Parameters.AddWithValue("@status", cobranca.Status.ToString());
 
-                cmd.Parameters.AddWithValue("@idCliente", cobranca.IdCliente);
-                cmd.Parameters.AddWithValue("@honorario", cobranca.Honorario);
-                cmd.Parameters.AddWithValue("@status", cobranca.Status.ToString());
+                    cmd.Parameters.AddWithValue("@vencimento",
+                        ((DateTime)cobranca.Vencimento!).ToString("dd/MM/yyyy"));
 
-                cmd.Parameters.AddWithValue("@vencimento", cobranca.Vencimento.ToString("dd/MM/yyyy"));
+                    cmd.Parameters.AddWithValue("@pagoEm",
+                        cobranca.PagoEm.HasValue
+                            ? ((DateTime)cobranca.PagoEm.Value!).ToString("dd/MM/yyyy")
+                            : DBNull.Value);
 
-                cmd.Parameters.AddWithValue("@pagoEm",
-                    cobranca.PagoEm.HasValue
-                        ? cobranca.PagoEm.Value.ToString("dd/MM/yyyy")
-                        : DBNull.Value);
+                    long idCobranca = (long)cmd.ExecuteScalar();
+                    ids.Add(idCobranca);
 
-                cmd.ExecuteNonQuery();
+                    cmd.Parameters.Clear();
+                }
+
+                else
+                {
+                    ids.Add(null);
+                }
             }
 
             transaction.Commit();
             conn.Close();
+
+            return ids;
         }
 
         catch (Exception ex)
         {
             Logger.LogException(ex);
+            return [];
         }
     }
 
@@ -119,7 +140,8 @@ public static class CobrancaDAO
                                 co.status, 
                                 co.vencimento, 
                                 co.pagoEm, 
-                                cli.nome, 
+                                cli.nome,
+                                cli.documento, 
                                 sc.idServicoCobranca, 
                                 sc.idServico, 
                                 sc.valor, 
@@ -137,7 +159,7 @@ public static class CobrancaDAO
 
             while (reader.Read())
             {
-                int idCobranca = reader.GetInt32(0);
+                long idCobranca = reader.GetInt64(0);
                 var cobranca = cobrancas.FirstOrDefault(c => c.IdCobranca == idCobranca);
 
                 // Verifica se a cobrança ja foi adicionada à lista
@@ -146,29 +168,30 @@ public static class CobrancaDAO
                     cobranca = new(
                         idCobranca, 
                         cliente: new(
-                            reader.GetInt32(1), 
-                            reader.GetString(6)), 
+                            reader.GetInt64(1), 
+                            reader.GetString(6),
+                            reader.GetString(7)), 
                         honorario: reader.GetFloat(2), 
                         status: Enum.Parse<CobrancaStatus>(reader.GetString(3)), 
                         vencimento: DateTime.Parse(reader.GetString(4)),
-                        pagoEm: reader.IsDBNull(4)
+                        pagoEm: reader.IsDBNull(5)
                             ? null
                             : DateTime.Parse(reader.GetString(5)));
 
                     cobrancas.Add(cobranca);
                 }
 
-                // Verifica a prenseça de serviços extras
-                if (!reader.IsDBNull(7))
+                // Verifica os serviços extras
+                if (!reader.IsDBNull(8))
                 {
                     cobranca.Servicos.Add(new(
-                        idServicoCobranca: reader.GetInt32(7), 
+                        idServicoCobranca: reader.GetInt64(8), 
                         idCobranca,
                         servico: new(
-                            reader.GetInt32(8),
-                            reader.GetString(11),
-                            reader.GetFloat(9)), 
-                        quantidade: reader.GetInt32(10)));
+                            reader.GetInt64(9),
+                            reader.GetString(12),
+                            reader.GetFloat(10)), 
+                        quantidade: reader.GetInt32(11)));
                 }
             }
 
@@ -196,6 +219,7 @@ public static class CobrancaDAO
                                 co.vencimento, 
                                 co.pagoEm, 
                                 cli.nome, 
+                                cli.documento, 
                                 sc.idServicoCobranca, 
                                 sc.idServico, 
                                 sc.valor, 
@@ -215,7 +239,7 @@ public static class CobrancaDAO
 
             while (reader.Read())
             {
-                int idCobranca = reader.GetInt32(0);
+                long idCobranca = reader.GetInt64(0);
                 var cobranca = cobrancas.FirstOrDefault(c => c.IdCobranca == idCobranca);
 
                 // Verifica se a cobrança ja foi adicionada à lista
@@ -223,7 +247,10 @@ public static class CobrancaDAO
                 {   
                     cobranca = new(
                         idCobranca,
-                        cliente: new(reader.GetInt32(1), reader.GetString(5)),
+                        cliente: new(
+                            reader.GetInt64(1), 
+                            reader.GetString(5),
+                            reader.GetString(6)),
                         honorario: reader.GetFloat(2),
                         status,
                         vencimento: DateTime.Parse(reader.GetString(3)),
@@ -235,16 +262,16 @@ public static class CobrancaDAO
                 }
 
                 // Verifica a presença de serviços extras
-                if (!reader.IsDBNull(6))
+                if (!reader.IsDBNull(7))
                 {
                     cobranca.Servicos.Add(new(
-                        idServicoCobranca: reader.GetInt32(6), 
+                        idServicoCobranca: reader.GetInt64(7), 
                         idCobranca, 
                         servico: new(
-                            reader.GetInt32(7), 
-                            reader.GetString(10), 
-                            reader.GetFloat(8)), 
-                        quantidade: reader.GetInt32(9)));
+                            reader.GetInt64(8), 
+                            reader.GetString(11), 
+                            reader.GetFloat(9)), 
+                        quantidade: reader.GetInt32(10)));
                 }
             }
 

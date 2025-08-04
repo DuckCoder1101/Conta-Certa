@@ -1,4 +1,5 @@
-﻿using Conta_Certa.Models;
+﻿using Conta_Certa.Forms;
+using Conta_Certa.Models;
 
 namespace Conta_Certa.UserControls;
 
@@ -24,7 +25,11 @@ public partial class ServicoControl : UserControl
     {
         if (e.Button == MouseButtons.Right)
         {
-
+            ServicosList? form = (ServicosList?) FindForm();
+            if (form != null)
+            {
+                form.OpenContextMenu(this);
+            }
         }
     }
 }
