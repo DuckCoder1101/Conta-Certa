@@ -1,14 +1,15 @@
 ﻿using Conta_Certa.DTOs;
 using Conta_Certa.Models;
 using Conta_Certa.UserControls;
+
 namespace Conta_Certa.Forms;
 
-public partial class ExcelColumnAssistant : Form
+public partial class ColumnAssistant : Form
 {
-    public ClienteExcelImportDTO ClienteModel { get; private set; } = new();
-    public CobrancaExcelImportDTO CobrancaModel { get; private set; } = new();
+    public ClienteColumns ClienteModel { get; private set; } = new();
+    public CobrancaColumns CobrancaModel { get; private set; } = new();
 
-    public ExcelColumnAssistant()
+    public ColumnAssistant()
     {
         InitializeComponent();
 
@@ -27,6 +28,7 @@ public partial class ExcelColumnAssistant : Form
             };
 
             clientesPropsList.Controls.Add(control);
+            clientesPropsList.Controls.SetChildIndex(control, 0);
         }
     }
 
@@ -40,15 +42,16 @@ public partial class ExcelColumnAssistant : Form
             };
 
             cobrancasPropsList.Controls.Add(control);
+            cobrancasPropsList.Controls.SetChildIndex(control, 0);
         }
     }
 
     private void Import_Click(object sender, EventArgs e)
     {
-        ImportColumnMap[] clienteColumns = [
+        ColumnMap[] clienteColumns = [
             ..ClienteModel.GetColumns().Where(c => c.Import)];
 
-        ImportColumnMap[] cobrancaColumns = [
+        ColumnMap[] cobrancaColumns = [
             ..CobrancaModel.GetColumns().Where(c => c.Import)];
 
         if (clienteColumns.Length == 0 && cobrancaColumns.Length == 0)
@@ -74,7 +77,7 @@ public partial class ExcelColumnAssistant : Form
         else
         {
             // Checa se a importação de IDs está ativa
-            if (cobrancaColumns.Any(c => c.Import) && !CobrancaModel.IdCliente.Import)
+            if (cobrancaColumns.Any(c => c.Import) && !CobrancaModel.DocumentoCliente.Import)
             {
                 var importIdResult = MessageBox.Show(
                     "Recomendamos ativar a importação dos IDs para evitar ter que digita-los manualmente depois.\nContinuar mesmo assim?",
@@ -102,7 +105,7 @@ public partial class ExcelColumnAssistant : Form
     private void ExcelColumnAssistant_Shown(object sender, EventArgs e)
     {
         MessageBox.Show(
-            "1º Marque as colunas que serão importadas em cada tabela.\n2º Altere o índice numérico de cada informação de acordo com a sua tabela.\nImportante: a linha 1 é considerada cabeçalho e será automaticamente ignorada.",
+            "1º Marque as colunas que serão importadas em cada tabela.\n2º Altere o índice numérico de cada informação de acordo com a sua tabela.\nImportante: a linha 1 é considerada cabeçalho e será automaticamente ignorada. As tabelas clientes e cobranças sempre devem ser a 1 e a 2 tabelas do arquivo respectivamente, mesmo que somente uma das duas seja importada.",
             "Como importar?",
             MessageBoxButtons.OK,
             MessageBoxIcon.Information);

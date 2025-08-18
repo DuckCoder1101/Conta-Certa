@@ -7,11 +7,9 @@ namespace Conta_Certa.Forms;
 
 public partial class ManageCobranca : Form
 {
-    public Cobranca? Cobranca { get; private set; } = null;
-
-    private ClienteResumoDTO[] clientes = [];
-
-    private System.Windows.Forms.Timer? debounceTimer;
+    // cliente selecionado no dropdown
+    private Cliente? cliente = null;
+    private readonly Cobranca? cobranca = null;
 
     public ManageCobranca(Cobranca? cobranca = null)
     {
@@ -21,12 +19,12 @@ public partial class ManageCobranca : Form
         // Carrega a cobrança
         if (cobranca != null)
         {
+            this.cobranca = cobranca;
             cadastrarBtn.Text = "ALTERAR";
 
-            var cliente = clientes.First(c => c.IdCliente == cobranca.Cliente.IdCliente);
-            clientesCb.SelectedItem = cliente;
+            
+            searchbar.SelectCliente(cobranca.Cliente.Documento!);
 
-            Cobranca = cobranca;
             honorarioNb.Value = (decimal)cobranca.Honorario;
             statusCb.SelectedIndex = (int)cobranca.Status;
             vencimentoTxt.Text = cobranca.Vencimento.ToString("dd/MM/yyyy");
@@ -35,22 +33,9 @@ public partial class ManageCobranca : Form
             {
                 pagoEmTxt.Text = cobranca.PagoEm?.ToString("dd/MM/yyyy");
             }
-
-            // Carrega os servicos da cobranca
-            foreach (var servicoCobranca in cobranca.Servicos)
-            {
-                ServicoCobrancaControl control = new(
-                    servicoCobranca.Servico,
-                    servicoCobranca.Quantidade)
-                {
-                    Dock = DockStyle.Top,
-                };
-
-                servicosPanel.Controls.Add(control);
-                servicosPanel.Controls.SetChildIndex(control, 0);
-            }
         }
 
+        LoadServicosCobranca();
         LoadServicos();
     }
 
@@ -59,8 +44,10 @@ public partial class ManageCobranca : Form
         InitializeComponent();
         LoadData();
 
-        var cliente = clientes.First(c => c.IdCliente == cobrancaDTO.IdCliente);
-        clientesCb.SelectedItem = cliente;
+        if (cobrancaDTO.DocumentoCliente != null)
+        {
+            searchbar.SelectCliente(cobrancaDTO.DocumentoCliente!);
+        }
 
         if (cobrancaDTO.Honorario != null)
         {
@@ -83,23 +70,38 @@ public partial class ManageCobranca : Form
         LoadServicos();
     }
 
+    public void LoadServicosCobranca()
+    {
+        // Carrega os servicos da cobranca
+        foreach (var servicoCobranca in cobranca!.ServicosCobranca)
+        {
+            ServicoCobrancaControl control = new(
+                servicoCobranca.Servico,
+                servicoCobranca.Quantidade)
+            {
+                Dock = DockStyle.Top,
+            };
+
+            servicosPanel.Controls.Add(control);
+            servicosPanel.Controls.SetChildIndex(control, 0);
+        }
+    }
+
     private void LoadData()
     {
-        // Timer
-        debounceTimer = new()
+        searchbar.OnClienteChange += (novoCliente) =>
         {
-            Interval = 200
+            cliente = novoCliente;
+            
+            if (cliente != null)
+            {
+                honorarioNb.Value = (decimal)cliente.Honorario;
+            }
         };
-
-        debounceTimer.Tick += DebounceTimer_Tick;
 
         // Carrega o status
         statusCb.DataSource = Enum.GetNames<CobrancaStatus>();
         statusCb.SelectedIndex = 0;
-
-        // Carrega a lista de clientes
-        clientes = [.. ClienteDAO.SelectAllClientesResumos()];
-        clientesCb.Items.AddRange(clientes);
     }
 
     private void LoadServicos()
@@ -130,76 +132,11 @@ public partial class ManageCobranca : Form
         pagoEmTxt.ReadOnly = !(status == CobrancaStatus.Paga);
     }
 
-    private void CadastrarBtn_Click(object sender, EventArgs e)
+    private void InsertServicos(long idCobranca)
     {
-        // Verifica os campos obrigatórios
-        if (
-            clientesCb.SelectedItem is not ClienteResumoDTO clienteResumoDTO ||
-            honorarioNb.Value == 0 ||
-            !vencimentoTxt.MaskCompleted)
-        {
-            MessageBox.Show(
-                "Os campos marcados com * são obrigatórios!",
-                "Faltam informações!",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Warning);
-
-            return;
-        }
-
-        var honorario = (float)honorarioNb.Value;
-        var status = Enum.Parse<CobrancaStatus>(statusCb.Text);
-        var vencimento = DateTime.Parse(vencimentoTxt.Text.Trim());
-        DateTime? pagoEm = null;
-
-        // Verifica o status
-        if (status == CobrancaStatus.Paga)
-        {
-            // Verifica o campo de data de pagamento
-            if (!pagoEmTxt.MaskCompleted)
-            {
-                MessageBox.Show(
-                    "Quando o status é definido para Paga, é necessária informar uma data de pagamento!",
-                    "Faltam informações!",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-
-                return;
-            }
-
-            pagoEm = DateTime.Parse(vencimentoTxt.Text);
-        }
-
-        long? idCobranca;
-
-        if (Cobranca != null)
-        {
-            idCobranca = Cobranca.IdCobranca;
-
-            CobrancaDAO.UpdateCobranca(new(
-                Cobranca.IdCobranca,
-                Cobranca.Cliente,
-                honorario,
-                status,
-                vencimento,
-                pagoEm));
-        }
-
-        else
-        {
-            CobrancaCadDTO cobranca = new(
-                clienteResumoDTO.IdCliente,
-                honorario,
-                status,
-                vencimento,
-                pagoEm);
-
-            idCobranca = CobrancaDAO.InsertCobrancas(cobranca)[0];
-        }
-
         // Salva os serviços da cobrança
         var controls = servicosPanel.Controls.OfType<ServicoCobrancaControl>();
-        var servicosCobrancaBase = Cobranca?.Servicos.ToDictionary(sc => sc.Servico.IdServico);
+        var servicosCobrancaBase = cobranca?.ServicosCobranca.ToDictionary(sc => sc.Servico.IdServico);
 
         foreach (var servicoCobrancaControl in controls)
         {
@@ -227,7 +164,7 @@ public partial class ManageCobranca : Form
                 }
             }
 
-            else if (quantidade > 0 && idCobranca != null)
+            else if (quantidade > 0)
             {
                 ServicoCobrancaCadDTO servicoCobranca = new(
                     servico,
@@ -237,50 +174,98 @@ public partial class ManageCobranca : Form
                 ServicoCobrancaDAO.InsertServicosCobranca(servicoCobranca);
             }
         }
+    }
+
+    private void CadastrarBtn_Click(object sender, EventArgs e)
+    {
+        // Verifica os campos obrigatórios
+        if (cliente == null || honorarioNb.Value == 0 || !vencimentoTxt.MaskCompleted)
+        {
+            MessageBox.Show(
+                "Os campos marcados com * são obrigatórios!",
+                "Faltam informações!",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+
+            return;
+        }
+
+        var honorario = (float)honorarioNb.Value;
+        var status = Enum.Parse<CobrancaStatus>(statusCb.Text);
+        DateTime vencimento;
+        DateTime? pagoEm = null;
+
+        // Verifica o status e a data de pagamento
+        if (status == CobrancaStatus.Paga && !pagoEmTxt.MaskCompleted)
+        { 
+            MessageBox.Show(
+                "Quando o status é definido para 'Paga', é necessária informar uma data de pagamento!",
+                "Faltam informações!",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+
+            return;
+        }
+
+        // Verifica d data de vencimento.
+        if (!DateTime.TryParse(vencimentoTxt.Text, out vencimento))
+        {
+            MessageBox.Show(
+                "A data de vencimento é inválida!",
+                "Data de vencimento inválida!",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+
+            return;
+        }
+
+        // Verifica a data de pagamento
+        if (status == CobrancaStatus.Paga)
+        {
+            if (!DateTime.TryParse(pagoEmTxt.Text, out DateTime pagoEmResult))
+            {
+                MessageBox.Show(
+                    "A data de pagamento é inválida!",
+                    "Data de pagamento inválida!",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                return;
+            }
+
+            pagoEm = pagoEmResult;
+        }
+
+        if (cobranca != null)
+        {
+            CobrancaDAO.UpdateCobranca(new(
+                cobranca.IdCobranca,
+                cobranca.Cliente,
+                honorario,
+                status,
+                vencimento,
+                pagoEm));
+
+            InsertServicos(cobranca.IdCobranca);
+        }
+
+        else
+        {
+            CobrancaCadDTO cobranca = new(
+                cliente.Documento,
+                honorario,
+                status,
+                vencimento,
+                pagoEm);
+
+            var ids = CobrancaDAO.InsertCobrancas(cobranca);
+            if (ids.Count > 0 && ids[0] != null)
+            {
+                InsertServicos((long) ids[0]!);
+            }
+        }
 
         DialogResult = DialogResult.OK;
         Close();
-    }
-
-    private void ClientesCb_TextUpdate(object sender, EventArgs e)
-    {
-        debounceTimer?.Stop();
-        debounceTimer?.Start();
-    }
-
-    private void DebounceTimer_Tick(object? sender, EventArgs e)
-    {
-        debounceTimer?.Stop();
-
-        string filter = clientesCb.Text;
-        string digits = new([.. filter.Where(char.IsDigit)]);
-
-        var filteredClientes = clientes
-            .Where(c =>
-                c.Nome.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
-                c.Documento.Contains(digits) ||
-                c.IdCliente.ToString().Contains(filter))
-            .ToArray();
-
-        clientesCb.BeginUpdate();
-        
-        if (!clientesCb.DroppedDown)
-        {
-            clientesCb.DroppedDown = false;
-        }
-
-        clientesCb.Items.Clear();
-
-        if (filteredClientes.Length > 0)
-        {
-            clientesCb.Items.AddRange(filteredClientes);
-            
-            clientesCb.Text = filter;
-            clientesCb.SelectionStart = clientesCb.SelectionStart;
-            clientesCb.SelectionLength = 0;
-        }
-
-        clientesCb.DroppedDown = true;
-        clientesCb.EndUpdate();
     }
 }

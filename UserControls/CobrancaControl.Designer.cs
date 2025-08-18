@@ -41,6 +41,7 @@
             // 
             // tableLayoutPanel1
             // 
+            tableLayoutPanel1.CellBorderStyle = TableLayoutPanelCellBorderStyle.Outset;
             tableLayoutPanel1.ColumnCount = 7;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.2857141F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.2857141F));
@@ -62,7 +63,7 @@
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(768, 43);
+            tableLayoutPanel1.Size = new Size(770, 45);
             tableLayoutPanel1.TabIndex = 1;
             // 
             // idTxt
@@ -70,9 +71,9 @@
             idTxt.AutoSize = true;
             idTxt.Dock = DockStyle.Fill;
             idTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            idTxt.Location = new Point(3, 0);
+            idTxt.Location = new Point(5, 2);
             idTxt.Name = "idTxt";
-            idTxt.Size = new Size(103, 43);
+            idTxt.Size = new Size(101, 41);
             idTxt.TabIndex = 0;
             idTxt.Text = "ID";
             idTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -82,9 +83,9 @@
             clienteTxt.AutoSize = true;
             clienteTxt.Dock = DockStyle.Fill;
             clienteTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            clienteTxt.Location = new Point(112, 0);
+            clienteTxt.Location = new Point(114, 2);
             clienteTxt.Name = "clienteTxt";
-            clienteTxt.Size = new Size(103, 43);
+            clienteTxt.Size = new Size(101, 41);
             clienteTxt.TabIndex = 1;
             clienteTxt.Text = "CLIENTE";
             clienteTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -95,9 +96,9 @@
             honorarioBaseTxt.AutoSize = true;
             honorarioBaseTxt.Dock = DockStyle.Fill;
             honorarioBaseTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            honorarioBaseTxt.Location = new Point(221, 0);
+            honorarioBaseTxt.Location = new Point(223, 2);
             honorarioBaseTxt.Name = "honorarioBaseTxt";
-            honorarioBaseTxt.Size = new Size(103, 43);
+            honorarioBaseTxt.Size = new Size(101, 41);
             honorarioBaseTxt.TabIndex = 2;
             honorarioBaseTxt.Text = "HONORÁRIO (BASE)";
             honorarioBaseTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -108,9 +109,9 @@
             statusTxt.AutoSize = true;
             statusTxt.Dock = DockStyle.Fill;
             statusTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            statusTxt.Location = new Point(330, 0);
+            statusTxt.Location = new Point(332, 2);
             statusTxt.Name = "statusTxt";
-            statusTxt.Size = new Size(103, 43);
+            statusTxt.Size = new Size(101, 41);
             statusTxt.TabIndex = 3;
             statusTxt.Text = "STATUS";
             statusTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -121,9 +122,9 @@
             vencimentoTxt.AutoSize = true;
             vencimentoTxt.Dock = DockStyle.Fill;
             vencimentoTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            vencimentoTxt.Location = new Point(439, 0);
+            vencimentoTxt.Location = new Point(441, 2);
             vencimentoTxt.Name = "vencimentoTxt";
-            vencimentoTxt.Size = new Size(103, 43);
+            vencimentoTxt.Size = new Size(101, 41);
             vencimentoTxt.TabIndex = 4;
             vencimentoTxt.Text = "VENCIMENTO";
             vencimentoTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -134,9 +135,9 @@
             pagoEmTxt.AutoSize = true;
             pagoEmTxt.Dock = DockStyle.Fill;
             pagoEmTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            pagoEmTxt.Location = new Point(548, 0);
+            pagoEmTxt.Location = new Point(550, 2);
             pagoEmTxt.Name = "pagoEmTxt";
-            pagoEmTxt.Size = new Size(103, 43);
+            pagoEmTxt.Size = new Size(101, 41);
             pagoEmTxt.TabIndex = 5;
             pagoEmTxt.Text = "PAGO EM";
             pagoEmTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -147,9 +148,9 @@
             honorarioTotalTxt.AutoSize = true;
             honorarioTotalTxt.Dock = DockStyle.Fill;
             honorarioTotalTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            honorarioTotalTxt.Location = new Point(657, 0);
+            honorarioTotalTxt.Location = new Point(659, 2);
             honorarioTotalTxt.Name = "honorarioTotalTxt";
-            honorarioTotalTxt.Size = new Size(108, 43);
+            honorarioTotalTxt.Size = new Size(106, 41);
             honorarioTotalTxt.TabIndex = 6;
             honorarioTotalTxt.Text = "HONORÁRIO (TOTAL)";
             honorarioTotalTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -159,10 +160,9 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BorderStyle = BorderStyle.FixedSingle;
             Controls.Add(tableLayoutPanel1);
             Name = "CobrancaControl";
-            Size = new Size(768, 43);
+            Size = new Size(770, 45);
             MouseClick += CobrancaControl_MouseClick;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();

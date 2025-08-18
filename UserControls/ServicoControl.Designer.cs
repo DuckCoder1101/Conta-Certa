@@ -37,6 +37,7 @@
             // 
             // tableLayoutPanel1
             // 
+            tableLayoutPanel1.CellBorderStyle = TableLayoutPanelCellBorderStyle.Outset;
             tableLayoutPanel1.ColumnCount = 3;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
@@ -53,7 +54,7 @@
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(768, 43);
+            tableLayoutPanel1.Size = new Size(770, 45);
             tableLayoutPanel1.TabIndex = 1;
             // 
             // idTxt
@@ -61,9 +62,9 @@
             idTxt.AutoSize = true;
             idTxt.Dock = DockStyle.Fill;
             idTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            idTxt.Location = new Point(3, 0);
+            idTxt.Location = new Point(5, 2);
             idTxt.Name = "idTxt";
-            idTxt.Size = new Size(250, 43);
+            idTxt.Size = new Size(248, 41);
             idTxt.TabIndex = 0;
             idTxt.Text = "ID";
             idTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -74,9 +75,9 @@
             nomeTxt.AutoSize = true;
             nomeTxt.Dock = DockStyle.Fill;
             nomeTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            nomeTxt.Location = new Point(259, 0);
+            nomeTxt.Location = new Point(261, 2);
             nomeTxt.Name = "nomeTxt";
-            nomeTxt.Size = new Size(250, 43);
+            nomeTxt.Size = new Size(248, 41);
             nomeTxt.TabIndex = 1;
             nomeTxt.Text = "NOME";
             nomeTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -87,9 +88,9 @@
             valorTxt.AutoSize = true;
             valorTxt.Dock = DockStyle.Fill;
             valorTxt.Font = new Font("Arial", 10F, FontStyle.Bold);
-            valorTxt.Location = new Point(515, 0);
+            valorTxt.Location = new Point(517, 2);
             valorTxt.Name = "valorTxt";
-            valorTxt.Size = new Size(250, 43);
+            valorTxt.Size = new Size(248, 41);
             valorTxt.TabIndex = 2;
             valorTxt.Text = "VALOR";
             valorTxt.TextAlign = ContentAlignment.MiddleCenter;
@@ -99,10 +100,9 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BorderStyle = BorderStyle.FixedSingle;
             Controls.Add(tableLayoutPanel1);
             Name = "ServicoControl";
-            Size = new Size(768, 43);
+            Size = new Size(770, 45);
             MouseClick += ServicoControl_MouseClick;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();

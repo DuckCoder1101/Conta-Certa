@@ -22,14 +22,7 @@ public partial class CobrancaControl : UserControl
             statusTxt.Text = Cobranca.Status.ToString();
             vencimentoTxt.Text = Cobranca.Vencimento.ToString("dd/MM/yy");
             pagoEmTxt.Text = Cobranca.PagoEm?.ToString("dd/MM/yyyy") ?? "-";
-
-            float honorarioTotal = Cobranca.Honorario;
-            foreach (var servicoCobranca in Cobranca.Servicos)
-            {
-                honorarioTotal += servicoCobranca.Servico.Valor * servicoCobranca.Quantidade;
-            }
-
-            honorarioTotalTxt.Text = honorarioTotal.ToString("c");
+            honorarioTotalTxt.Text = Cobranca.HonorarioTotal.ToString("c");
         }
     }
 

@@ -58,12 +58,12 @@ public partial class CobrancasList : Form
     {
         if (statusFilter != null)
         {
-            cobrancas = CobrancaDAO.SelectCobrancasByStatus((CobrancaStatus)statusFilter);
+            cobrancas = CobrancaDAO.GetCobrancasByStatus((CobrancaStatus)statusFilter);
         }
 
         else
         {
-            cobrancas = CobrancaDAO.SelectAllCobrancas();
+            cobrancas = CobrancaDAO.GetAllCobrancas();
         }
 
         UpdateCobrancasPanel();

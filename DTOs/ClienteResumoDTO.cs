@@ -4,19 +4,19 @@ namespace Conta_Certa.DTOs;
 
 public record ClienteResumoDTO
 {
-    public long IdCliente { get; }
     public string Nome { get; }
     public string Documento { get; }
+    public string Telefone { get; }
 
-    public ClienteResumoDTO(long idCliente, string nome, string documento)
+    public ClienteResumoDTO(string documento, string nome, string telefone)
     {
+        Documento = documento;
         Nome = nome;
-        IdCliente = idCliente;
-        Documento = Cliente.FormatDocumento(documento);
+        Telefone = telefone;
     }
 
     public override string ToString()
     {
-        return $"{Nome} - {Documento} - ID: {IdCliente}";
+        return $"{Nome} - {Cliente.FormatDocumento(Documento)}";
     }
 }

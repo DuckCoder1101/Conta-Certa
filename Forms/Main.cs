@@ -1,3 +1,4 @@
+using Conta_Certa.DAOs;
 using Conta_Certa.Forms;
 using Conta_Certa.Models;
 using Conta_Certa.Utils;
@@ -9,8 +10,6 @@ namespace Conta_Certa
         public Main()
         {
             InitializeComponent();
-
-            Database.CreateDatabase();
         }
 
         private void CadastrarCliente_Click(object sender, EventArgs e)
@@ -77,6 +76,12 @@ namespace Conta_Certa
             form.ShowDialog();
         }
 
+        private void CobrancasPagas_Click(object sender, EventArgs e)
+        {
+            using CobrancasList form = new(CobrancaStatus.Paga);
+            form.ShowDialog();
+        }
+
         private void ListaServicos_Menu_Click(object sender, EventArgs e)
         {
             using ServicosList form = new();
@@ -87,6 +92,23 @@ namespace Conta_Certa
         {
             using ManageServico manageServico = new ManageServico();
             manageServico.ShowDialog();
+        }
+
+        private void GerarCobrancas_Click(object sender, EventArgs e)
+        {
+            // Agenda as cobranças
+            Task.Run(() => CobrancasScheduler.GenCobrancasDoMes());
+        }
+
+        private void GerarRelatorio(object sender, EventArgs e)
+        {
+            RelatorioManager.CreateRelatorio();
+        }
+
+        private void EnviarCobrancasPorWhastapp_Click(object sender, EventArgs e)
+        {
+            var cobrancas = CobrancaDAO.GetCobrancasByStatus(CobrancaStatus.Pendente);
+            Server.ConnectExtension([.. cobrancas]);
         }
     }
 }

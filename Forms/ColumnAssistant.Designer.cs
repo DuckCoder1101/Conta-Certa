@@ -1,6 +1,6 @@
 ﻿namespace Conta_Certa.Forms
 {
-    partial class ExcelColumnAssistant
+    partial class ColumnAssistant
     {
         /// <summary>
         /// Required designer variable.
@@ -30,12 +30,12 @@
         {
             tableLayoutPanel1 = new TableLayoutPanel();
             clientePanel = new TableLayoutPanel();
+            label4 = new Label();
             clientesPropsList = new Panel();
             cobrancaPanel = new TableLayoutPanel();
             cobrancasPropsList = new Panel();
             label1 = new Label();
             importarBtn = new Button();
-            label4 = new Label();
             tableLayoutPanel1.SuspendLayout();
             clientePanel.SuspendLayout();
             cobrancaPanel.SuspendLayout();
@@ -74,8 +74,22 @@
             clientePanel.Size = new Size(394, 406);
             clientePanel.TabIndex = 4;
             // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Dock = DockStyle.Top;
+            label4.Font = new Font("Arial", 12F, FontStyle.Bold);
+            label4.Location = new Point(8, 8);
+            label4.Margin = new Padding(6);
+            label4.Name = "label4";
+            label4.Size = new Size(378, 19);
+            label4.TabIndex = 3;
+            label4.Text = "CLIENTES";
+            label4.TextAlign = ContentAlignment.MiddleCenter;
+            // 
             // clientesPropsList
             // 
+            clientesPropsList.AutoScroll = true;
             clientesPropsList.Dock = DockStyle.Fill;
             clientesPropsList.Location = new Point(5, 38);
             clientesPropsList.Name = "clientesPropsList";
@@ -100,6 +114,7 @@
             // 
             // cobrancasPropsList
             // 
+            cobrancasPropsList.AutoScroll = true;
             cobrancasPropsList.Dock = DockStyle.Fill;
             cobrancasPropsList.Location = new Point(5, 38);
             cobrancasPropsList.Name = "cobrancasPropsList";
@@ -135,19 +150,6 @@
             importarBtn.Text = "IMPORTAR";
             importarBtn.UseVisualStyleBackColor = false;
             importarBtn.Click += Import_Click;
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Dock = DockStyle.Top;
-            label4.Font = new Font("Arial", 12F, FontStyle.Bold);
-            label4.Location = new Point(8, 8);
-            label4.Margin = new Padding(6);
-            label4.Name = "label4";
-            label4.Size = new Size(378, 19);
-            label4.TabIndex = 3;
-            label4.Text = "CLIENTES";
-            label4.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // ExcelColumnAssistant
             // 

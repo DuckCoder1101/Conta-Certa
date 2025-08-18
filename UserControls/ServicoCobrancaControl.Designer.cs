@@ -38,6 +38,7 @@
             // 
             // tableLayoutPanel1
             // 
+            tableLayoutPanel1.CellBorderStyle = TableLayoutPanelCellBorderStyle.Outset;
             tableLayoutPanel1.ColumnCount = 3;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
@@ -59,9 +60,9 @@
             nomeServicoTxt.AutoSize = true;
             nomeServicoTxt.Dock = DockStyle.Fill;
             nomeServicoTxt.Font = new Font("Arial", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            nomeServicoTxt.Location = new Point(3, 0);
+            nomeServicoTxt.Location = new Point(5, 2);
             nomeServicoTxt.Name = "nomeServicoTxt";
-            nomeServicoTxt.Size = new Size(119, 27);
+            nomeServicoTxt.Size = new Size(115, 23);
             nomeServicoTxt.TabIndex = 0;
             nomeServicoTxt.Text = "label1";
             nomeServicoTxt.TextAlign = ContentAlignment.MiddleLeft;
@@ -72,9 +73,9 @@
             valorServicoTxt.Dock = DockStyle.Fill;
             valorServicoTxt.FlatStyle = FlatStyle.Flat;
             valorServicoTxt.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            valorServicoTxt.Location = new Point(128, 0);
+            valorServicoTxt.Location = new Point(128, 2);
             valorServicoTxt.Name = "valorServicoTxt";
-            valorServicoTxt.Size = new Size(69, 27);
+            valorServicoTxt.Size = new Size(66, 23);
             valorServicoTxt.TabIndex = 2;
             valorServicoTxt.Text = "label1";
             valorServicoTxt.TextAlign = ContentAlignment.MiddleLeft;
@@ -83,10 +84,10 @@
             // 
             quantidadeServicoNb.BorderStyle = BorderStyle.FixedSingle;
             quantidadeServicoNb.Dock = DockStyle.Fill;
-            quantidadeServicoNb.Location = new Point(200, 0);
+            quantidadeServicoNb.Location = new Point(199, 2);
             quantidadeServicoNb.Margin = new Padding(0);
             quantidadeServicoNb.Name = "quantidadeServicoNb";
-            quantidadeServicoNb.Size = new Size(50, 23);
+            quantidadeServicoNb.Size = new Size(49, 23);
             quantidadeServicoNb.TabIndex = 1;
             quantidadeServicoNb.ValueChanged += QuantidadeServicoNb_ValueChanged;
             // 

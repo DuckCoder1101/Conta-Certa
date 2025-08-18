@@ -4,9 +4,8 @@ namespace Conta_Certa.DTOs;
 
 public record ClienteCadDTO
 {
-    public string? Nome { get; set; }
-
     public string? Documento { get; set; }
+    public string? Nome { get; set; }
     public string? Telefone { get; set; }
     public string? Email { get; set; }
     public float? Honorario { get; set; }
@@ -17,7 +16,7 @@ public record ClienteCadDTO
 
     }
 
-    public ClienteCadDTO(string nome, string documento, string telefone, string? email, float honorario, int vencimentoHonorario)
+    public ClienteCadDTO(string documento, string nome, string telefone, string? email, float honorario, int vencimentoHonorario)
     {
         Nome = nome;
         Documento = documento;
@@ -40,8 +39,8 @@ public record ClienteCadDTO
     public bool IsFull()
     {
         return (
-            Nome != null && 
             Documento != null &&
+            Nome != null && 
             Telefone != null && 
             Honorario != null && 
             VencimentoHonorario != null

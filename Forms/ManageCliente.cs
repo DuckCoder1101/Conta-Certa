@@ -6,12 +6,12 @@ namespace Conta_Certa.Forms;
 
 public partial class ManageCliente : Form
 {
-    public Cliente? Cliente { get; private set; }
+    private readonly Cliente? cliente;
 
     public ManageCliente(Cliente? cliente = null)
     {
         InitializeComponent();
-        Cliente = cliente;
+        this.cliente = cliente;
 
         if (cliente != null)
         {
@@ -42,87 +42,86 @@ public partial class ManageCliente : Form
             if (!string.IsNullOrWhiteSpace(valor))
             {
                 controle.Text = valor;
-                controle.ReadOnly = true;
             }
         }
 
         if (!string.IsNullOrEmpty(clienteDTO.Telefone))
         {
             telefoneTxt.Text = clienteDTO.Telefone;
-            telefoneTxt.ReadOnly = true;
         }
 
-        if (clienteDTO.Honorario is float h)
+        if (clienteDTO.Honorario is float honorario)
         {
-            honorarioNumber.Value = (decimal)h;
-            honorarioNumber.Enabled = false;
+            honorarioNumber.Value = (decimal)honorario;
         }
 
-        if (clienteDTO.VencimentoHonorario is int v)
+        if (clienteDTO.VencimentoHonorario is int vencimento)
         {
-            vencimentoNumber.Value = v;
-            vencimentoNumber.Enabled = false;
+            vencimentoNumber.Value = vencimento;
         }
-
     }
 
     private void Cadastrar_Click(object sender, EventArgs e)
     {
         string nome = nomeTxt.Text.Trim();
         string documento = documentoTxt.Text.Trim();
-        string telefone = telefoneTxt.Text.Trim();
+        string telefone = new([.. telefoneTxt.Text.Where(char.IsDigit)]);
         string email = emailTxt.Text.Trim();
         float honorario = ((float)honorarioNumber.Value);
         int vencimentoHonorario = ((int)vencimentoNumber.Value);
 
-        // Verificações de valor
-        if (telefoneTxt.Mask.Length != telefone.Length || nome.Length == 0)
+        // Verificações de documento, telefone e nome
+        if (telefone.Length == 0 || nome.Length == 0)
         {
             MessageBox.Show(
                 "Os campos marcados com * são obrigatórios!",
                 "Faltam informações!",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
+
+            return;
+        }
+
+        // Verificação do documento
+        if (!Cliente.CheckDocumento(documento))
+        {
+            MessageBox.Show(
+                "O CPF/CNPJ escrito é inválido!\nCorrija e tente novamente.",
+                "Documento inválido!",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+
+            return;
+        }
+
+        if (cliente == null)
+        {
+            ClienteCadDTO cliente = new(documento, nome, telefone, email, honorario, vencimentoHonorario);
+            ClienteDAO.InsertClientes(cliente);
         }
 
         else
         {
-            if (Cliente == null)
-            {
-                ClienteCadDTO cliente =
-                    new(nome, documento, telefone, email, honorario, vencimentoHonorario);
+            ClienteDAO.UpdateCliente(new(
+                documento,
+                nome,
+                telefone,
+                email,
+                honorario,
+                vencimentoHonorario));
+        }
 
-                var ids = ClienteDAO.InsertClientes(cliente);
+        DialogResult = DialogResult.OK;
+        Close();
+    }
 
-                if (ids.Count != 0 && ids[0] != null)
-                {
-                    Cliente = new(
-                        (long)ids[0]!,
-                        documento,
-                        nome,
-                        telefone,
-                        email,
-                        honorario,
-                        vencimentoHonorario);
-                }
-            }
-
-            else
-            {
-                Cliente = new(
-                    Cliente.IdCliente,
-                    nome,
-                    documento,
-                    telefone,
-                    email,
-                    honorario,
-                    vencimentoHonorario);
-
-                ClienteDAO.UpdateCliente(Cliente);
-            }
-
-            DialogResult = DialogResult.OK;
-            Close();
+    private void DocumentoTxt_TextChanged(object sender, EventArgs e)
+    {
+        string digits = new([.. documentoTxt.Text.Where(char.IsDigit)]);
+        if (digits != documentoTxt.Text)
+        {
+            documentoTxt.Text = digits;
+            documentoTxt.SelectionStart = digits.Length;
         }
     }
 }

@@ -35,13 +35,13 @@ public partial class ClientesList : Form
                 return [.. clientes.OrderBy(c => c.Honorario)];
 
             default:
-                return [.. clientes.OrderBy(c => c.IdCliente)];
+                return [.. clientes.OrderBy(c => c.Documento)];
         }
     }
 
     private void UpdateClientesList()
     {
-        clientes = ClienteDAO.SelectAllClientes();
+        clientes = ClienteDAO.GetAllClientes();
         UpdateClientesPanel();
     }
 

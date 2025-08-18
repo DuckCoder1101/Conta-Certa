@@ -41,7 +41,7 @@
             pagoEmTxt = new MaskedTextBox();
             cadastrarBtn = new Button();
             servicosPanel = new Panel();
-            clientesCb = new ComboBox();
+            searchbar = new Conta_Certa.UserControls.ClientesSearchbar();
             tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)honorarioNb).BeginInit();
             SuspendLayout();
@@ -63,7 +63,7 @@
             tableLayoutPanel2.Controls.Add(pagoEmTxt, 1, 4);
             tableLayoutPanel2.Controls.Add(cadastrarBtn, 0, 6);
             tableLayoutPanel2.Controls.Add(servicosPanel, 1, 5);
-            tableLayoutPanel2.Controls.Add(clientesCb, 1, 0);
+            tableLayoutPanel2.Controls.Add(searchbar, 1, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(0, 0);
             tableLayoutPanel2.Margin = new Padding(4);
@@ -76,7 +76,7 @@
             tableLayoutPanel2.RowStyles.Add(new RowStyle());
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Size = new Size(572, 301);
+            tableLayoutPanel2.Size = new Size(572, 328);
             tableLayoutPanel2.TabIndex = 2;
             // 
             // label1
@@ -87,7 +87,7 @@
             label1.Location = new Point(8, 0);
             label1.Margin = new Padding(8, 0, 4, 0);
             label1.Name = "label1";
-            label1.Size = new Size(274, 38);
+            label1.Size = new Size(274, 36);
             label1.TabIndex = 20;
             label1.Text = "CLIENTE";
             label1.TextAlign = ContentAlignment.MiddleLeft;
@@ -97,7 +97,7 @@
             label7.AutoSize = true;
             label7.Dock = DockStyle.Fill;
             label7.Font = new Font("Arial", 12F);
-            label7.Location = new Point(8, 184);
+            label7.Location = new Point(8, 182);
             label7.Margin = new Padding(8, 0, 4, 0);
             label7.Name = "label7";
             label7.Size = new Size(274, 70);
@@ -110,7 +110,7 @@
             label3.AutoSize = true;
             label3.Dock = DockStyle.Fill;
             label3.Font = new Font("Arial", 12F);
-            label3.Location = new Point(8, 38);
+            label3.Location = new Point(8, 36);
             label3.Margin = new Padding(8, 0, 4, 0);
             label3.Name = "label3";
             label3.Size = new Size(274, 36);
@@ -123,7 +123,7 @@
             honorarioNb.DecimalPlaces = 2;
             honorarioNb.Dock = DockStyle.Fill;
             honorarioNb.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            honorarioNb.Location = new Point(290, 45);
+            honorarioNb.Location = new Point(290, 43);
             honorarioNb.Margin = new Padding(4, 7, 4, 7);
             honorarioNb.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
             honorarioNb.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
@@ -137,7 +137,7 @@
             label4.AutoSize = true;
             label4.Dock = DockStyle.Fill;
             label4.Font = new Font("Arial", 12F);
-            label4.Location = new Point(8, 74);
+            label4.Location = new Point(8, 72);
             label4.Margin = new Padding(8, 0, 4, 0);
             label4.Name = "label4";
             label4.Size = new Size(274, 38);
@@ -151,18 +151,19 @@
             statusCb.DropDownStyle = ComboBoxStyle.DropDownList;
             statusCb.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             statusCb.FormattingEnabled = true;
-            statusCb.Location = new Point(290, 81);
+            statusCb.Location = new Point(290, 79);
             statusCb.Margin = new Padding(4, 7, 4, 7);
             statusCb.Name = "statusCb";
             statusCb.Size = new Size(278, 24);
             statusCb.TabIndex = 13;
+            statusCb.SelectedValueChanged += StatusCb_SelectedIndexChanged;
             // 
             // label5
             // 
             label5.AutoSize = true;
             label5.Dock = DockStyle.Fill;
             label5.Font = new Font("Arial", 12F);
-            label5.Location = new Point(8, 112);
+            label5.Location = new Point(8, 110);
             label5.Margin = new Padding(8, 0, 4, 0);
             label5.Name = "label5";
             label5.Size = new Size(274, 36);
@@ -175,7 +176,7 @@
             vencimentoTxt.BorderStyle = BorderStyle.FixedSingle;
             vencimentoTxt.Dock = DockStyle.Fill;
             vencimentoTxt.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            vencimentoTxt.Location = new Point(290, 119);
+            vencimentoTxt.Location = new Point(290, 117);
             vencimentoTxt.Margin = new Padding(4, 7, 4, 7);
             vencimentoTxt.Mask = "00/00/0000";
             vencimentoTxt.Name = "vencimentoTxt";
@@ -188,7 +189,7 @@
             label6.AutoSize = true;
             label6.Dock = DockStyle.Fill;
             label6.Font = new Font("Arial", 12F);
-            label6.Location = new Point(8, 148);
+            label6.Location = new Point(8, 146);
             label6.Margin = new Padding(8, 0, 4, 0);
             label6.Name = "label6";
             label6.Size = new Size(274, 36);
@@ -202,7 +203,7 @@
             pagoEmTxt.BorderStyle = BorderStyle.FixedSingle;
             pagoEmTxt.Dock = DockStyle.Fill;
             pagoEmTxt.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            pagoEmTxt.Location = new Point(290, 155);
+            pagoEmTxt.Location = new Point(290, 153);
             pagoEmTxt.Margin = new Padding(4, 7, 4, 7);
             pagoEmTxt.Mask = "00/00/0000";
             pagoEmTxt.Name = "pagoEmTxt";
@@ -219,40 +220,38 @@
             cadastrarBtn.Cursor = Cursors.Hand;
             cadastrarBtn.FlatStyle = FlatStyle.Flat;
             cadastrarBtn.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            cadastrarBtn.Location = new Point(196, 257);
+            cadastrarBtn.Location = new Point(196, 273);
             cadastrarBtn.Name = "cadastrarBtn";
-            cadastrarBtn.Size = new Size(180, 40);
+            cadastrarBtn.Size = new Size(180, 33);
             cadastrarBtn.TabIndex = 10;
             cadastrarBtn.Text = "CADASTRAR";
             cadastrarBtn.UseVisualStyleBackColor = false;
+            cadastrarBtn.Click += CadastrarBtn_Click;
             // 
             // servicosPanel
             // 
             servicosPanel.AutoScroll = true;
             servicosPanel.BorderStyle = BorderStyle.FixedSingle;
             servicosPanel.Dock = DockStyle.Fill;
-            servicosPanel.Location = new Point(289, 187);
+            servicosPanel.Location = new Point(289, 185);
             servicosPanel.Name = "servicosPanel";
             servicosPanel.Size = new Size(280, 64);
             servicosPanel.TabIndex = 19;
             // 
-            // clientesCb
+            // searchbar
             // 
-            clientesCb.Dock = DockStyle.Fill;
-            clientesCb.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            clientesCb.FormattingEnabled = true;
-            clientesCb.Location = new Point(290, 7);
-            clientesCb.Margin = new Padding(4, 7, 4, 7);
-            clientesCb.Name = "clientesCb";
-            clientesCb.Size = new Size(278, 24);
-            clientesCb.TabIndex = 21;
-            clientesCb.TextUpdate += ClientesCb_TextUpdate;
+            searchbar.Dock = DockStyle.Fill;
+            searchbar.Location = new Point(286, 0);
+            searchbar.Margin = new Padding(0);
+            searchbar.Name = "searchbar";
+            searchbar.Size = new Size(286, 36);
+            searchbar.TabIndex = 21;
             // 
             // ManageCobranca
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(572, 301);
+            ClientSize = new Size(572, 328);
             Controls.Add(tableLayoutPanel2);
             MaximizeBox = false;
             MdiChildrenMinimizedAnchorBottom = false;
@@ -280,6 +279,6 @@
         private MaskedTextBox pagoEmTxt;
         private Button cadastrarBtn;
         private Panel servicosPanel;
-        private ComboBox clientesCb;
+        private UserControls.ClientesSearchbar searchbar;
     }
 }

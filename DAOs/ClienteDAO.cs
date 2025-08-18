@@ -1,13 +1,14 @@
-﻿ using System.Data.SQLite;
+﻿using Conta_Certa.DTOs;
 using Conta_Certa.Models;
-using Conta_Certa.DTOs;
 using Conta_Certa.Utils;
+using System.Data.SQLite;
+using System.Diagnostics;
 
 namespace Conta_Certa.DAOs;
 
 public static class ClienteDAO
 {
-    public static List<long?> InsertClientes(params ClienteCadDTO[] clientes)
+    public static void InsertClientes(params ClienteCadDTO[] dtos)
     {
         try
         {
@@ -17,58 +18,44 @@ public static class ClienteDAO
             using var transaction = conn.BeginTransaction();
 
             string sql = @"INSERT INTO Clientes 
-                    (nome, documento, telefone, email, honorario, vencimentoHonorario) 
+                    (documento, nome, telefone, email, honorario, vencimentoHonorario) 
                 VALUES 
-                    (@nome, @documento, @telefone, @email, @honorario, @vencimentoHonorario)
+                    (@documento, @nome, @telefone, @email, @honorario, @vencimentoHonorario)
                 ON CONFLICT(documento) DO UPDATE SET
                     nome = excluded.nome,
-                    documento = excluded.documento, 
                     telefone = excluded.telefone,
                     honorario = excluded.honorario,
-                    vencimentoHonorario = excluded.vencimentoHonorario
-                RETURNING idCliente;";
+                    vencimentoHonorario = excluded.vencimentoHonorario;";
 
             using var cmd = new SQLiteCommand(sql, conn, transaction);
-            List<long?> ids = [];
 
-            foreach (var cliente in clientes)
+            foreach (var clienteDTO in dtos)
             {
-                if (cliente.IsFull())
+                if (clienteDTO.IsFull())
                 {
-                    cmd.Parameters.AddWithValue("@nome", cliente.Nome);
-
                     cmd.Parameters.AddWithValue("@documento",
-                        new string([.. cliente.Documento!.Where(char.IsDigit)]));
+                        new string([.. clienteDTO.Documento!.Where(char.IsDigit)]));
 
+                    cmd.Parameters.AddWithValue("@nome", clienteDTO.Nome);
                     cmd.Parameters.AddWithValue("@telefone",
-                        new string([.. cliente.Telefone!.Where(char.IsDigit)]));
+                        new string([.. clienteDTO.Telefone!.Where(char.IsDigit)]));
 
-                    cmd.Parameters.AddWithValue("@email", cliente.Email);
-                    cmd.Parameters.AddWithValue("@honorario", cliente.Honorario);
-                    cmd.Parameters.AddWithValue("@vencimentoHonorario", cliente.VencimentoHonorario);
+                    cmd.Parameters.AddWithValue("@email", clienteDTO.Email);
+                    cmd.Parameters.AddWithValue("@honorario", clienteDTO.Honorario);
+                    cmd.Parameters.AddWithValue("@vencimentoHonorario", clienteDTO.VencimentoHonorario);
 
-                    long idCliente = (long)cmd.ExecuteScalar();
-                    ids.Add(idCliente);
-
+                    cmd.ExecuteNonQuery();
                     cmd.Parameters.Clear();
-                }
-
-                else
-                {
-                    ids.Add(null);
                 }
             }
 
             transaction.Commit();
             conn.Close();
-
-            return ids;
         }
 
         catch (Exception ex)
         {
             Logger.LogException(ex);
-            return [];
         }
     }
 
@@ -80,23 +67,23 @@ public static class ClienteDAO
             conn.Open();
 
             string sql = @"UPDATE Clientes SET 
-                                nome = @nome, 
-                                documento = @documento, 
+                                nome = @nome,
                                 telefone = @telefone, 
                                 email = @email, 
                                 honorario = @honorario, 
                                 vencimentoHonorario = @vencimentoHonorario
-                           WHERE idCliente = @idCliente;";
+                           WHERE documento = @documento;";
 
             using var cmd = new SQLiteCommand(sql, conn);
 
+            Debug.WriteLine(cliente.Telefone);
+
             cmd.Parameters.AddWithValue("@nome", cliente.Nome);
-            cmd.Parameters.AddWithValue("@documento", cliente.Documento);
-            cmd.Parameters.AddWithValue("@telefone", cliente.Telefone);
+            cmd.Parameters.AddWithValue("telefone", cliente.Telefone);
             cmd.Parameters.AddWithValue("@email", cliente.Email);
             cmd.Parameters.AddWithValue("@honorario", cliente.Honorario);
-            cmd.Parameters.AddWithValue("idCliente", cliente.IdCliente);
             cmd.Parameters.AddWithValue("@vencimentoHonorario", cliente.VencimentoHonorario);
+            cmd.Parameters.AddWithValue("@documento", cliente.Documento);
 
             cmd.ExecuteNonQuery();
             conn.Close();
@@ -115,11 +102,10 @@ public static class ClienteDAO
             using var conn = new SQLiteConnection(Database.ConnStr);
             conn.Open();
 
-            string sql = @"DELETE FROM Clientes WHERE idCliente = @idCliente;";
+            string sql = @"DELETE FROM Clientes WHERE documento = @documento;";
 
             using var cmd = new SQLiteCommand(sql, conn);
-
-            cmd.Parameters.AddWithValue("idCliente", cliente.IdCliente);
+            cmd.Parameters.AddWithValue("@documento", cliente.Documento);
 
             cmd.ExecuteNonQuery();
             conn.Close();
@@ -131,7 +117,7 @@ public static class ClienteDAO
         }
     }
 
-    public static List<Cliente> SelectAllClientes()
+    public static List<Cliente> GetAllClientes()
     {
         try
         {
@@ -147,18 +133,16 @@ public static class ClienteDAO
 
             while (reader.Read())
             {
-                var id = reader.GetInt64(0);
+                var documento = reader.GetString(0);
                 var nome = reader.GetString(1);
-                var documento = reader.GetString(2);
-                var telefone = reader.GetString(3);
-                var email = reader.GetString(4);
-                var honorario = reader.GetFloat(5);
-                var vencimentoHonorario = reader.GetInt32(6);
+                var telefone = reader.GetString(2);
+                var email = reader.GetString(3);
+                var honorario = reader.GetFloat(4);
+                var vencimentoHonorario = reader.GetInt32(5);
 
                 clientes.Add(new(
-                    id, 
+                    documento,
                     nome,
-                    documento, 
                     telefone, 
                     email, 
                     honorario, 
@@ -184,7 +168,7 @@ public static class ClienteDAO
             using var conn = new SQLiteConnection(Database.ConnStr);
             conn.Open();
 
-            string sql = "SELECT idCliente, nome, documento FROM Clientes;";
+            string sql = "SELECT documento, nome, telefone FROM Clientes;";
 
             using var cmd = new SQLiteCommand(sql, conn);
             using var reader = cmd.ExecuteReader();
@@ -193,14 +177,14 @@ public static class ClienteDAO
 
             while (reader.Read())
             {
-                var id = reader.GetInt64(0);
+                var documento = reader.GetString(0);
                 var nome = reader.GetString(1);
-                var documento = reader.GetString(2);
+                var telefone = reader.GetString(2);
 
                 clientes.Add(new(
-                    id,
+                    documento,
                     nome,
-                    documento));
+                    telefone));
             }
 
             conn.Close();
@@ -215,33 +199,31 @@ public static class ClienteDAO
         }
     }
 
-    public static Cliente? GetClienteByID(long id)
+    public static Cliente? GetClienteByDocumento(string documento)
     {
         try
         {
             using var conn = new SQLiteConnection(Database.ConnStr);
             conn.Open();
 
-            string sql = @"SELECT * FROM Clientes WHERE idCliente = @idCliente";
+            string sql = @"SELECT * FROM Clientes WHERE documento = @documento";
 
             using var cmd = new SQLiteCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@idCliente", id);
+            cmd.Parameters.AddWithValue("@documento", documento);
 
             using var reader = cmd.ExecuteReader();
 
             if (reader.Read())
             {
                 var nome = reader.GetString(1);
-                var documento = reader.GetString(2);
                 var telefone = reader.GetString(3);
                 var email = reader.GetString(4);
                 var honorario = reader.GetFloat(5);
                 var vencimentoHonorario = reader.GetInt32(6);
 
                 return new(
-                    id,
-                    nome,
                     documento,
+                    nome,
                     telefone, 
                     email, 
                     honorario, 

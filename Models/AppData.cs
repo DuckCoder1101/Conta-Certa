@@ -10,8 +10,8 @@ public class AppData
 
     public AppData()
     {
-        Clientes = ClienteDAO.SelectAllClientes();
-        Cobrancas = CobrancaDAO.SelectAllCobrancas();
+        Clientes = ClienteDAO.GetAllClientes();
+        Cobrancas = CobrancaDAO.GetAllCobrancas();
         Servicos = ServicoDAO.SelectAllServicos();
     }
 }

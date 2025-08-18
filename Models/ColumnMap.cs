@@ -1,6 +1,6 @@
 ﻿namespace Conta_Certa.Models;
 
-public class ImportColumnMap
+public class ColumnMap
 {
     public string Nome { get; set; }
     public int ColumnIndex { get; set; } = 1;
@@ -9,7 +9,7 @@ public class ImportColumnMap
     public string ToolTip { get; } = string.Empty;
     public string PropertyName { get; }
 
-    public ImportColumnMap(string nome, string propertyName, bool isRequired, string toolTip = "")
+    public ColumnMap(string nome, string propertyName, bool isRequired, string toolTip = "")
     {
         Nome = nome;
         PropertyName = propertyName;

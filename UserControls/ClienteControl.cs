@@ -14,11 +14,9 @@ public partial class ClienteControl : UserControl
         if (cliente != null)
         {
             Cliente = cliente;
-
-            idTxt.Text = Cliente.IdCliente.ToString();
+            documentoTxt.Text = Cliente.FormatDocumento(Cliente.Documento);
             nomeTxt.Text = Cliente.Nome;
-            documentoTxt.Text = Cliente.Documento;
-            telefoneTxt.Text = Cliente.Telefone;
+            telefoneTxt.Text = Cliente.FormatTelefone(Cliente.Telefone);
             emailTxt.Text = Cliente.Email;
             honorarioTxt.Text = Cliente.Honorario.ToString("C");
             vencimentoTxt.Text = Cliente.VencimentoHonorario.ToString();

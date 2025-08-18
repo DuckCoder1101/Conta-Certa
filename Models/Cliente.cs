@@ -1,24 +1,22 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Conta_Certa.Models;
 
 public class Cliente
 {
-    public long IdCliente { get; }
-    public string Nome { get; private set; }
     public string Documento { get; private set; }
+    public string Nome { get; private set; }
     public string Telefone { get; private set; }
     public string? Email { get; private set; }
     public float Honorario { get; private set; }
     public int VencimentoHonorario { get; private set; }
 
-    public Cliente(long idCliente, string nome, string documento, string telefone, string email, float honorario, int vencimentoHonorario)
+    public Cliente(string documento, string nome, string telefone, string email, float honorario, int vencimentoHonorario)
     {
-
-        IdCliente = idCliente;
-        Documento = FormatDocumento(documento);
+        Documento = documento;
         Nome = nome;
-        Telefone = FormatTelefone(telefone);
+        Telefone = telefone;
         Email = email;
         Honorario = honorario;
         VencimentoHonorario = vencimentoHonorario;
@@ -26,7 +24,7 @@ public class Cliente
 
     public static bool CheckDocumento(string documento)
     {
-        var numeros = new string(documento.Where(char.IsDigit).ToArray());
+        string numeros = new([.. documento.Where(char.IsDigit)]);
 
         return numeros.Length switch
         {
@@ -40,14 +38,16 @@ public class Cliente
     {
         if (cpf.Distinct().Count() == 1) return false;
 
-        int[] multiplicador1 = { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
-        int[] multiplicador2 = { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+        int[] multiplicador1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
+        int[] multiplicador2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
 
-        string tempCpf = cpf.Substring(0, 9);
+        string tempCpf = cpf[..9];
         int soma = 0;
 
         for (int i = 0; i < 9; i++)
+        {
             soma += int.Parse(tempCpf[i].ToString()) * multiplicador1[i];
+        }
 
         int resto = soma % 11;
         int digito1 = resto < 2 ? 0 : 11 - resto;
@@ -56,7 +56,9 @@ public class Cliente
         soma = 0;
 
         for (int i = 0; i < 10; i++)
+        {
             soma += int.Parse(tempCpf[i].ToString()) * multiplicador2[i];
+        }
 
         resto = soma % 11;
         int digito2 = resto < 2 ? 0 : 11 - resto;
@@ -66,16 +68,21 @@ public class Cliente
 
     private static bool CheckCPNJ(string cnpj)
     {
-        if (cnpj.Distinct().Count() == 1) return false;
+        if (cnpj.Distinct().Count() == 1)
+        {
+            return false;
+        }
 
-        int[] multiplicador1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
-        int[] multiplicador2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+        int[] multiplicador1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        int[] multiplicador2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 
-        string tempCnpj = cnpj.Substring(0, 12);
+        string tempCnpj = cnpj[..12];
         int soma = 0;
 
         for (int i = 0; i < 12; i++)
+        {
             soma += int.Parse(tempCnpj[i].ToString()) * multiplicador1[i];
+        }
 
         int resto = soma % 11;
         int digito1 = resto < 2 ? 0 : 11 - resto;
@@ -84,7 +91,9 @@ public class Cliente
         soma = 0;
 
         for (int i = 0; i < 13; i++)
+        {
             soma += int.Parse(tempCnpj[i].ToString()) * multiplicador2[i];
+        }
 
         resto = soma % 11;
         int digito2 = resto < 2 ? 0 : 11 - resto;
@@ -111,25 +120,32 @@ public class Cliente
 
     public static bool CheckTelefone(string telefone)
     {
-        var digits = new string([.. telefone.Where(char.IsDigit)]);
+        var digits = new string(telefone.Where(char.IsDigit).ToArray());
 
         if (digits.Length < 10 || digits.Length > 11)
         {
             return false;
         }
 
-        if (digits.Length == 11 && digits[2] != '9')
+        // Se tem 11 dígitos → DDD + celular (9 dígitos começando com 9)
+        if (digits.Length == 11)
         {
-            return false;
+            // O dígito 2 (primeiro após o DDD) precisa ser 9
+            if (digits[2] != '9')
+                return false;
         }
 
-        if (digits.Length == 10 && !"2345".Contains(digits[2]))
+        // Se tem 10 dígitos → DDD + fixo (8 dígitos começando com 2–5)
+        if (digits.Length == 10)
         {
-            return false;
+            // O dígito 2 (primeiro após o DDD) precisa ser 2,3,4 ou 5
+            if (!"2345".Contains(digits[2]))
+                return false;
         }
 
         return true;
     }
+
 
     public static string FormatTelefone(string telefone)
     {

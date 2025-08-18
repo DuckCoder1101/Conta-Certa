@@ -1,11 +1,11 @@
 ﻿using System.Data;
 using System.Text.Json;
-using System.Globalization;
 using ExcelDataReader;
 using Conta_Certa.DAOs;
 using Conta_Certa.DTOs;
 using Conta_Certa.Models;
 using Conta_Certa.Forms;
+using System.Diagnostics;
 
 namespace Conta_Certa.Utils;
 
@@ -41,28 +41,22 @@ public static class ExportImportData
         return map;
     }
 
-    private static Dictionary<long, long?> ImportClientesFromJSON(List<Cliente> clientes)
+    private static void ImportClientesFromJSON(List<Cliente> clientes)
     {
         ClienteCadDTO[] dtos = [.. clientes.Select(c => new ClienteCadDTO(c))];
-        var ids = ClienteDAO.InsertClientes(dtos);
-
-        return MapIds(clientes, ids, c => c.IdCliente);
+        ClienteDAO.InsertClientes(dtos);
     }
 
-    private static Dictionary<long, long?> ImportCobrancasFromJSON(List<Cobranca> cobrancas, Dictionary<long, long?> idClientes)
+    private static Dictionary<long, long?> ImportCobrancasFromJSON(List<Cobranca> cobrancas)
     {
        List<CobrancaCadDTO> dtos = [];
 
         foreach (var cobranca in cobrancas)
         {
-            if (idClientes[cobranca.Cliente.IdCliente] != null)
-            {
-                dtos.Add(new(cobranca, (long)idClientes[cobranca.Cliente.IdCliente]!));
-            }
+            dtos.Add(new(cobranca));
         }
 
         var ids = CobrancaDAO.InsertCobrancas([..dtos]);
-
         return MapIds(cobrancas, ids, c => c.IdCobranca);
     }
 
@@ -93,17 +87,14 @@ public static class ExportImportData
         ServicoCobrancaDAO.InsertServicosCobranca([..dtos]);
     }
     
-    private static Dictionary<string, long?> ImportClientesFromTable(ClienteExcelImportDTO clienteModel, DataSet dataSet)
+    private static void ImportClientesFromTable(ClienteColumns clienteModel, DataSet dataSet)
     {
-        Dictionary<string, long?> idClientes = [];
-        List<ClienteCadDTO> clientes = [];
-
         for (int i = 1; i < dataSet.Tables[0].Rows.Count; i++)
         {
             var row = dataSet.Tables[0].Rows[i];   
             ClienteCadDTO clienteDTO = new();
 
-            foreach (ImportColumnMap map in clienteModel.GetColumns())
+            foreach (ColumnMap map in clienteModel.GetColumns())
             {
                 int columnIndex = map.ColumnIndex - 1;
                 var columnValue = row.Table.Columns.Count > columnIndex
@@ -147,31 +138,12 @@ public static class ExportImportData
             if (!clienteDTO.IsFull())
             {
                 ManageCliente cadForm = new(clienteDTO);
-                DialogResult result = cadForm.ShowDialog();
-
-                if (result == DialogResult.OK && cadForm.Cliente != null)
-                {
-                    idClientes[cadForm.Cliente.Documento] = cadForm.Cliente.IdCliente;
-                }
-            }
-
-            else
-            {
-                clientes.Add(clienteDTO);
-                idClientes[clienteDTO.Documento!] = null;
+                cadForm.ShowDialog();
             }
         }
-
-        foreach (long? id in ClienteDAO.InsertClientes([.. clientes.Where(c => c.IsFull())]))
-        {
-            var map = idClientes.First((id) => id.Value == null);
-            idClientes[map.Key] = id;
-        }
-
-        return idClientes;
     }
 
-    private static void ImportCobrancasFromTable(CobrancaExcelImportDTO cobrancaModel, DataSet dataSet, Dictionary<string, long?> idsClientes)
+    private static void ImportCobrancasFromTable(CobrancaColumns cobrancaModel, DataSet dataSet)
     {
         List<CobrancaCadDTO> cobrancas = [];
 
@@ -180,7 +152,7 @@ public static class ExportImportData
             var row = dataSet.Tables[1].Rows[i];
             CobrancaCadDTO cobrancaDTO = new();
 
-            foreach (ImportColumnMap map in cobrancaModel.GetColumns())
+            foreach (ColumnMap map in cobrancaModel.GetColumns())
             {
                 int columnIndex = map.ColumnIndex - 1;
                 var columnValue = row.Table.Columns.Count > columnIndex
@@ -193,48 +165,47 @@ public static class ExportImportData
                     continue;
                 }
 
-                // Formatos de data aceitos
-                string[] dateFormats = { "dd/MM/yyyy", "d/M/yy", "dd/MM/yy", "d/M/yyyy" };
-                
                 switch (map.PropertyName)
                 {
-                    case nameof(CobrancaCadDTO.IdCliente) when (Cliente.CheckDocumento(columnValue)):
-                        cobrancaDTO.IdCliente = idsClientes[columnValue];
+                    case nameof(ClienteCadDTO.Documento) 
+                    when (Cliente.CheckDocumento(columnValue)):
+                        cobrancaDTO.DocumentoCliente = columnValue;
                         break;
 
-                    case nameof(CobrancaCadDTO.Honorario) when (float.TryParse(columnValue, out var honorario) && honorario > 0):
+                    case nameof(CobrancaCadDTO.Honorario) 
+                    when (float.TryParse(columnValue, out var honorario) && honorario > 0):
                         cobrancaDTO.Honorario = honorario;
                         break;
 
-                    case nameof(CobrancaCadDTO.Status) when (Enum.TryParse<CobrancaStatus>(columnValue, true, out var status)):
+                    case nameof(CobrancaCadDTO.Status) 
+                    when (Enum.TryParse<CobrancaStatus>(columnValue, true, out var status)):
                         cobrancaDTO.Status = status;
                         break;
 
                     case nameof(Cobranca.Vencimento) 
-                    when (DateTime.TryParseExact(columnValue, dateFormats, new CultureInfo("pt-BR"), DateTimeStyles.None, out var vencimento)):
+                    when (DateTime.TryParse(columnValue, out var vencimento)):
                         cobrancaDTO.Vencimento = vencimento;
                         break;
 
                     case nameof(Cobranca.PagoEm)
-                    when (cobrancaDTO.Status == CobrancaStatus.Paga && DateTime.TryParseExact(columnValue, dateFormats, new CultureInfo("pt-BR"), DateTimeStyles.None, out var pagoEm)):
+                    when (cobrancaDTO.Status == CobrancaStatus.Paga && DateTime.TryParse(columnValue, out var pagoEm)):
                         cobrancaDTO.PagoEm = pagoEm;
                         break;
                 }
-
-                if (!cobrancaDTO.IsFull())
-                {
-                    ManageCobranca cadForm = new(cobrancaDTO);
-                    cadForm.ShowDialog();
-                }
-
-                else
-                {
-                    cobrancas.Add(cobrancaDTO);
-                }
             }
 
-            CobrancaDAO.InsertCobrancas([
-                ..cobrancas.Where(c => c.IsFull())]);
+            if (!cobrancaDTO.IsFull())
+            {
+                ManageCobranca cadForm = new(cobrancaDTO);
+                cadForm.ShowDialog();
+            }
+
+            else
+            {
+                cobrancas.Add(cobrancaDTO);
+            }
+
+            CobrancaDAO.InsertCobrancas([.. cobrancas.Where(c => c.IsFull())]);
         }
     }
 
@@ -277,10 +248,10 @@ public static class ExportImportData
 
                 if (appData != null)
                 {
-                    List<ServicoCobranca> servicoCobrancas = [.. appData.Cobrancas.SelectMany(c => c.Servicos)];
+                    List<ServicoCobranca> servicoCobrancas = [.. appData.Cobrancas.SelectMany(c => c.ServicosCobranca)];
 
-                    var idClientes = ImportClientesFromJSON(appData.Clientes);
-                    var idCobrancas = ImportCobrancasFromJSON(appData.Cobrancas, idClientes);
+                    ImportClientesFromJSON(appData.Clientes);
+                    var idCobrancas = ImportCobrancasFromJSON(appData.Cobrancas);
                     var idServicos = ImportServicosFromJSON(appData.Servicos);
 
                     ImportServicosCobrancaFromJSON(servicoCobrancas, idCobrancas, idServicos);
@@ -336,7 +307,7 @@ public static class ExportImportData
             using var stream = File.Open(filePath, FileMode.Open, FileAccess.Read);
             using var reader = ExcelReaderFactory.CreateReader(stream);
 
-            using var columnMapForm = new ExcelColumnAssistant();
+            using var columnMapForm = new ColumnAssistant();
 
             if (columnMapForm.ShowDialog() == DialogResult.Yes)
             {
@@ -348,16 +319,32 @@ public static class ExportImportData
                     UseColumnDataType = false
                 });
 
-                var idClientes = ImportClientesFromTable(clienteModel, dataSet);
-                ImportCobrancasFromTable(cobrancaModel, dataSet, idClientes);
+                if (clienteModel.GetColumns().Any(c => c.Import))
+                {
+                    ImportClientesFromTable(clienteModel, dataSet);
+                }
+
+                if (cobrancaModel.GetColumns().Any(c => c.Import))
+                {
+                    ImportCobrancasFromTable(cobrancaModel, dataSet);
+                }
             }
+        }
+
+        catch (IOException)
+        {
+            MessageBox.Show(
+                "Esse arquivo provavelmente está sendo usado por outro programa.\nFeche-o e tente novamente!",
+                "Erro de leitura!",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
         }
 
         catch (UnauthorizedAccessException)
         {
             MessageBox.Show(
-                "Esse arquivo está sendo usado por outro programa.\nFeche-o e tente novamente!",
-                "Arquivo em uso!",
+                "Este arquivo está inacessível.",
+                "Erro de leitura!",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }

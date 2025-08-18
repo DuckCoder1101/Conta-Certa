@@ -7,7 +7,7 @@ namespace Conta_Certa.DAOs;
 
 public static class CobrancaDAO
 {
-    public static List<long?> InsertCobrancas(params CobrancaCadDTO[] cobrancas)
+    public static List<long?> InsertCobrancas(params CobrancaCadDTO[] dtos)
     {
         try
         {
@@ -17,32 +17,30 @@ public static class CobrancaDAO
             using var transaction = conn.BeginTransaction();
 
             string sql = @"INSERT INTO Cobrancas 
-                                (idCliente, honorario, status, vencimento, pagoEm)
-                           VALUES (@idCliente, @honorario, @status, @vencimento, @pagoEm) 
-                           ON CONFLICT (idCliente, vencimento) DO UPDATE SET 
+                                (documentoCliente, honorario, status, vencimento, pagoEm)
+                           VALUES (@documentoCliente, @honorario, @status, @vencimento, @pagoEm) 
+                           ON CONFLICT (documentoCliente, vencimento) DO UPDATE SET 
                                 honorario = excluded.honorario, 
                                 status = excluded.status,
                                 pagoEm = excluded.pagoEm
                            RETURNING idCobranca;";
 
+
             using var cmd = new SQLiteCommand(sql, conn, transaction);
             List<long?> ids = [];
 
-            foreach (var cobranca in cobrancas)
+            foreach (var cobrancaDTO in dtos)
             {
-                if (cobranca.IsFull())
+                if (cobrancaDTO.IsFull())
                 {
-                    cmd.Parameters.AddWithValue("@idCliente", cobranca.IdCliente);
-                    cmd.Parameters.AddWithValue("@honorario", cobranca.Honorario);
-                    cmd.Parameters.AddWithValue("@status", cobranca.Status.ToString());
+                    var vencimento = cobrancaDTO.Vencimento?.ToString("yyyy-MM-dd");
+                    var pagoEm = cobrancaDTO.PagoEm?.ToString("yyyy-MM-dd");
 
-                    cmd.Parameters.AddWithValue("@vencimento",
-                        ((DateTime)cobranca.Vencimento!).ToString("dd/MM/yyyy"));
-
-                    cmd.Parameters.AddWithValue("@pagoEm",
-                        cobranca.PagoEm.HasValue
-                            ? ((DateTime)cobranca.PagoEm.Value!).ToString("dd/MM/yyyy")
-                            : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@documentoCliente", cobrancaDTO.DocumentoCliente);
+                    cmd.Parameters.AddWithValue("@honorario", cobrancaDTO.Honorario);
+                    cmd.Parameters.AddWithValue("@status", cobrancaDTO.Status.ToString());
+                    cmd.Parameters.AddWithValue("@vencimento", vencimento);
+                    cmd.Parameters.AddWithValue("@pagoEm", pagoEm);
 
                     long idCobranca = (long)cmd.ExecuteScalar();
                     ids.Add(idCobranca);
@@ -81,16 +79,15 @@ public static class CobrancaDAO
                                vencimento = @vencimento, pagoEm = @pagoEm  
                            WHERE idCobranca = @idCobranca;";
 
-            string vencimento = cobranca.Vencimento.ToString("dd/MM/yyyy");
+            var vencimento = cobranca.Vencimento.ToString("yyyy-MM-dd");
+            var pagoEm = cobranca.PagoEm?.ToString("yyyy-MM-dd");
 
             using var cmd = new SQLiteCommand(sql, conn);
 
             cmd.Parameters.AddWithValue("@honorario", cobranca.Honorario);
             cmd.Parameters.AddWithValue("@status", cobranca.Status.ToString());
-            cmd.Parameters.AddWithValue("@vencimento",
-                cobranca.Vencimento.ToString("dd/MM/yyyy"));
-            cmd.Parameters.AddWithValue("@pagoEm",
-                cobranca.PagoEm?.ToString("dd/MM/yyyy"));
+            cmd.Parameters.AddWithValue("@vencimento", vencimento);
+            cmd.Parameters.AddWithValue("@pagoEm", pagoEm);
             cmd.Parameters.AddWithValue("@idCobranca", cobranca.IdCobranca);
 
             cmd.ExecuteNonQuery();
@@ -126,7 +123,7 @@ public static class CobrancaDAO
         }
     }
 
-    public static List<Cobranca> SelectAllCobrancas()
+    public static List<Cobranca> GetAllCobrancas()
     {
         try
         {
@@ -135,20 +132,20 @@ public static class CobrancaDAO
 
             string sql = @"SELECT
                                 co.idCobranca, 
-                                co.idCliente, 
+                                co.documentoCliente, 
                                 co.honorario, 
                                 co.status, 
                                 co.vencimento, 
                                 co.pagoEm, 
                                 cli.nome,
-                                cli.documento, 
+                                cli.telefone, 
                                 sc.idServicoCobranca, 
                                 sc.idServico, 
                                 sc.valor, 
                                 sc.quantidade, 
                                 s.nome 
                            FROM Cobrancas AS co 
-                           LEFT JOIN Clientes cli ON cli.idCliente = co.idCliente 
+                           LEFT JOIN Clientes cli ON cli.documento = co.documentoCliente 
                            LEFT JOIN ServicosCobranca sc ON sc.idCobranca = co.idCobranca 
                            LEFT JOIN Servicos s ON s.idServico = sc.idServico;";
 
@@ -168,7 +165,7 @@ public static class CobrancaDAO
                     cobranca = new(
                         idCobranca, 
                         cliente: new(
-                            reader.GetInt64(1), 
+                            reader.GetString(1), 
                             reader.GetString(6),
                             reader.GetString(7)), 
                         honorario: reader.GetFloat(2), 
@@ -184,7 +181,7 @@ public static class CobrancaDAO
                 // Verifica os serviços extras
                 if (!reader.IsDBNull(8))
                 {
-                    cobranca.Servicos.Add(new(
+                    cobranca.ServicosCobranca.Add(new(
                         idServicoCobranca: reader.GetInt64(8), 
                         idCobranca,
                         servico: new(
@@ -205,7 +202,7 @@ public static class CobrancaDAO
         }
     }
 
-    public static List<Cobranca> SelectCobrancasByStatus(CobrancaStatus status)
+    public static List<Cobranca> GetCobrancasByStatus(CobrancaStatus status)
     {
         try
         {
@@ -214,21 +211,22 @@ public static class CobrancaDAO
 
             string sql = @"SELECT
                                 co.idCobranca, 
-                                co.idCliente, 
+                                co.documentoCliente, 
                                 co.honorario, 
                                 co.vencimento, 
                                 co.pagoEm, 
                                 cli.nome, 
-                                cli.documento, 
+                                cli.telefone, 
                                 sc.idServicoCobranca, 
                                 sc.idServico, 
                                 sc.valor, 
                                 sc.quantidade, 
                                 s.nome 
                            FROM Cobrancas AS co 
-                           LEFT JOIN Clientes cli ON cli.idCliente = co.idCliente 
+                           LEFT JOIN Clientes cli ON cli.documento = co.documentoCliente 
                            LEFT JOIN ServicosCobranca sc ON sc.idCobranca = co.idCobranca 
-                           LEFT JOIN Servicos s ON s.idServico = sc.idServico;";
+                           LEFT JOIN Servicos s ON s.idServico = sc.idServico 
+                           WHERE co.status = @status;";
 
             using var cmd = new SQLiteCommand(sql, conn);
             cmd.Parameters.AddWithValue("@status", status.ToString());
@@ -248,7 +246,7 @@ public static class CobrancaDAO
                     cobranca = new(
                         idCobranca,
                         cliente: new(
-                            reader.GetInt64(1), 
+                            reader.GetString(1), 
                             reader.GetString(5),
                             reader.GetString(6)),
                         honorario: reader.GetFloat(2),
@@ -264,7 +262,7 @@ public static class CobrancaDAO
                 // Verifica a presença de serviços extras
                 if (!reader.IsDBNull(7))
                 {
-                    cobranca.Servicos.Add(new(
+                    cobranca.ServicosCobranca.Add(new(
                         idServicoCobranca: reader.GetInt64(7), 
                         idCobranca, 
                         servico: new(
@@ -272,6 +270,87 @@ public static class CobrancaDAO
                             reader.GetString(11), 
                             reader.GetFloat(9)), 
                         quantidade: reader.GetInt32(10)));
+                }
+            }
+
+            return cobrancas;
+        }
+
+        catch (Exception ex)
+        {
+            Logger.LogException(ex);
+            return [];
+        }
+    }
+
+    public static List<Cobranca> GetCobrancasDoMes()
+    {
+        try
+        {
+            using var conn = new SQLiteConnection(Database.ConnStr);
+            conn.Open();
+
+            string sql = @"SELECT
+                                co.idCobranca, 
+                                co.documentoCliente, 
+                                co.honorario, 
+                                co.status, 
+                                co.vencimento AS vencimento, 
+                                co.pagoEm, 
+                                cli.nome,
+                                cli.telefone, 
+                                sc.idServicoCobranca, 
+                                sc.idServico, 
+                                sc.valor, 
+                                sc.quantidade, 
+                                s.nome 
+                           FROM Cobrancas AS co 
+                           LEFT JOIN Clientes cli ON cli.documento = co.documentoCliente 
+                           LEFT JOIN ServicosCobranca sc ON sc.idCobranca = co.idCobranca 
+                           LEFT JOIN Servicos s ON s.idServico = sc.idServico 
+                           WHERE strftime('%m', co.vencimento) = strftime('%m', 'now')
+                           AND strftime('%Y', co.vencimento) = strftime('%Y', 'now');";
+
+            using var cmd = new SQLiteCommand(sql, conn);
+            using var reader = cmd.ExecuteReader();
+
+            List<Cobranca> cobrancas = [];
+
+            while (reader.Read())
+            {
+                long idCobranca = reader.GetInt64(0);
+                var cobranca = cobrancas.FirstOrDefault(c => c.IdCobranca == idCobranca);
+
+                // Verifica se a cobrança ja foi adicionada à lista
+                if (cobranca == null)
+                {
+                    cobranca = new(
+                        idCobranca,
+                        cliente: new(
+                            reader.GetString(1),
+                            reader.GetString(6),
+                            reader.GetString(7)),
+                        honorario: reader.GetFloat(2),
+                        status: Enum.Parse<CobrancaStatus>(reader.GetString(3)),
+                        vencimento: DateTime.Parse(reader.GetString(4)),
+                        pagoEm: reader.IsDBNull(5)
+                            ? null
+                            : DateTime.Parse(reader.GetString(5)));
+
+                    cobrancas.Add(cobranca);
+                }
+
+                // Verifica os serviços extras
+                if (!reader.IsDBNull(8))
+                {
+                    cobranca.ServicosCobranca.Add(new(
+                        idServicoCobranca: reader.GetInt64(8),
+                        idCobranca,
+                        servico: new(
+                            reader.GetInt64(9),
+                            reader.GetString(12),
+                            reader.GetFloat(10)),
+                        quantidade: reader.GetInt32(11)));
                 }
             }
 

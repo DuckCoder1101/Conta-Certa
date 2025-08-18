@@ -34,19 +34,17 @@
             importFromExelBtn = new ToolStripMenuItem();
             importFromJSONBtn = new ToolStripMenuItem();
             exportToJSONBtn = new ToolStripMenuItem();
-            tabelaExelToolStripMenuItem = new ToolStripMenuItem();
-            jSONToolStripMenuItem = new ToolStripMenuItem();
             openSetingsBtn = new ToolStripMenuItem();
-            relatToolStripMenuItem = new ToolStripMenuItem();
-            newRelatoryBtn = new ToolStripMenuItem();
-            openReportsHistory = new ToolStripMenuItem();
+            configuraçõesToolStripMenuItem = new ToolStripMenuItem();
             cobrançasToolStripMenuItem = new ToolStripMenuItem();
             openClientsListBtn = new ToolStripMenuItem();
             cadastrarClienteToolStripMenuItem = new ToolStripMenuItem();
             cobrançasToolStripMenuItem1 = new ToolStripMenuItem();
             cobrancasPendentes = new ToolStripMenuItem();
             cobrancasPagas = new ToolStripMenuItem();
-            cobrarTodos = new ToolStripMenuItem();
+            gerarCobrancas = new ToolStripMenuItem();
+            enviarCobrançasPorWhastappToolStripMenuItem = new ToolStripMenuItem();
+            enviarCobrançasPorEmailToolStripMenuItem = new ToolStripMenuItem();
             serviçosToolStripMenuItem = new ToolStripMenuItem();
             listaDeServiçosToolStripMenuItem = new ToolStripMenuItem();
             cadastrarServiçoToolStripMenuItem = new ToolStripMenuItem();
@@ -57,7 +55,7 @@
             // 
             menu.BackColor = SystemColors.ControlLight;
             menu.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            menu.Items.AddRange(new ToolStripItem[] { arquivoToolStripMenuItem, relatToolStripMenuItem, cobrançasToolStripMenuItem, cobrançasToolStripMenuItem1, serviçosToolStripMenuItem });
+            menu.Items.AddRange(new ToolStripItem[] { arquivoToolStripMenuItem, cobrançasToolStripMenuItem, cobrançasToolStripMenuItem1, serviçosToolStripMenuItem });
             menu.Location = new Point(0, 0);
             menu.Name = "menu";
             menu.Size = new Size(800, 24);
@@ -66,7 +64,7 @@
             // 
             // arquivoToolStripMenuItem
             // 
-            arquivoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importarDadosToolStripMenuItem, exportToJSONBtn, openSetingsBtn });
+            arquivoToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importarDadosToolStripMenuItem, exportToJSONBtn, openSetingsBtn, configuraçõesToolStripMenuItem });
             arquivoToolStripMenuItem.Name = "arquivoToolStripMenuItem";
             arquivoToolStripMenuItem.Size = new Size(61, 20);
             arquivoToolStripMenuItem.Text = "Arquivo";
@@ -75,67 +73,42 @@
             // 
             importarDadosToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importFromExelBtn, importFromJSONBtn });
             importarDadosToolStripMenuItem.Name = "importarDadosToolStripMenuItem";
-            importarDadosToolStripMenuItem.Size = new Size(180, 22);
+            importarDadosToolStripMenuItem.Size = new Size(190, 22);
             importarDadosToolStripMenuItem.Text = "Importar";
             // 
             // importFromExelBtn
             // 
             importFromExelBtn.Name = "importFromExelBtn";
-            importFromExelBtn.Size = new Size(180, 22);
+            importFromExelBtn.Size = new Size(148, 22);
             importFromExelBtn.Text = "Tabela Excel";
             importFromExelBtn.Click += ImportFromExcelBtn_Click;
             // 
             // importFromJSONBtn
             // 
             importFromJSONBtn.Name = "importFromJSONBtn";
-            importFromJSONBtn.Size = new Size(180, 22);
+            importFromJSONBtn.Size = new Size(148, 22);
             importFromJSONBtn.Text = "JSON";
             importFromJSONBtn.Click += ImportFromJSON_Click;
             // 
             // exportToJSONBtn
             // 
-            exportToJSONBtn.DropDownItems.AddRange(new ToolStripItem[] { tabelaExelToolStripMenuItem, jSONToolStripMenuItem });
             exportToJSONBtn.Name = "exportToJSONBtn";
-            exportToJSONBtn.Size = new Size(180, 22);
-            exportToJSONBtn.Text = "Exportar";
-            // 
-            // tabelaExelToolStripMenuItem
-            // 
-            tabelaExelToolStripMenuItem.Name = "tabelaExelToolStripMenuItem";
-            tabelaExelToolStripMenuItem.Size = new Size(141, 22);
-            tabelaExelToolStripMenuItem.Text = "Tabela Exel";
-            // 
-            // jSONToolStripMenuItem
-            // 
-            jSONToolStripMenuItem.Name = "jSONToolStripMenuItem";
-            jSONToolStripMenuItem.Size = new Size(141, 22);
-            jSONToolStripMenuItem.Text = "JSON";
-            jSONToolStripMenuItem.Click += ExportToJSON_Click;
+            exportToJSONBtn.Size = new Size(190, 22);
+            exportToJSONBtn.Text = "Exportar para JSON";
+            exportToJSONBtn.Click += ExportToJSON_Click;
             // 
             // openSetingsBtn
             // 
             openSetingsBtn.Name = "openSetingsBtn";
-            openSetingsBtn.Size = new Size(180, 22);
-            openSetingsBtn.Text = "Configurações";
+            openSetingsBtn.Size = new Size(190, 22);
+            openSetingsBtn.Text = "Gerar relatório";
+            openSetingsBtn.Click += GerarRelatorio;
             // 
-            // relatToolStripMenuItem
+            // configuraçõesToolStripMenuItem
             // 
-            relatToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { newRelatoryBtn, openReportsHistory });
-            relatToolStripMenuItem.Name = "relatToolStripMenuItem";
-            relatToolStripMenuItem.Size = new Size(77, 20);
-            relatToolStripMenuItem.Text = "Relatórios";
-            // 
-            // newRelatoryBtn
-            // 
-            newRelatoryBtn.Name = "newRelatoryBtn";
-            newRelatoryBtn.Size = new Size(200, 22);
-            newRelatoryBtn.Text = "Gerar relatório";
-            // 
-            // openReportsHistory
-            // 
-            openReportsHistory.Name = "openReportsHistory";
-            openReportsHistory.Size = new Size(200, 22);
-            openReportsHistory.Text = "Histórico de relatórios";
+            configuraçõesToolStripMenuItem.Name = "configuraçõesToolStripMenuItem";
+            configuraçõesToolStripMenuItem.Size = new Size(190, 22);
+            configuraçõesToolStripMenuItem.Text = "Configurações";
             // 
             // cobrançasToolStripMenuItem
             // 
@@ -160,7 +133,7 @@
             // 
             // cobrançasToolStripMenuItem1
             // 
-            cobrançasToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { cobrancasPendentes, cobrancasPagas, cobrarTodos });
+            cobrançasToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { cobrancasPendentes, cobrancasPagas, gerarCobrancas, enviarCobrançasPorWhastappToolStripMenuItem, enviarCobrançasPorEmailToolStripMenuItem });
             cobrançasToolStripMenuItem1.Name = "cobrançasToolStripMenuItem1";
             cobrançasToolStripMenuItem1.Size = new Size(81, 20);
             cobrançasToolStripMenuItem1.Text = "Cobranças";
@@ -168,21 +141,36 @@
             // cobrancasPendentes
             // 
             cobrancasPendentes.Name = "cobrancasPendentes";
-            cobrancasPendentes.Size = new Size(200, 22);
+            cobrancasPendentes.Size = new Size(258, 22);
             cobrancasPendentes.Text = "Cobranças pendentes";
             cobrancasPendentes.Click += CobrancasPendentes_Menu_Click;
             // 
             // cobrancasPagas
             // 
             cobrancasPagas.Name = "cobrancasPagas";
-            cobrancasPagas.Size = new Size(200, 22);
+            cobrancasPagas.Size = new Size(258, 22);
             cobrancasPagas.Text = "Cobranças pagas";
+            cobrancasPagas.Click += CobrancasPagas_Click;
             // 
-            // cobrarTodos
+            // gerarCobrancas
             // 
-            cobrarTodos.Name = "cobrarTodos";
-            cobrarTodos.Size = new Size(200, 22);
-            cobrarTodos.Text = "Cobrar todos";
+            gerarCobrancas.Name = "gerarCobrancas";
+            gerarCobrancas.Size = new Size(258, 22);
+            gerarCobrancas.Text = "Gerar cobranças do mês";
+            gerarCobrancas.Click += GerarCobrancas_Click;
+            // 
+            // enviarCobrançasPorWhastappToolStripMenuItem
+            // 
+            enviarCobrançasPorWhastappToolStripMenuItem.Name = "enviarCobrançasPorWhastappToolStripMenuItem";
+            enviarCobrançasPorWhastappToolStripMenuItem.Size = new Size(258, 22);
+            enviarCobrançasPorWhastappToolStripMenuItem.Text = "Enviar cobranças por Whastapp";
+            enviarCobrançasPorWhastappToolStripMenuItem.Click += EnviarCobrancasPorWhastapp_Click;
+            // 
+            // enviarCobrançasPorEmailToolStripMenuItem
+            // 
+            enviarCobrançasPorEmailToolStripMenuItem.Name = "enviarCobrançasPorEmailToolStripMenuItem";
+            enviarCobrançasPorEmailToolStripMenuItem.Size = new Size(258, 22);
+            enviarCobrançasPorEmailToolStripMenuItem.Text = "Enviar cobranças por email";
             // 
             // serviçosToolStripMenuItem
             // 
@@ -229,20 +217,18 @@
         private ToolStripMenuItem importFromJSONBtn;
         private ToolStripMenuItem exportToJSONBtn;
         private ToolStripMenuItem openSetingsBtn;
-        private ToolStripMenuItem relatToolStripMenuItem;
-        private ToolStripMenuItem newRelatoryBtn;
-        private ToolStripMenuItem openReportsHistory;
         private ToolStripMenuItem cobrançasToolStripMenuItem;
         private ToolStripMenuItem openClientsListBtn;
         private ToolStripMenuItem cobrançasToolStripMenuItem1;
         private ToolStripMenuItem cobrancasPendentes;
         private ToolStripMenuItem cobrancasPagas;
         private ToolStripMenuItem cadastrarClienteToolStripMenuItem;
-        private ToolStripMenuItem cobrarTodos;
-        private ToolStripMenuItem tabelaExelToolStripMenuItem;
-        private ToolStripMenuItem jSONToolStripMenuItem;
+        private ToolStripMenuItem gerarCobrancas;
         private ToolStripMenuItem serviçosToolStripMenuItem;
         private ToolStripMenuItem listaDeServiçosToolStripMenuItem;
         private ToolStripMenuItem cadastrarServiçoToolStripMenuItem;
+        private ToolStripMenuItem enviarCobrançasPorWhastappToolStripMenuItem;
+        private ToolStripMenuItem enviarCobrançasPorEmailToolStripMenuItem;
+        private ToolStripMenuItem configuraçõesToolStripMenuItem;
     }
 }

@@ -193,10 +193,11 @@
             documentoTxt.Font = new Font("Arial", 9.75F);
             documentoTxt.Location = new Point(241, 43);
             documentoTxt.Margin = new Padding(4, 7, 4, 7);
-            documentoTxt.MaxLength = 18;
+            documentoTxt.MaxLength = 14;
             documentoTxt.Name = "documentoTxt";
             documentoTxt.Size = new Size(229, 22);
             documentoTxt.TabIndex = 2;
+            documentoTxt.TextChanged += DocumentoTxt_TextChanged;
             // 
             // telefoneTxt
             // 

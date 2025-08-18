@@ -1,7 +1,6 @@
-﻿using Conta_Certa.Utils;
-using System.Data.SQLite;
+﻿using System.Data.SQLite;
 
-namespace Conta_Certa.Models;
+namespace Conta_Certa.Utils;
 
 public static class Database
 {
@@ -56,10 +55,9 @@ public static class Database
         conn.Open();
 
         string sql = @"CREATE TABLE IF NOT EXISTS Clientes (
-                            idCliente INTEGER PRIMARY KEY AUTOINCREMENT,
+                            documento TEXT PRIMARY KEY CHECK(length(documento) <= 14),
                             nome TEXT NOT NULL,
-                            documento TEXT UNIQUE NOT NULL,
-                            telefone TEXT NOT NULL,
+                            telefone TEXT NOT NULL CHECK(length(telefone) = 11),
                             email TEXT,
                             honorario NUMERIC NOT NULL,
                             vencimentoHonorario INTEGER NOT NULL);";
@@ -77,21 +75,21 @@ public static class Database
 
         string sql = @"CREATE TABLE IF NOT EXISTS Cobrancas ( 
                             idCobranca INTEGER PRIMARY KEY AUTOINCREMENT, 
-                            idCliente INTEGER, 
+                            documentoCliente TEXT NOT NULL, 
                             honorario NUMERIC NOT NULL, 
                             status TEXT NOT NULL, 
                             vencimento TEXT NOT NULL, 
                             pagoEm TEXT, 
                                         
-                            FOREIGN KEY (idCliente) REFERENCES Clientes(idCliente)
+                            FOREIGN KEY (documentoCliente) REFERENCES Clientes(documento)
                             ON DELETE CASCADE 
-                            UNIQUE (idCliente, vencimento));";
+                            UNIQUE (documentoCliente, vencimento));";
 
         using var cmd = new SQLiteCommand(sql, conn);
         cmd.ExecuteNonQuery();
 
         string indexSql = @"CREATE UNIQUE INDEX IF NOT EXISTS idx_cliente_vencimento 
-                            ON Cobrancas(idCliente, vencimento);";
+                            ON Cobrancas(documentoCliente, vencimento);";
 
         cmd.CommandText = indexSql;
         cmd.ExecuteNonQuery();

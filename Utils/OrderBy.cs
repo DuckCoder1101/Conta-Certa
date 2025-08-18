@@ -1,5 +1,4 @@
-﻿
-namespace Conta_Certa.Utils;
+﻿namespace Conta_Certa.Utils;
 
 public enum OrderBy
 {

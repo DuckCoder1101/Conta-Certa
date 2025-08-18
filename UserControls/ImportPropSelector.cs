@@ -4,14 +4,14 @@ namespace Conta_Certa.UserControls;
 
 public partial class ImportPropSelector : UserControl
 {
-    public ImportColumnMap ColumnMap { get; private set; }
+    public ColumnMap ColumnMap { get; private set; }
 
-    public ImportPropSelector(ImportColumnMap map)
+    public ImportPropSelector(ColumnMap map)
     {
         InitializeComponent();
         ColumnMap = map;
 
-        propNameTxt.Text = ColumnMap.PropertyName;
+        propNameTxt.Text = ColumnMap.Nome;
         toolTip.SetToolTip(toolTipBtn, map.ToolTip);
     }
 

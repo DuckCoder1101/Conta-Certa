@@ -1,14 +1,17 @@
 ﻿using Conta_Certa.DAOs;
 using Conta_Certa.DTOs;
+using Conta_Certa.Models;
+using System.Diagnostics;
 
 namespace Conta_Certa.UserControls;
 
-public partial class ClientesSearch : UserControl
+public partial class ClientesSearchbar : UserControl
 {
-    ClienteSearchbarItem? selectedItem;
-    List<ClienteResumoDTO> clientes;
+    private readonly List<ClienteResumoDTO> clientes = [];
 
-    public ClientesSearch()
+    public event Action<Cliente?>? OnClienteChange;
+
+    public ClientesSearchbar()
     {
         InitializeComponent();
 
@@ -20,24 +23,47 @@ public partial class ClientesSearch : UserControl
 
     private void UpdateClientesList(string filter = "")
     {
-        clientesList.Controls.Clear();
+        clientesCB.BeginUpdate();
+        clientesCB.Items.Clear();
 
         foreach (var cliente in clientes)
         {
             if (cliente.Nome.StartsWith(filter, StringComparison.InvariantCultureIgnoreCase) ||
-                cliente.IdCliente.ToString().StartsWith(filter) ||
                 cliente.Documento.StartsWith(filter))
             {
-                ClienteSearchbarItem item = new(cliente);
-
-                clientesList.Controls.Add(item);
-                clientesList.Controls.SetChildIndex(item, 0);
+                clientesCB.Items.Add(cliente);
             }
+        }
+
+        clientesCB.EndUpdate();
+
+        if (clientesCB.SelectedItem == null)
+        {
+            OnClienteChange?.Invoke(null);
         }
     }
 
-    private void SearchBar_TextChanged(object sender, EventArgs e)
+    private void Searchbar_TextChanged(object sender, EventArgs e)
     {
-        UpdateClientesList(searchBar.Text);
+        UpdateClientesList(searchbar.Text.Trim());
+    }
+
+    public void SelectCliente(string documento)
+    {
+        clientesCB.SelectedItem = clientesCB.Items
+            .OfType<ClienteResumoDTO>()
+            .First(c => c.Documento == documento);
+    }
+
+    private void ClientesCB_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        Cliente? cliente = null;
+
+        if (clientesCB.SelectedItem is ClienteResumoDTO clienteResumo)
+        {
+            cliente = ClienteDAO.GetClienteByDocumento(clienteResumo.Documento);
+        }
+        
+        OnClienteChange?.Invoke(cliente);
     }
 }
