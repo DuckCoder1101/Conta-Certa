@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CobrancasList));
             tableLayoutPanel1 = new TableLayoutPanel();
             cobrancasPanel = new Panel();
             searchbar = new Conta_Certa.UserControls.SearchbarControl();
@@ -108,6 +109,7 @@
             ClientSize = new Size(800, 480);
             Controls.Add(tableLayoutPanel1);
             Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "CobrancasList";
             Text = "Cobranças";
             FormClosing += CobrancasList_FormClosing;

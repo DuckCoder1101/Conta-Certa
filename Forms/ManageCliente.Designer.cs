@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ManageCliente));
             tableLayoutPanel1 = new TableLayoutPanel();
             cadastrarBtn = new Button();
             label6 = new Label();
@@ -78,7 +79,7 @@
             tableLayoutPanel1.RowStyles.Add(new RowStyle());
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel1.Size = new Size(474, 270);
+            tableLayoutPanel1.Size = new Size(474, 305);
             tableLayoutPanel1.TabIndex = 0;
             // 
             // cadastrarBtn
@@ -89,7 +90,7 @@
             cadastrarBtn.Cursor = Cursors.Hand;
             cadastrarBtn.FlatStyle = FlatStyle.Flat;
             cadastrarBtn.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            cadastrarBtn.Location = new Point(147, 223);
+            cadastrarBtn.Location = new Point(147, 240);
             cadastrarBtn.Name = "cadastrarBtn";
             cadastrarBtn.Size = new Size(180, 40);
             cadastrarBtn.TabIndex = 12;
@@ -254,9 +255,10 @@
             // 
             AutoScaleDimensions = new SizeF(9F, 18F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(474, 270);
+            ClientSize = new Size(474, 305);
             Controls.Add(tableLayoutPanel1);
             Font = new Font("Arial", 12F);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4);
             MaximizeBox = false;
             MdiChildrenMinimizedAnchorBottom = false;
@@ -279,13 +281,13 @@
         private Label label3;
         private Label label4;
         private Label label5;
+        private Label label6;
+        private Button cadastrarBtn;
+        private TextBox documentoTxt;
+        private MaskedTextBox telefoneTxt;
         private TextBox emailTxt;
         private NumericUpDown honorarioNumber;
-        private MaskedTextBox telefoneTxt;
-        private TextBox nomeTxt;
         private NumericUpDown vencimentoNumber;
-        private Label label6;
-        private TextBox documentoTxt;
-        private Button cadastrarBtn;
+        private TextBox nomeTxt;
     }
 }

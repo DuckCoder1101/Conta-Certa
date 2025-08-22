@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace Conta_Certa.Models;
 
@@ -120,30 +119,34 @@ public class Cliente
 
     public static bool CheckTelefone(string telefone)
     {
-        var digits = new string(telefone.Where(char.IsDigit).ToArray());
+        var digits = new string([.. telefone.Where(char.IsDigit)]);
 
-        if (digits.Length < 10 || digits.Length > 11)
-        {
-            return false;
-        }
+        return (
+            digits.Length == telefone.Length &&
+            telefone.Length <= 11);
 
-        // Se tem 11 dígitos → DDD + celular (9 dígitos começando com 9)
-        if (digits.Length == 11)
-        {
-            // O dígito 2 (primeiro após o DDD) precisa ser 9
-            if (digits[2] != '9')
-                return false;
-        }
+        //if (digits.Length < 10 || digits.Length > 11)
+        //{
+        //    return false;
+        //}
 
-        // Se tem 10 dígitos → DDD + fixo (8 dígitos começando com 2–5)
-        if (digits.Length == 10)
-        {
-            // O dígito 2 (primeiro após o DDD) precisa ser 2,3,4 ou 5
-            if (!"2345".Contains(digits[2]))
-                return false;
-        }
+        //// Se tem 11 dígitos → DDD + celular (9 dígitos começando com 9)
+        //if (digits.Length == 11)
+        //{
+        //    // O dígito 2 (primeiro após o DDD) precisa ser 9
+        //    if (digits[2] != '9')
+        //        return false;
+        //}
 
-        return true;
+        //// Se tem 10 dígitos → DDD + fixo (8 dígitos começando com 2–5)
+        //if (digits.Length == 10)
+        //{
+        //    // O dígito 2 (primeiro após o DDD) precisa ser 2,3,4 ou 5
+        //    if (!"2345".Contains(digits[2]))
+        //        return false;
+        //}
+
+        //return true;
     }
 
 

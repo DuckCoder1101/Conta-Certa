@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ManageCobranca));
             tableLayoutPanel2 = new TableLayoutPanel();
             label1 = new Label();
             label7 = new Label();
@@ -220,9 +221,9 @@
             cadastrarBtn.Cursor = Cursors.Hand;
             cadastrarBtn.FlatStyle = FlatStyle.Flat;
             cadastrarBtn.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            cadastrarBtn.Location = new Point(196, 273);
+            cadastrarBtn.Location = new Point(196, 270);
             cadastrarBtn.Name = "cadastrarBtn";
-            cadastrarBtn.Size = new Size(180, 33);
+            cadastrarBtn.Size = new Size(180, 40);
             cadastrarBtn.TabIndex = 10;
             cadastrarBtn.Text = "CADASTRAR";
             cadastrarBtn.UseVisualStyleBackColor = false;
@@ -253,6 +254,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(572, 328);
             Controls.Add(tableLayoutPanel2);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MdiChildrenMinimizedAnchorBottom = false;
             MinimizeBox = false;

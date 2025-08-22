@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ManageServico));
             tableLayoutPanel1 = new TableLayoutPanel();
             cadastrarBtn = new Button();
             label1 = new Label();
@@ -137,6 +138,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(464, 124);
             Controls.Add(tableLayoutPanel1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MdiChildrenMinimizedAnchorBottom = false;
             MinimizeBox = false;

@@ -13,12 +13,12 @@ public class ClienteColumns
 
     public ClienteColumns()
     {
-        Nome = new("Nome", nameof(ClienteCadDTO.Nome), true, "Nome do cliente.");
-        Documento = new("Documento (CPF/CNPJ)", nameof(ClienteCadDTO.Documento), true, "Documento do cliente.");
-        Telefone = new("Telefone", nameof(ClienteCadDTO.Telefone), true, "Telefone do cliente (11 dígitos).");
-        Email = new("E-mail", nameof(ClienteCadDTO.Email), false, "Email do cliente.");
-        Honorario = new("Honorário", nameof(ClienteCadDTO.Honorario), true, "Honorário mensal base do cliente.");
-        VencimentoHonorario = new("Vencimento Honorário", nameof(ClienteCadDTO.VencimentoHonorario), true, "Dia padrão de vencimento do honorário (dd).");
+        Nome = new("Nome", nameof(ClienteCadDTO.Nome), "Nome do cliente.");
+        Documento = new("Documento (CPF/CNPJ)", nameof(ClienteCadDTO.Documento), "Documento do cliente.");
+        Telefone = new("Telefone", nameof(ClienteCadDTO.Telefone), "Telefone do cliente (11 dígitos).");
+        Email = new("E-mail", nameof(ClienteCadDTO.Email), "Email do cliente.");
+        Honorario = new("Honorário", nameof(ClienteCadDTO.Honorario), "Honorário mensal base do cliente.");
+        VencimentoHonorario = new("Vencimento Honorário", nameof(ClienteCadDTO.VencimentoHonorario), "Dia padrão de vencimento do honorário (dd).");
     }
 
     public IEnumerable<ColumnMap> GetColumns()

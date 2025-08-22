@@ -1,6 +1,6 @@
 ﻿namespace Conta_Certa.Forms
 {
-    partial class ColumnAssistant
+    partial class ClienteColumnManager
     {
         /// <summary>
         /// Required designer variable.
@@ -28,26 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClienteColumnManager));
             tableLayoutPanel1 = new TableLayoutPanel();
             clientePanel = new TableLayoutPanel();
             label4 = new Label();
             clientesPropsList = new Panel();
-            cobrancaPanel = new TableLayoutPanel();
-            cobrancasPropsList = new Panel();
-            label1 = new Label();
             importarBtn = new Button();
             tableLayoutPanel1.SuspendLayout();
             clientePanel.SuspendLayout();
-            cobrancaPanel.SuspendLayout();
             SuspendLayout();
             // 
             // tableLayoutPanel1
             // 
-            tableLayoutPanel1.ColumnCount = 2;
+            tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.Controls.Add(clientePanel, 0, 0);
-            tableLayoutPanel1.Controls.Add(cobrancaPanel, 1, 0);
             tableLayoutPanel1.Controls.Add(importarBtn, 0, 1);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
@@ -71,7 +67,7 @@
             clientePanel.RowCount = 2;
             clientePanel.RowStyles.Add(new RowStyle());
             clientePanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            clientePanel.Size = new Size(394, 406);
+            clientePanel.Size = new Size(794, 406);
             clientePanel.TabIndex = 4;
             // 
             // label4
@@ -82,9 +78,9 @@
             label4.Location = new Point(8, 8);
             label4.Margin = new Padding(6);
             label4.Name = "label4";
-            label4.Size = new Size(378, 19);
+            label4.Size = new Size(778, 19);
             label4.TabIndex = 3;
-            label4.Text = "CLIENTES";
+            label4.Text = "IMPORTAR CLIENTES";
             label4.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // clientesPropsList
@@ -93,82 +89,42 @@
             clientesPropsList.Dock = DockStyle.Fill;
             clientesPropsList.Location = new Point(5, 38);
             clientesPropsList.Name = "clientesPropsList";
-            clientesPropsList.Size = new Size(384, 363);
+            clientesPropsList.Size = new Size(784, 363);
             clientesPropsList.TabIndex = 4;
-            // 
-            // cobrancaPanel
-            // 
-            cobrancaPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Outset;
-            cobrancaPanel.ColumnCount = 1;
-            cobrancaPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            cobrancaPanel.Controls.Add(cobrancasPropsList, 0, 1);
-            cobrancaPanel.Controls.Add(label1, 0, 0);
-            cobrancaPanel.Dock = DockStyle.Fill;
-            cobrancaPanel.Location = new Point(403, 3);
-            cobrancaPanel.Name = "cobrancaPanel";
-            cobrancaPanel.RowCount = 2;
-            cobrancaPanel.RowStyles.Add(new RowStyle());
-            cobrancaPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            cobrancaPanel.Size = new Size(394, 406);
-            cobrancaPanel.TabIndex = 5;
-            // 
-            // cobrancasPropsList
-            // 
-            cobrancasPropsList.AutoScroll = true;
-            cobrancasPropsList.Dock = DockStyle.Fill;
-            cobrancasPropsList.Location = new Point(5, 38);
-            cobrancasPropsList.Name = "cobrancasPropsList";
-            cobrancasPropsList.Size = new Size(384, 363);
-            cobrancasPropsList.TabIndex = 5;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Dock = DockStyle.Top;
-            label1.Font = new Font("Arial", 12F, FontStyle.Bold);
-            label1.Location = new Point(8, 8);
-            label1.Margin = new Padding(6);
-            label1.Name = "label1";
-            label1.Size = new Size(378, 19);
-            label1.TabIndex = 3;
-            label1.Text = "COBRANÇAS";
-            label1.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // importarBtn
             // 
             importarBtn.BackColor = Color.Green;
-            tableLayoutPanel1.SetColumnSpan(importarBtn, 2);
-            importarBtn.Dock = DockStyle.Right;
+            importarBtn.Dock = DockStyle.Fill;
             importarBtn.FlatStyle = FlatStyle.Flat;
             importarBtn.Font = new Font("Arial", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             importarBtn.ForeColor = SystemColors.HighlightText;
-            importarBtn.Location = new Point(694, 416);
+            importarBtn.Location = new Point(4, 416);
             importarBtn.Margin = new Padding(4);
             importarBtn.Name = "importarBtn";
-            importarBtn.Size = new Size(102, 30);
+            importarBtn.Size = new Size(792, 30);
             importarBtn.TabIndex = 6;
             importarBtn.Text = "IMPORTAR";
             importarBtn.UseVisualStyleBackColor = false;
             importarBtn.Click += Import_Click;
             // 
-            // ExcelColumnAssistant
+            // ClienteColumnManager
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(tableLayoutPanel1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MdiChildrenMinimizedAnchorBottom = false;
             MinimizeBox = false;
-            Name = "ExcelColumnAssistant";
+            Name = "ClienteColumnManager";
             StartPosition = FormStartPosition.CenterParent;
             Text = "Selecinar Colunas";
             Shown += ExcelColumnAssistant_Shown;
             tableLayoutPanel1.ResumeLayout(false);
             clientePanel.ResumeLayout(false);
             clientePanel.PerformLayout();
-            cobrancaPanel.ResumeLayout(false);
-            cobrancaPanel.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -176,11 +132,8 @@
 
         private TableLayoutPanel tableLayoutPanel1;
         private TableLayoutPanel clientePanel;
-        private TableLayoutPanel cobrancaPanel;
-        private Label label1;
         private Button importarBtn;
         private Panel clientesPropsList;
-        private Panel cobrancasPropsList;
         private Label label4;
     }
 }

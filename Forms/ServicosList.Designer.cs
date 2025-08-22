@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServicosList));
             tableLayoutPanel1 = new TableLayoutPanel();
             searchbar = new Conta_Certa.UserControls.SearchbarControl();
             servicosPanel = new Panel();
@@ -100,6 +101,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(tableLayoutPanel1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "ServicosList";
             Text = "ServicosList";
             FormClosing += ServicosList_FormClosing;

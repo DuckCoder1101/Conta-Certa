@@ -7,24 +7,124 @@ namespace Conta_Certa
 {
     public partial class Main : Form
     {
+        Form? currentForm = null;
+
+        FlowLayoutPanel? submenu = null;
+        bool isMenuExpanded = false;
+        const int step = 5;
+
         public Main()
         {
             InitializeComponent();
         }
 
+        private void MenuTimer_Tick(object? sender, EventArgs e)
+        {
+            if (isMenuExpanded)
+            {
+                if (sidebarPanel.Width > 50)
+                {
+                    sidebarPanel.Width -= step;
+                }
+
+                else
+                {
+                    menuTimer.Stop();
+                    isMenuExpanded = false;
+                }
+            }
+
+            else
+            {
+                if (sidebarPanel.Width < 250)
+                {
+                    sidebarPanel.Width += step;
+                }
+
+                else
+                {
+                    menuTimer.Stop();
+                    isMenuExpanded = true;
+                }
+            }
+        }
+
+        private void ShowMenuBtn_Click(object sender, EventArgs e)
+        {
+            if (!menuTimer.Enabled)
+            {
+                CloseSubmenu();
+                menuTimer.Start();
+            }
+        }
+
+        private void CloseSubmenu()
+        {
+            if (submenu != null)
+            {
+                submenu.Height = 56;
+            }
+        }
+
+        private void Submenu_Click(object sender, EventArgs e)
+        {
+            FlowLayoutPanel? panel = (FlowLayoutPanel?) ((Button)sender)?.Parent?.Parent;
+            if (panel != null && !menuTimer.Enabled)
+            {
+                if (submenu != null && submenu != panel)
+                {
+                    CloseSubmenu();
+                }
+
+                if (panel.Height == 56)
+                {
+                    submenu = panel;
+                    submenu.Height = 56 * submenu.Controls.Count;
+                }
+
+                else
+                {
+                    CloseSubmenu();
+                    submenu = null;
+                }
+            }
+        }
+
         private void CadastrarCliente_Click(object sender, EventArgs e)
         {
-            using ManageCliente form = new();
-            form.ShowDialog();
+            currentForm?.Close();
+
+            ManageCliente form = new()
+            {
+                FormBorderStyle = FormBorderStyle.None,
+                TopLevel = false,
+                Dock = DockStyle.Fill
+            };
+
+            mainFrame.Controls.Add(form);
+            form.Show();
+
+            currentForm = form;
         }
 
         private void AbrirClientesList_Click(object sender, EventArgs e)
         {
-            using ClientesList form = new();
-            form.ShowDialog();
+            currentForm?.Close();
+
+            ClientesList form = new()
+            {
+                FormBorderStyle = FormBorderStyle.None,
+                TopLevel = false,
+                Dock = DockStyle.Fill
+            };
+
+            mainFrame.Controls.Add(form);
+            form.Show();
+
+            currentForm = form;
         }
 
-        private void ImportFromJSON_Click(object sender, EventArgs e)
+        private void ImportJSON_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new()
             {
@@ -35,7 +135,7 @@ namespace Conta_Certa
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                ExportImportData.ImportFromJson(dialog.FileName);
+                JSONImporter.ImportFromJson(dialog.FileName);
             }
         }
 
@@ -51,11 +151,91 @@ namespace Conta_Certa
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                ExportImportData.ExportToJSON(dialog.FileName);
+                JSONImporter.ExportToJSON(dialog.FileName);
             }
         }
 
-        private void ImportFromExcelBtn_Click(object sender, EventArgs e)
+        private void CobrancasPendentes_Menu_Click(object sender, EventArgs e)
+        {
+            currentForm?.Close();
+
+            CobrancasList form = new(CobrancaStatus.Pendente)
+            {
+                FormBorderStyle = FormBorderStyle.None,
+                TopLevel = false,
+                Dock = DockStyle.Fill
+            };
+
+            mainFrame.Controls.Add(form);
+            form.Show();
+
+            currentForm = form;
+        }
+
+        private void CobrancasPagas_Click(object sender, EventArgs e)
+        {
+            currentForm?.Close();
+
+            CobrancasList form = new(CobrancaStatus.Paga)
+            {
+                FormBorderStyle = FormBorderStyle.None,
+                TopLevel = false,
+                Dock = DockStyle.Fill
+            };
+
+            mainFrame.Controls.Add(form);
+            form.Show();
+
+            currentForm = form;
+        }
+
+        private void ListaServicos_Click(object sender, EventArgs e)
+        {
+            currentForm?.Close();
+
+            ServicosList form = new()
+            {
+                FormBorderStyle = FormBorderStyle.None,
+                TopLevel = false,
+                Dock = DockStyle.Fill
+            };
+
+            mainFrame.Controls.Add(form);
+            form.Show();
+
+            currentForm = form;
+        }
+
+        private void CadastrarSevico_Click(object sender, EventArgs e)
+        {
+            currentForm?.Close();
+
+            ManageServico form = new()
+            {
+                FormBorderStyle = FormBorderStyle.None,
+                TopLevel = false,
+                Dock = DockStyle.Fill
+            };
+
+            mainFrame.Controls.Add(form);
+            form.Show();
+
+            currentForm = form;
+        }
+
+        private void GerarCobrancas_Click(object sender, EventArgs e)
+        {
+            // Agenda as cobranças
+            Task.Run(() => CobrancasScheduler.GenCobrancasDoMes());
+        }
+
+        private void StartWhastappAutomation_Click(object sender, EventArgs e)
+        {
+            var cobrancas = CobrancaDAO.GetCobrancasByStatus(CobrancaStatus.Pendente);
+            Server.ConnectExtension([.. cobrancas]);
+        }
+
+        private void ImportClientesTable_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new()
             {
@@ -66,49 +246,23 @@ namespace Conta_Certa
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                ExportImportData.ImportFromTable(dialog.FileName);
+                ExcelImporter.ImportClientesTable(dialog.FileName);
             }
         }
 
-        private void CobrancasPendentes_Menu_Click(object sender, EventArgs e)
+        private void ImportCobrancaTable_Click(object sender, EventArgs e)
         {
-            using CobrancasList form = new(CobrancaStatus.Pendente);
-            form.ShowDialog();
-        }
+            OpenFileDialog dialog = new()
+            {
+                Title = "Importar tabela Excel",
+                Filter = "Arquivo JSON (*.xls;*.xlsx)|*.xls;*.xlsx",
+                DefaultExt = "json"
+            };
 
-        private void CobrancasPagas_Click(object sender, EventArgs e)
-        {
-            using CobrancasList form = new(CobrancaStatus.Paga);
-            form.ShowDialog();
-        }
-
-        private void ListaServicos_Menu_Click(object sender, EventArgs e)
-        {
-            using ServicosList form = new();
-            form.ShowDialog();
-        }
-
-        private void CadastrarSevico_Menu_Click(object sender, EventArgs e)
-        {
-            using ManageServico manageServico = new ManageServico();
-            manageServico.ShowDialog();
-        }
-
-        private void GerarCobrancas_Click(object sender, EventArgs e)
-        {
-            // Agenda as cobranças
-            Task.Run(() => CobrancasScheduler.GenCobrancasDoMes());
-        }
-
-        private void GerarRelatorio(object sender, EventArgs e)
-        {
-            RelatorioManager.CreateRelatorio();
-        }
-
-        private void EnviarCobrancasPorWhastapp_Click(object sender, EventArgs e)
-        {
-            var cobrancas = CobrancaDAO.GetCobrancasByStatus(CobrancaStatus.Pendente);
-            Server.ConnectExtension([.. cobrancas]);
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                ExcelImporter.ImportCobrancasTable(dialog.FileName);
+            }
         }
     }
 }

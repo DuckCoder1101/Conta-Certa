@@ -1,6 +1,6 @@
-﻿using Conta_Certa.Models;
+﻿using Conta_Certa.DTOs;
 
-namespace Conta_Certa.DTOs;
+namespace Conta_Certa.Models;
 
 public class CobrancaColumns
 {
@@ -12,11 +12,11 @@ public class CobrancaColumns
 
     public CobrancaColumns()
     {
-        DocumentoCliente = new("Doc. cliente", nameof(ClienteCadDTO.Documento), true, "Documento do devedor.");
-        Honorario = new("Honorário", nameof(CobrancaCadDTO.Honorario), true, "Honorário base da cobrança.");
-        Status = new("Status", nameof(CobrancaCadDTO.Status), true, "Status do pagamento da cobrança (Pago | Pendente).");
-        Vencimento = new("Vencimento", nameof(CobrancaCadDTO.Vencimento), true, "Data de vencimento da cobrança (dd/MM/aaaa).");
-        PagoEm = new("Pago em", nameof(CobrancaCadDTO.PagoEm), true, "Data de pagamento da cobrança (dd/MM/aaaa).");
+        DocumentoCliente = new("Doc. cliente", nameof(ClienteCadDTO.Documento), "Documento do devedor.");
+        Honorario = new("Honorário", nameof(CobrancaCadDTO.Honorario), "Honorário base da cobrança.");
+        Status = new("Status", nameof(CobrancaCadDTO.Status), "Status do pagamento da cobrança (Pago | Pendente).");
+        Vencimento = new("Vencimento", nameof(CobrancaCadDTO.Vencimento), "Data de vencimento da cobrança (dd/MM/aaaa).");
+        PagoEm = new("Pago em", nameof(CobrancaCadDTO.PagoEm), "Data de pagamento da cobrança (dd/MM/aaaa).");
     }
 
     public IEnumerable<ColumnMap> GetColumns()

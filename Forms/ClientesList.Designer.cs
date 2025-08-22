@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClientesList));
             menu = new ContextMenuStrip(components);
             verCobrançasToolStripMenuItem = new ToolStripMenuItem();
             alterarToolStripMenuItem = new ToolStripMenuItem();
@@ -108,6 +109,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(tableLayoutPanel1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "ClientesList";
             StartPosition = FormStartPosition.CenterParent;
             Text = "Lista de clientes";
