@@ -11,7 +11,7 @@ namespace Conta_Certa.Utils;
 
 public class Server
 {
-    private static readonly string ExtensionID = "fpjccdhjcgggodabemgaknlaoemdmjip";
+    private static readonly string ExtensionID = "ahelgipfokmhnfmgjfockapnfedenbod";
 
     private static int GetFreePort()
     {
@@ -74,7 +74,7 @@ public class Server
 
                 // Inicia o chrome
                 Process.Start(chromePath,
-                    $"--profile-directory=Default chrome-extension://{ExtensionID}/index.html?port={port}");
+                    $"--profile-directory=Default chrome-extension://{ExtensionID}/service/loader.html?port={port}");
             }
         }
 
