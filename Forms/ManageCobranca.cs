@@ -108,7 +108,7 @@ public partial class ManageCobranca : InputForm
     private void LoadServicos()
     {
         // Carrega todos os servicos
-        foreach (var servico in ServicoDAO.SelectAllServicos())
+        foreach (var servico in ServicoDAO.GetAllServicos())
         {
             bool exists = servicosPanel.Controls
                 .OfType<ServicoCobrancaControl>()
@@ -160,7 +160,7 @@ public partial class ManageCobranca : InputForm
 
                     else
                     {
-                        ServicoCobrancaDAO.DeleteSerivocCobranca(sc);
+                        ServicoCobrancaDAO.DeleteServicoCobranca(sc);
                     }
                 }
             }

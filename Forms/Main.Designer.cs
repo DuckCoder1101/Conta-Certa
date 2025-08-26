@@ -1169,7 +1169,7 @@
             MdiChildrenMinimizedAnchorBottom = false;
             Name = "Main";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Conta Fácil";
+            Text = "Conta Certa";
             sidebarPanel.ResumeLayout(false);
             dashboard.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);

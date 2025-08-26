@@ -1,5 +1,4 @@
-﻿using Conta_Certa.Models;
-
+﻿
 namespace Conta_Certa.DTOs;
 
 public record ClienteCadDTO
@@ -11,10 +10,7 @@ public record ClienteCadDTO
     public float? Honorario { get; set; }
     public int? VencimentoHonorario { get; set; }
 
-    public ClienteCadDTO()
-    {
-
-    }
+    public ClienteCadDTO() { }
 
     public ClienteCadDTO(string documento, string nome, string telefone, string? email, float honorario, int vencimentoHonorario)
     {
@@ -26,14 +22,14 @@ public record ClienteCadDTO
         VencimentoHonorario = vencimentoHonorario;
     }
 
-    public ClienteCadDTO(Cliente cliente)
+    public ClienteCadDTO(ClienteJSONDTO @base)
     {
-        Nome = cliente.Nome;
-        Documento = cliente.Documento;
-        Telefone = cliente.Telefone;
-        Email = cliente.Email;
-        Honorario = cliente.Honorario;
-        VencimentoHonorario = cliente.VencimentoHonorario;
+        Nome = @base.Nome;
+        Documento = @base.Documento;
+        Telefone= @base.Telefone;
+        Email = @base.Email;
+        Honorario = @base.Honorario;
+        VencimentoHonorario = @base.VencimentoHonorario;
     }
 
     public bool IsFull()

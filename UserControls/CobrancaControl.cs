@@ -21,7 +21,7 @@ public partial class CobrancaControl : UserControl
             vencimentoTxt.Text = Cobranca.Honorario.ToString();
             statusTxt.Text = Cobranca.Status.ToString();
             vencimentoTxt.Text = Cobranca.Vencimento.ToString("dd/MM/yy");
-            pagoEmTxt.Text = Cobranca.PagoEm?.ToString("dd/MM/yyyy") ?? "-";
+            pagoEmTxt.Text = Cobranca.PagoEm?.ToString("dd/MM/yy") ?? "-";
             honorarioTotalTxt.Text = Cobranca.HonorarioTotal.ToString("c");
         }
     }

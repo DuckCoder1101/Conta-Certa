@@ -41,7 +41,7 @@ public partial class ServicosList : Form
 
     private void UpdateServicosList()
     {
-        servicos = ServicoDAO.SelectAllServicos();
+        servicos = ServicoDAO.GetAllServicos();
         UpdateServicosPanel();
     }
 

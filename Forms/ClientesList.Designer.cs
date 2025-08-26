@@ -31,7 +31,6 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClientesList));
             menu = new ContextMenuStrip(components);
-            verCobrançasToolStripMenuItem = new ToolStripMenuItem();
             alterarToolStripMenuItem = new ToolStripMenuItem();
             excluirToolStripMenuItem = new ToolStripMenuItem();
             clientesPanel = new Panel();
@@ -44,28 +43,22 @@
             // menu
             // 
             menu.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            menu.Items.AddRange(new ToolStripItem[] { verCobrançasToolStripMenuItem, alterarToolStripMenuItem, excluirToolStripMenuItem });
+            menu.Items.AddRange(new ToolStripItem[] { alterarToolStripMenuItem, excluirToolStripMenuItem });
             menu.Name = "menu";
-            menu.Size = new Size(158, 70);
+            menu.Size = new Size(115, 48);
             menu.Text = "Menu cliente";
-            // 
-            // verCobrançasToolStripMenuItem
-            // 
-            verCobrançasToolStripMenuItem.Name = "verCobrançasToolStripMenuItem";
-            verCobrançasToolStripMenuItem.Size = new Size(157, 22);
-            verCobrançasToolStripMenuItem.Text = "Ver cobranças";
             // 
             // alterarToolStripMenuItem
             // 
             alterarToolStripMenuItem.Name = "alterarToolStripMenuItem";
-            alterarToolStripMenuItem.Size = new Size(157, 22);
+            alterarToolStripMenuItem.Size = new Size(114, 22);
             alterarToolStripMenuItem.Text = "Alterar";
             alterarToolStripMenuItem.Click += Alterar_Menu_Click;
             // 
             // excluirToolStripMenuItem
             // 
             excluirToolStripMenuItem.Name = "excluirToolStripMenuItem";
-            excluirToolStripMenuItem.Size = new Size(157, 22);
+            excluirToolStripMenuItem.Size = new Size(114, 22);
             excluirToolStripMenuItem.Text = "Excluir";
             excluirToolStripMenuItem.Click += Excluir_Menu_Click;
             // 
@@ -121,7 +114,6 @@
 
         #endregion
         private ContextMenuStrip menu;
-        private ToolStripMenuItem verCobrançasToolStripMenuItem;
         private ToolStripMenuItem alterarToolStripMenuItem;
         private ToolStripMenuItem excluirToolStripMenuItem;
         private Panel clientesPanel;

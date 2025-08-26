@@ -96,7 +96,7 @@ public static class ServicoDAO
         }
     }
 
-    public static List<Servico> SelectAllServicos()
+    public static List<Servico> GetAllServicos()
     {
         try
         {

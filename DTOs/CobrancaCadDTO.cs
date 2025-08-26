@@ -15,6 +15,15 @@ public record CobrancaCadDTO
 
     }
 
+    public CobrancaCadDTO(CobrancaJSONDTO @base)
+    {
+        DocumentoCliente = @base.DocumentoCliente;
+        Honorario = @base.Honorario;
+        Status = @base.Status;
+        Vencimento = @base.Vencimento;
+        PagoEm = @base.PagoEm;
+    }
+
     public CobrancaCadDTO(string documentoCliente, float honorario, CobrancaStatus status, DateTime vencimento, DateTime? pagoEm)
     {
         DocumentoCliente = documentoCliente;
@@ -22,15 +31,6 @@ public record CobrancaCadDTO
         Status = status;
         Vencimento = vencimento;
         PagoEm = pagoEm;
-    }
-
-    public CobrancaCadDTO(Cobranca cobranca)
-    {
-        DocumentoCliente = cobranca.Cliente.Documento;
-        Honorario = cobranca.Honorario;
-        Status = cobranca.Status;
-        Vencimento = cobranca.Vencimento;
-        PagoEm = cobranca.PagoEm;
     }
 
     public bool IsFull()

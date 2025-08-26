@@ -13,9 +13,9 @@ public record ServicoCadDTO
         Valor = valor;
     }
 
-    public ServicoCadDTO(Servico servico)
+    public ServicoCadDTO(ServicoJSONDTO @base)
     {
-        Nome = servico.Nome;
-        Valor = servico.Valor;
+        Nome = @base.Nome;
+        Valor = @base.Valor;
     }
 }

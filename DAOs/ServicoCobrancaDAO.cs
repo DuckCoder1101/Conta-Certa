@@ -7,7 +7,7 @@ namespace Conta_Certa.DAOs;
 
 public static class ServicoCobrancaDAO
 {
-    public static List<long?> InsertServicosCobranca(params ServicoCobrancaCadDTO[] servicos)
+    public static void InsertServicosCobranca(params ServicoCobrancaCadDTO[] servicos)
     {
         try
         {
@@ -25,8 +25,6 @@ public static class ServicoCobrancaDAO
                            RETURNING idServicoCobranca;";
 
             using var cmd = new SQLiteCommand(sql, conn, transaction);
-            List<long?> ids = [];
-
             foreach (var servico in servicos)
             {
 
@@ -35,22 +33,14 @@ public static class ServicoCobrancaDAO
                 cmd.Parameters.AddWithValue("@valor", servico.Valor);
                 cmd.Parameters.AddWithValue("@quantidade", servico.Quantidade);
 
-                long idServicoCobranca = (long) cmd.ExecuteScalar();
-                ids.Add(idServicoCobranca);
-
+                cmd.ExecuteNonQuery();
                 cmd.Parameters.Clear();
             }
-
-            transaction.Commit();
-            conn.Close();
-
-            return ids;
         }
 
         catch (Exception ex)
         {
             Logger.LogException(ex);
-            return [];
         }
     }
 
@@ -81,7 +71,7 @@ public static class ServicoCobrancaDAO
         }
     }
 
-    public static void DeleteSerivocCobranca(ServicoCobranca servico)
+    public static void DeleteServicoCobranca(ServicoCobranca servico)
     {
         try
         {

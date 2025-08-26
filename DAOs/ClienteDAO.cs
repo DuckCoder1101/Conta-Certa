@@ -216,10 +216,10 @@ public static class ClienteDAO
             if (reader.Read())
             {
                 var nome = reader.GetString(1);
-                var telefone = reader.GetString(3);
-                var email = reader.GetString(4);
-                var honorario = reader.GetFloat(5);
-                var vencimentoHonorario = reader.GetInt32(6);
+                var telefone = reader.GetString(2);
+                var email = reader.GetString(3);
+                var honorario = reader.GetFloat(4);
+                var vencimentoHonorario = reader.GetInt32(5);
 
                 return new(
                     documento,

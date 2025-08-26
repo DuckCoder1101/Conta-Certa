@@ -38,46 +38,49 @@ public static class JSONImporter
         return map;
     }
 
-    private static void ImportClientesFromJSON(List<Cliente> clientes)
+    private static void ImportClientes(List<ClienteJSONDTO> clientes)
     {
         ClienteCadDTO[] dtos = [.. clientes.Select(c => new ClienteCadDTO(c))];
         ClienteDAO.InsertClientes(dtos);
     }
 
-    private static Dictionary<long, long?> ImportCobrancasFromJSON(List<Cobranca> cobrancas)
+    private static Dictionary<long, long?> ImportCobrancas(List<CobrancaJSONDTO> cobrancas)
     {
-       List<CobrancaCadDTO> dtos = [];
-
-        foreach (var cobranca in cobrancas)
-        {
-            dtos.Add(new(cobranca));
-        }
+        List<CobrancaCadDTO> dtos = [.. cobrancas.Select(c => new CobrancaCadDTO(c))];
 
         var ids = CobrancaDAO.InsertCobrancas([..dtos]);
-        return MapIds(cobrancas, ids, c => c.IdCobranca);
+        return MapIds(cobrancas, ids, c => c.TransitionIdCobranca);
     }
 
-    private static Dictionary<long, long?> ImportServicosFromJSON(List<Servico> servicos)
+    private static Dictionary<long, long?> ImportServicos(List<ServicoJSONDTO> servicos)
     {
         ServicoCadDTO[] dtos = [.. servicos.Select(s => new ServicoCadDTO(s))];
         var ids = ServicoDAO.InsertServicos(dtos);
 
-        return MapIds(servicos, ids, s => s.IdServico);
+        return MapIds(servicos, ids, s => s.TransitionIdServico);
     }
 
-    private static void ImportServicosCobrancaFromJSON(List<ServicoCobranca> servicosCobrancas, Dictionary<long, long?> idCobrancas, Dictionary<long, long?> idServicos)
+    private static void ImportServicosCobranca(List<CobrancaJSONDTO> cobrancas, Dictionary<long, long?> idCobrancas, Dictionary<long, long?> idServicos)
     {
         List<ServicoCobrancaCadDTO> dtos = [];
 
-        foreach (var sc in servicosCobrancas)
+        foreach (var c in cobrancas)
         {
-            if (idCobrancas[sc.IdCobranca] != null && 
-                idServicos[sc.Servico.IdServico] != null)
+            long? idCobranca = idCobrancas[c.TransitionIdCobranca];
+            if (idCobranca != null)
             {
-                dtos.Add(new(
-                    sc,
-                    (long)idCobrancas[sc.IdCobranca]!,
-                    (long)idServicos[sc.Servico.IdServico]!));
+                foreach (var sc in c.ServicosCobranca)
+                {
+                    long? idServico = idServicos[sc.IdServico];
+                    if (idServico != null)
+                    {
+                        dtos.Add(new(
+                            (long)idCobranca,
+                            (long)idServico,
+                            sc.Valor,
+                            sc.Quantidade));
+                    }
+                }
             }
         }
 
@@ -123,13 +126,10 @@ public static class JSONImporter
 
                 if (appData != null)
                 {
-                    List<ServicoCobranca> servicoCobrancas = [.. appData.Cobrancas.SelectMany(c => c.ServicosCobranca)];
-
-                    ImportClientesFromJSON(appData.Clientes);
-                    var idCobrancas = ImportCobrancasFromJSON(appData.Cobrancas);
-                    var idServicos = ImportServicosFromJSON(appData.Servicos);
-
-                    ImportServicosCobrancaFromJSON(servicoCobrancas, idCobrancas, idServicos);
+                    ImportClientes(appData.Clientes);
+                    var idCobrancas = ImportCobrancas(appData.Cobrancas);
+                    var idServicos = ImportServicos(appData.Servicos);
+                    ImportServicosCobranca(appData.Cobrancas, idCobrancas, idServicos);
 
                     MessageBox.Show(
                         "Os dados foram importados com sucesso!",

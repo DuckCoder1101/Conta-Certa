@@ -2,6 +2,7 @@
 using Conta_Certa.Models;
 using Conta_Certa.Utils;
 using System.Data.SQLite;
+using System.Diagnostics;
 
 namespace Conta_Certa.DAOs;
 
