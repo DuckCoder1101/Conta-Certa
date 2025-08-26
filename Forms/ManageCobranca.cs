@@ -1,11 +1,12 @@
-﻿using Conta_Certa.DAOs;
+﻿using Conta_Certa.Components;
+using Conta_Certa.DAOs;
 using Conta_Certa.DTOs;
 using Conta_Certa.Models;
 using Conta_Certa.UserControls;
 
 namespace Conta_Certa.Forms;
 
-public partial class ManageCobranca : Form
+public partial class ManageCobranca : InputForm
 {
     // cliente selecionado no dropdown
     private Cliente? cliente = null;
@@ -266,6 +267,15 @@ public partial class ManageCobranca : Form
         }
 
         DialogResult = DialogResult.OK;
-        Close();
+
+        if (Modal)
+        {
+            Close();
+        }
+
+        else
+        {
+            ClearInputs();
+        }
     }
 }

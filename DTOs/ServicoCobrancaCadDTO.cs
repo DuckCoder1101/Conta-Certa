@@ -4,10 +4,10 @@ namespace Conta_Certa.DTOs;
 
 public record ServicoCobrancaCadDTO
 {
-    public long IdCobranca { get; }
-    public long IdServico { get; }
-    public float Valor { get; }
-    public int Quantidade { get; }
+    public long IdCobranca { get; set; }
+    public long IdServico { get; set; }
+    public float Valor { get; set; }
+    public int Quantidade { get; set; }
 
     public ServicoCobrancaCadDTO(long idCobranca, long idServico, float valor, int quantidade)
     {

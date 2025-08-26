@@ -1,10 +1,11 @@
-﻿using Conta_Certa.DAOs;
+﻿using Conta_Certa.Components;
+using Conta_Certa.DAOs;
 using Conta_Certa.DTOs;
 using Conta_Certa.Models;
 
 namespace Conta_Certa.Forms
 {
-    public partial class ManageServico : Form
+    public partial class ManageServico : InputForm
     {
         private readonly Servico? servicoBase;
 
@@ -56,6 +57,16 @@ namespace Conta_Certa.Forms
             }
 
             DialogResult = DialogResult.OK;
+
+            if (Modal)
+            {
+                Close();
+            }
+
+            else
+            {
+                ClearInputs();
+            }
         }
     }
 }

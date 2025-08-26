@@ -1,10 +1,11 @@
-﻿using Conta_Certa.DAOs;
+﻿using Conta_Certa.Components;
+using Conta_Certa.DAOs;
 using Conta_Certa.DTOs;
 using Conta_Certa.Models;
 
 namespace Conta_Certa.Forms;
 
-public partial class ManageCliente : Form
+public partial class ManageCliente : InputForm
 {
     private readonly Cliente? cliente;
 
@@ -112,7 +113,16 @@ public partial class ManageCliente : Form
         }
 
         DialogResult = DialogResult.OK;
-        Close();
+
+        if (Modal)
+        {
+            Close();
+        }
+
+        else
+        {
+            ClearInputs();
+        }
     }
 
     private void DocumentoTxt_TextChanged(object sender, EventArgs e)

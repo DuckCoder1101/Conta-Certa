@@ -1,4 +1,5 @@
 ﻿using Conta_Certa.DTOs;
+using System.Text.Json.Serialization;
 
 namespace Conta_Certa.Models;
 
@@ -17,8 +18,9 @@ public class Cobranca
     public CobrancaStatus Status { get; private set; }
     public DateTime Vencimento { get; private set; }
     public DateTime? PagoEm { get; private set; }
-
     public List<ServicoCobranca> ServicosCobranca { get; private set; } = [];
+
+    [JsonConstructor]
 
     public Cobranca(long idCobranca, ClienteResumoDTO cliente, float honorario, CobrancaStatus status, DateTime vencimento, DateTime? pagoEm, List<ServicoCobranca>? servicos = null)
     {
