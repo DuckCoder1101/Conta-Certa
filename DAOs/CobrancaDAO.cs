@@ -2,7 +2,6 @@
 using Conta_Certa.Models;
 using Conta_Certa.Utils;
 using System.Data.SQLite;
-using System.Diagnostics;
 
 namespace Conta_Certa.DAOs;
 
@@ -30,16 +29,16 @@ public static class CobrancaDAO
             using var cmd = new SQLiteCommand(sql, conn, transaction);
             List<long?> ids = [];
 
-            foreach (var cobrancaDTO in dtos)
+            foreach (var dto in dtos)
             {
-                if (cobrancaDTO.IsFull())
+                if (dto.IsFull())
                 {
-                    var vencimento = cobrancaDTO.Vencimento?.ToString("yyyy-MM-dd");
-                    var pagoEm = cobrancaDTO.PagoEm?.ToString("yyyy-MM-dd");
+                    var vencimento = dto.Vencimento?.ToString("yyyy-MM-dd");
+                    var pagoEm = dto.PagoEm?.ToString("yyyy-MM-dd");
 
-                    cmd.Parameters.AddWithValue("@documentoCliente", cobrancaDTO.DocumentoCliente);
-                    cmd.Parameters.AddWithValue("@honorario", cobrancaDTO.Honorario);
-                    cmd.Parameters.AddWithValue("@status", cobrancaDTO.Status.ToString());
+                    cmd.Parameters.AddWithValue("@documentoCliente", dto.DocumentoCliente);
+                    cmd.Parameters.AddWithValue("@honorario", dto.Honorario);
+                    cmd.Parameters.AddWithValue("@status", dto.Status.ToString());
                     cmd.Parameters.AddWithValue("@vencimento", vencimento);
                     cmd.Parameters.AddWithValue("@pagoEm", pagoEm);
 
@@ -352,6 +351,73 @@ public static class CobrancaDAO
                             reader.GetString(12),
                             reader.GetFloat(10)),
                         quantidade: reader.GetInt32(11)));
+                }
+            }
+
+            return cobrancas;
+        }
+
+        catch (Exception ex)
+        {
+            Logger.LogException(ex);
+            return [];
+        }
+    }
+
+    public static List<CobrancaRelatoryDTO> GetRelatory(CobrancaStatus status)
+    {
+        try
+        {
+            using var conn = new SQLiteConnection(Database.ConnStr);
+            conn.Open();
+
+            string sql = @"SELECT
+                                co.idCobranca, 
+                                co.honorario, 
+                                co.vencimento, 
+                                co.pagoEm, 
+                                cli.nome, 
+                                sc.valor, 
+                                sc.quantidade 
+                           FROM Cobrancas AS co 
+                           LEFT JOIN Clientes cli ON cli.documento = co.documentoCliente 
+                           LEFT JOIN ServicosCobranca sc ON sc.idCobranca = co.idCobranca 
+                           LEFT JOIN Servicos s ON s.idServico = sc.idServico 
+                           WHERE co.status = @status;";
+
+            using var cmd = new SQLiteCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@status", status.ToString());
+
+            using var reader = cmd.ExecuteReader();
+
+            List<CobrancaRelatoryDTO> cobrancas = [];
+
+            while (reader.Read())
+            {
+                long idCobranca = reader.GetInt64(0);
+                var cobranca = cobrancas.FirstOrDefault(c => c.IdCobranca == idCobranca);
+
+                // Verifica se a cobrança ja foi adicionada à lista
+                if (cobranca == null)
+                {
+                    cobranca = new(
+                        idCobranca,
+                        reader.GetString(4),
+                        reader.GetFloat(1),
+                        status,
+                        DateTime.Parse(reader.GetString(2)),
+                        reader.IsDBNull(3) 
+                            ? null
+                            : reader.GetDateTime(3));
+
+                    cobrancas.Add(cobranca);
+                }
+
+                // Verifica a presença de serviços extras
+                if (!reader.IsDBNull(5))
+                {
+                    cobranca.HonorarioTotal +=
+                        reader.GetFloat(5) * reader.GetInt32(6);
                 }
             }
 

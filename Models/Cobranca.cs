@@ -1,5 +1,4 @@
 ﻿using Conta_Certa.DTOs;
-using System.Diagnostics;
 
 namespace Conta_Certa.Models;
 

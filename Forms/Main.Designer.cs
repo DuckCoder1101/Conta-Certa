@@ -95,6 +95,9 @@
             openMenuBtn = new Button();
             menuTimer = new System.Windows.Forms.Timer(components);
             mainFrame = new Panel();
+            tableLayoutPanel17 = new TableLayoutPanel();
+            pictureBox18 = new PictureBox();
+            gerarRelatorio = new Button();
             sidebarPanel.SuspendLayout();
             dashboard.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
@@ -138,6 +141,8 @@
             tableLayoutPanel16.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox17).BeginInit();
             topbar.SuspendLayout();
+            tableLayoutPanel17.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox18).BeginInit();
             SuspendLayout();
             // 
             // sidebarPanel
@@ -646,6 +651,7 @@
             cobrancas.Controls.Add(tableLayoutPanel12);
             cobrancas.Controls.Add(tableLayoutPanel13);
             cobrancas.Controls.Add(tableLayoutPanel14);
+            cobrancas.Controls.Add(tableLayoutPanel17);
             cobrancas.FlowDirection = FlowDirection.TopDown;
             cobrancas.Location = new Point(0, 189);
             cobrancas.Margin = new Padding(0, 3, 0, 3);
@@ -1157,6 +1163,54 @@
             mainFrame.Size = new Size(750, 400);
             mainFrame.TabIndex = 3;
             // 
+            // tableLayoutPanel17
+            // 
+            tableLayoutPanel17.ColumnCount = 2;
+            tableLayoutPanel17.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 50F));
+            tableLayoutPanel17.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel17.Controls.Add(pictureBox18, 0, 0);
+            tableLayoutPanel17.Controls.Add(gerarRelatorio, 1, 0);
+            tableLayoutPanel17.Location = new Point(20, 339);
+            tableLayoutPanel17.Margin = new Padding(20, 3, 0, 3);
+            tableLayoutPanel17.Name = "tableLayoutPanel17";
+            tableLayoutPanel17.RowCount = 1;
+            tableLayoutPanel17.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel17.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel17.Size = new Size(211, 50);
+            tableLayoutPanel17.TabIndex = 7;
+            // 
+            // pictureBox18
+            // 
+            pictureBox18.BackgroundImageLayout = ImageLayout.None;
+            pictureBox18.Dock = DockStyle.Fill;
+            pictureBox18.Image = (Image)resources.GetObject("pictureBox18.Image");
+            pictureBox18.Location = new Point(0, 3);
+            pictureBox18.Margin = new Padding(0, 3, 3, 3);
+            pictureBox18.Name = "pictureBox18";
+            pictureBox18.Size = new Size(47, 44);
+            pictureBox18.SizeMode = PictureBoxSizeMode.CenterImage;
+            pictureBox18.TabIndex = 0;
+            pictureBox18.TabStop = false;
+            // 
+            // gerarRelatorio
+            // 
+            gerarRelatorio.BackColor = Color.Transparent;
+            gerarRelatorio.FlatAppearance.BorderSize = 0;
+            gerarRelatorio.FlatAppearance.MouseOverBackColor = SystemColors.ControlDark;
+            gerarRelatorio.FlatStyle = FlatStyle.Flat;
+            gerarRelatorio.Font = new Font("Arial", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            gerarRelatorio.ForeColor = SystemColors.ControlLightLight;
+            gerarRelatorio.ImageAlign = ContentAlignment.MiddleLeft;
+            gerarRelatorio.Location = new Point(53, 3);
+            gerarRelatorio.Name = "gerarRelatorio";
+            gerarRelatorio.Size = new Size(155, 44);
+            gerarRelatorio.TabIndex = 4;
+            gerarRelatorio.Text = "GERAR RELATÓRIO";
+            gerarRelatorio.TextAlign = ContentAlignment.MiddleLeft;
+            gerarRelatorio.TextImageRelation = TextImageRelation.ImageBeforeText;
+            gerarRelatorio.UseVisualStyleBackColor = false;
+            gerarRelatorio.Click += GerarRelatorio_Click;
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1219,6 +1273,8 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox17).EndInit();
             topbar.ResumeLayout(false);
             topbar.PerformLayout();
+            tableLayoutPanel17.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox18).EndInit();
             ResumeLayout(false);
         }
 
@@ -1289,5 +1345,8 @@
         private Label label1;
         private System.Windows.Forms.Timer menuTimer;
         private Panel mainFrame;
+        private TableLayoutPanel tableLayoutPanel17;
+        private PictureBox pictureBox18;
+        private Button gerarRelatorio;
     }
 }

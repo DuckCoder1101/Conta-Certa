@@ -1,7 +1,9 @@
 using Conta_Certa.DAOs;
 using Conta_Certa.Forms;
 using Conta_Certa.Models;
+using Conta_Certa.Relatories;
 using Conta_Certa.Utils;
+using QuestPDF.Fluent;
 
 namespace Conta_Certa
 {
@@ -68,7 +70,7 @@ namespace Conta_Certa
 
         private void Submenu_Click(object sender, EventArgs e)
         {
-            FlowLayoutPanel? panel = (FlowLayoutPanel?) ((Button)sender)?.Parent?.Parent;
+            FlowLayoutPanel? panel = (FlowLayoutPanel?)((Button)sender)?.Parent?.Parent;
             if (panel != null && !menuTimer.Enabled)
             {
                 if (submenu != null && submenu != panel)
@@ -263,6 +265,16 @@ namespace Conta_Certa
             {
                 ExcelImporter.ImportCobrancasTable(dialog.FileName);
             }
+        }
+
+        private void GerarRelatorio_Click(object sender, EventArgs e)
+        {
+            Task.Run(() =>
+            {
+                var cobrancas = CobrancaDAO.GetRelatory(CobrancaStatus.Pendente);
+                var document = new CobrancaRelatory(cobrancas);
+                document.GeneratePdfAndShow();
+            });
         }
     }
 }
