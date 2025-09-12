@@ -1,6 +1,5 @@
 ﻿using System.Data.SQLite;
 using Conta_Certa.DTOs;
-using Conta_Certa.Models;
 using Conta_Certa.Utils;
 
 namespace Conta_Certa.DAOs;
@@ -36,6 +35,8 @@ public static class ServicoCobrancaDAO
                 cmd.ExecuteNonQuery();
                 cmd.Parameters.Clear();
             }
+
+            transaction.Commit();
         }
 
         catch (Exception ex)
@@ -44,34 +45,7 @@ public static class ServicoCobrancaDAO
         }
     }
 
-    public static void UpdateServicoCobranca(ServicoCobranca servicoCobranca)
-    {
-        try
-        {
-            using var conn = new SQLiteConnection(Database.ConnStr);
-            conn.Open();
-
-            string sql = @"UPDATE ServicosCobranca 
-                           SET valor = @valor, quantidade = @quantidade 
-                           WHERE idServicoCobranca = @idServicoCobranca;";
-
-            using var cmd = new SQLiteCommand(sql, conn);
-
-            cmd.Parameters.AddWithValue("@valor", servicoCobranca.Servico.Valor);
-            cmd.Parameters.AddWithValue("@quantidade", servicoCobranca.Quantidade);
-            cmd.Parameters.AddWithValue("@idServicoCobranca", servicoCobranca.IdServicoCobranca);
-
-            cmd.ExecuteNonQuery();
-            conn.Close();
-        }
-
-        catch (Exception ex)
-        { 
-            Logger.LogException(ex); 
-        }
-    }
-
-    public static void DeleteServicoCobranca(ServicoCobranca servico)
+    public static void DeleteServicoCobranca(long idCobranca, long idServico)
     {
         try
         {
@@ -79,11 +53,11 @@ public static class ServicoCobrancaDAO
             conn.Open();
 
             string sql = @"DELETE FROM ServicosCobranca 
-                       WHERE idServicoCobranca = @idServicoCobranca";
+                       WHERE idCobranca = @idCobranca AND idServico = @idServico";
 
             using var cmd = new SQLiteCommand(sql, conn);
-
-            cmd.Parameters.AddWithValue("@idServicoCobranca", servico.IdServicoCobranca);
+            cmd.Parameters.AddWithValue("@idCobranca", idCobranca);
+            cmd.Parameters.AddWithValue("@idServico", idServico);
 
             cmd.ExecuteNonQuery();
             conn.Close();

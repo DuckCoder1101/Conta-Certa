@@ -2,6 +2,7 @@
 using Conta_Certa.Models;
 using Conta_Certa.Utils;
 using System.Data.SQLite;
+using System.Diagnostics;
 
 namespace Conta_Certa.DAOs;
 
@@ -24,7 +25,6 @@ public static class CobrancaDAO
                                 status = excluded.status,
                                 pagoEm = excluded.pagoEm
                            RETURNING idCobranca;";
-
 
             using var cmd = new SQLiteCommand(sql, conn, transaction);
             List<long?> ids = [];
@@ -272,6 +272,7 @@ public static class CobrancaDAO
                         quantidade: reader.GetInt32(10)));
                 }
             }
+
 
             return cobrancas;
         }

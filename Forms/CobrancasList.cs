@@ -2,6 +2,7 @@
 using Conta_Certa.Models;
 using Conta_Certa.UserControls;
 using Conta_Certa.Utils;
+using System.Diagnostics;
 
 namespace Conta_Certa.Forms;
 

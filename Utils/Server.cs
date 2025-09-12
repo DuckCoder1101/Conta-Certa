@@ -11,7 +11,7 @@ namespace Conta_Certa.Utils;
 
 public class Server
 {
-    private static readonly string ExtensionID = "ahelgipfokmhnfmgjfockapnfedenbod";
+    private static readonly string ExtensionID = "ckninbegjaoimakgjifdfjilcjakmjmk";
 
     private static int GetFreePort()
     {

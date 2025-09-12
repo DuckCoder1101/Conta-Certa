@@ -3,6 +3,7 @@ using Conta_Certa.DAOs;
 using Conta_Certa.DTOs;
 using Conta_Certa.Models;
 using Conta_Certa.UserControls;
+using System.Diagnostics;
 
 namespace Conta_Certa.Forms;
 
@@ -23,7 +24,6 @@ public partial class ManageCobranca : InputForm
             this.cobranca = cobranca;
             cadastrarBtn.Text = "ALTERAR";
 
-            
             searchbar.SelectCliente(cobranca.Cliente.Documento!);
 
             honorarioNb.Value = (decimal)cobranca.Honorario;
@@ -34,9 +34,24 @@ public partial class ManageCobranca : InputForm
             {
                 pagoEmTxt.Text = cobranca.PagoEm?.ToString("dd/MM/yyyy");
             }
+
+            // Carrega os servicos da cobranca
+            foreach (var servicoCobranca in cobranca.ServicosCobranca)
+            {
+                Debug.WriteLine(servicoCobranca.Quantidade);
+
+                ServicoCobrancaControl control = new(
+                    servicoCobranca.Servico,
+                    servicoCobranca.Quantidade)
+                {
+                    Dock = DockStyle.Top,
+                };
+
+                servicosPanel.Controls.Add(control);
+                servicosPanel.Controls.SetChildIndex(control, 0);
+            }
         }
 
-        LoadServicosCobranca();
         LoadServicos();
     }
 
@@ -69,23 +84,6 @@ public partial class ManageCobranca : InputForm
         }
 
         LoadServicos();
-    }
-
-    public void LoadServicosCobranca()
-    {
-        // Carrega os servicos da cobranca
-        foreach (var servicoCobranca in cobranca!.ServicosCobranca)
-        {
-            ServicoCobrancaControl control = new(
-                servicoCobranca.Servico,
-                servicoCobranca.Quantidade)
-            {
-                Dock = DockStyle.Top,
-            };
-
-            servicosPanel.Controls.Add(control);
-            servicosPanel.Controls.SetChildIndex(control, 0);
-        }
     }
 
     private void LoadData()
@@ -137,35 +135,13 @@ public partial class ManageCobranca : InputForm
     {
         // Salva os serviços da cobrança
         var controls = servicosPanel.Controls.OfType<ServicoCobrancaControl>();
-        var servicosCobrancaBase = cobranca?.ServicosCobranca.ToDictionary(sc => sc.Servico.IdServico);
 
         foreach (var servicoCobrancaControl in controls)
         {
             var servico = servicoCobrancaControl.Servico;
             var quantidade = servicoCobrancaControl.Quantidade;
 
-            if (servicosCobrancaBase != null &&
-                servicosCobrancaBase.TryGetValue(servico.IdServico, out var sc))
-            {
-                if (sc.Quantidade != quantidade)
-                {
-                    if (quantidade > 0)
-                    {
-                        ServicoCobrancaDAO.UpdateServicoCobranca(new(
-                            sc.IdServicoCobranca,
-                            sc.IdCobranca,
-                            sc.Servico,
-                            quantidade));
-                    }
-
-                    else
-                    {
-                        ServicoCobrancaDAO.DeleteServicoCobranca(sc);
-                    }
-                }
-            }
-
-            else if (quantidade > 0)
+            if (quantidade > 0)
             {
                 ServicoCobrancaCadDTO servicoCobranca = new(
                     servico,
@@ -173,6 +149,11 @@ public partial class ManageCobranca : InputForm
                     quantidade);
 
                 ServicoCobrancaDAO.InsertServicosCobranca(servicoCobranca);
+            }
+
+            else
+            {
+                ServicoCobrancaDAO.DeleteServicoCobranca(idCobranca, servico.IdServico);
             }
         }
     }

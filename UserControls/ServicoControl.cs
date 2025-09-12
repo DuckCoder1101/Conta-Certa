@@ -23,7 +23,7 @@ public partial class ServicoControl : UserControl
 
     private void ServicoControl_MouseClick(object sender, MouseEventArgs e)
     {
-        if (e.Button == MouseButtons.Right)
+        if (e.Button == MouseButtons.Right && Servico != null)
         {
             ServicosList? form = (ServicosList?) FindForm();
             if (form != null)
