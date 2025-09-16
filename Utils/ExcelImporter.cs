@@ -81,12 +81,12 @@ public static class ExcelImporter
                                 clienteDTO.Nome = columnValue;
                                 break;
 
-                            case nameof(ClienteCadDTO.Documento) when (Cliente.CheckDocumento(columnValue)):
+                            case nameof(ClienteCadDTO.Documento) when (Models.Cliente.CheckDocumento(columnValue)):
                                 clienteDTO.Documento = columnValue;
                                 break;
 
-                            case nameof(ClienteCadDTO.Telefone) when (Cliente.CheckTelefone(columnValue)):
-                                clienteDTO.Telefone = Cliente.FormatTelefone(columnValue);
+                            case nameof(ClienteCadDTO.Telefone) when (Models.Cliente.CheckTelefone(columnValue)):
+                                clienteDTO.Telefone = Models.Cliente.FormatTelefone(columnValue);
                                 break;
 
                             case nameof(ClienteCadDTO.Email):
@@ -149,7 +149,7 @@ public static class ExcelImporter
                         switch (map.PropertyName)
                         {
                             case nameof(ClienteCadDTO.Documento)
-                            when (Cliente.CheckDocumento(columnValue)):
+                            when (Models.Cliente.CheckDocumento(columnValue)):
                                 cobrancaDTO.DocumentoCliente = columnValue;
                                 break;
 

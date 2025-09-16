@@ -7,12 +7,11 @@ namespace Conta_Certa.Forms;
 
 public partial class ManageCliente : InputForm
 {
-    private readonly Cliente? cliente;
+    public Cliente? Result { get; private set; }
 
-    public ManageCliente(Cliente? cliente = null)
+    public ManageCliente(Models.Cliente? cliente = null)
     {
         InitializeComponent();
-        this.cliente = cliente;
 
         if (cliente != null)
         {
@@ -84,7 +83,7 @@ public partial class ManageCliente : InputForm
         }
 
         // Verificação do documento
-        if (!Cliente.CheckDocumento(documento))
+        if (!Models.Cliente.CheckDocumento(documento))
         {
             MessageBox.Show(
                 "O CPF/CNPJ escrito é inválido!\nCorrija e tente novamente.",
@@ -95,27 +94,14 @@ public partial class ManageCliente : InputForm
             return;
         }
 
-        if (cliente == null)
-        {
-            ClienteCadDTO cliente = new(documento, nome, telefone, email, honorario, vencimentoHonorario);
-            ClienteDAO.InsertClientes(cliente);
-        }
-
-        else
-        {
-            ClienteDAO.UpdateCliente(new(
-                documento,
-                nome,
-                telefone,
-                email,
-                honorario,
-                vencimentoHonorario));
-        }
+        ClienteCadDTO cliente = new(documento, nome, telefone, email, honorario, vencimentoHonorario);
+        ClienteDAO.InsertClientes(cliente);
 
         DialogResult = DialogResult.OK;
 
         if (Modal)
         {
+            Result = new(documento, nome, telefone, email, honorario, vencimentoHonorario);
             Close();
         }
 

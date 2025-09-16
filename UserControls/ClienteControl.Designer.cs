@@ -63,7 +63,7 @@
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Size = new Size(912, 47);
             tableLayoutPanel1.TabIndex = 0;
-            tableLayoutPanel1.Click += ClienteUserControl_Click;
+            tableLayoutPanel1.MouseClick += ClienteUserControl_MouseClick;
             // 
             // nomeTxt
             // 
@@ -76,7 +76,7 @@
             nomeTxt.TabIndex = 1;
             nomeTxt.Text = "NOME";
             nomeTxt.TextAlign = ContentAlignment.MiddleCenter;
-            nomeTxt.Click += ClienteUserControl_Click;
+            nomeTxt.MouseClick += ClienteUserControl_MouseClick;
             // 
             // documentoTxt
             // 
@@ -89,7 +89,7 @@
             documentoTxt.TabIndex = 6;
             documentoTxt.Text = "CPF/CPNJ";
             documentoTxt.TextAlign = ContentAlignment.MiddleCenter;
-            documentoTxt.Click += ClienteUserControl_Click;
+            documentoTxt.MouseClick += ClienteUserControl_MouseClick;
             // 
             // telefoneTxt
             // 
@@ -102,7 +102,7 @@
             telefoneTxt.TabIndex = 2;
             telefoneTxt.Text = "TELEFONE";
             telefoneTxt.TextAlign = ContentAlignment.MiddleCenter;
-            telefoneTxt.Click += ClienteUserControl_Click;
+            telefoneTxt.MouseClick += ClienteUserControl_MouseClick;
             // 
             // emailTxt
             // 
@@ -115,7 +115,7 @@
             emailTxt.TabIndex = 3;
             emailTxt.Text = "EMAIL";
             emailTxt.TextAlign = ContentAlignment.MiddleCenter;
-            emailTxt.Click += ClienteUserControl_Click;
+            emailTxt.MouseClick += ClienteUserControl_MouseClick;
             // 
             // honorarioTxt
             // 
@@ -128,7 +128,7 @@
             honorarioTxt.TabIndex = 4;
             honorarioTxt.Text = "HONORÁRIO";
             honorarioTxt.TextAlign = ContentAlignment.MiddleCenter;
-            honorarioTxt.Click += ClienteUserControl_Click;
+            honorarioTxt.MouseClick += ClienteUserControl_MouseClick;
             // 
             // vencimentoTxt
             // 
@@ -141,7 +141,7 @@
             vencimentoTxt.TabIndex = 5;
             vencimentoTxt.Text = "DIA VENCIMENTO";
             vencimentoTxt.TextAlign = ContentAlignment.MiddleCenter;
-            vencimentoTxt.Click += ClienteUserControl_Click;
+            vencimentoTxt.MouseClick += ClienteUserControl_MouseClick;
             // 
             // ClienteControl
             // 
@@ -150,7 +150,6 @@
             Controls.Add(tableLayoutPanel1);
             Name = "ClienteControl";
             Size = new Size(912, 47);
-            Click += ClienteUserControl_Click;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ResumeLayout(false);

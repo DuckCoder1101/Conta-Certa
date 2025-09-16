@@ -1,4 +1,6 @@
-﻿namespace Conta_Certa.Forms
+﻿using Conta_Certa.Components;
+
+namespace Conta_Certa.Forms
 {
     partial class ClientesList
     {
@@ -33,7 +35,7 @@
             menu = new ContextMenuStrip(components);
             alterarToolStripMenuItem = new ToolStripMenuItem();
             excluirToolStripMenuItem = new ToolStripMenuItem();
-            clientesPanel = new Panel();
+            clientesPanel = new BufferedPanel();
             tableLayoutPanel1 = new TableLayoutPanel();
             searchbar = new Conta_Certa.UserControls.SearchbarControl();
             menu.SuspendLayout();
@@ -117,7 +119,7 @@
         private ContextMenuStrip menu;
         private ToolStripMenuItem alterarToolStripMenuItem;
         private ToolStripMenuItem excluirToolStripMenuItem;
-        private Panel clientesPanel;
+        private BufferedPanel clientesPanel;
         private TableLayoutPanel tableLayoutPanel1;
         private UserControls.SearchbarControl searchbar;
     }

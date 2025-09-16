@@ -1,4 +1,6 @@
-﻿namespace Conta_Certa.Forms
+﻿using Conta_Certa.Components;
+
+namespace Conta_Certa.Forms
 {
     partial class ServicosList
     {
@@ -32,7 +34,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServicosList));
             tableLayoutPanel1 = new TableLayoutPanel();
             searchbar = new Conta_Certa.UserControls.SearchbarControl();
-            servicosPanel = new Panel();
+            servicosPanel = new BufferedPanel();
             menu = new ContextMenuStrip(components);
             alterarToolStripMenuItem = new ToolStripMenuItem();
             excluirToolStripMenuItem = new ToolStripMenuItem();
@@ -115,7 +117,7 @@
 
         private TableLayoutPanel tableLayoutPanel1;
         private UserControls.SearchbarControl searchbar;
-        private Panel servicosPanel;
+        private BufferedPanel servicosPanel;
         private ContextMenuStrip menu;
         private ToolStripMenuItem alterarToolStripMenuItem;
         private ToolStripMenuItem excluirToolStripMenuItem;

@@ -78,11 +78,11 @@ public partial class ClientesList : Form
         if (currentControl?.Cliente != null)
         {
             using ManageCliente form = new(currentControl.Cliente);
-            DialogResult result = form.ShowDialog();
+            DialogResult dialogResult = form.ShowDialog();
 
-            if (result == DialogResult.OK)
+            if (dialogResult == DialogResult.OK && form.Result != null)
             {
-                UpdateClientesList();
+                UpdateClientesPanel();
             }
         }
     }
@@ -129,11 +129,11 @@ public partial class ClientesList : Form
     private void OnAddButtonClicked()
     {
         using ManageCliente form = new();
-        DialogResult result = form.ShowDialog();
+        DialogResult dialogResult = form.ShowDialog();
 
-        if (result == DialogResult.OK)
+        if (dialogResult == DialogResult.OK && form.Result != null)
         {
-            UpdateClientesList();
+            UpdateClientesPanel();
         }
     }
 

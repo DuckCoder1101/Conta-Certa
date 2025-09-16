@@ -1,4 +1,6 @@
-﻿namespace Conta_Certa.Forms
+﻿using Conta_Certa.Components;
+
+namespace Conta_Certa.Forms
 {
     partial class CobrancasList
     {
@@ -31,7 +33,7 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CobrancasList));
             tableLayoutPanel1 = new TableLayoutPanel();
-            cobrancasPanel = new Panel();
+            cobrancasPanel = new BufferedPanel();
             searchbar = new Conta_Certa.UserControls.SearchbarControl();
             menu = new ContextMenuStrip(components);
             alterarToolStripMenuItem = new ToolStripMenuItem();
@@ -122,7 +124,7 @@
         #endregion
 
         private TableLayoutPanel tableLayoutPanel1;
-        private Panel cobrancasPanel;
+        private BufferedPanel cobrancasPanel;
         private UserControls.SearchbarControl searchbar;
         private ContextMenuStrip menu;
         private ToolStripMenuItem alterarToolStripMenuItem;

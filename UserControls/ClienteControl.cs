@@ -5,7 +5,7 @@ namespace Conta_Certa.UserControls;
 
 public partial class ClienteControl : UserControl
 {
-    public Cliente? Cliente { get; } = null;
+    public Cliente? Cliente { get; private set; } = null;
 
     public ClienteControl(Cliente? cliente = null)
     {
@@ -13,21 +13,27 @@ public partial class ClienteControl : UserControl
 
         if (cliente != null)
         {
-            Cliente = cliente;
-            documentoTxt.Text = Cliente.FormatDocumento(Cliente.Documento);
-            nomeTxt.Text = Cliente.Nome;
-            telefoneTxt.Text = Cliente.FormatTelefone(Cliente.Telefone);
-            emailTxt.Text = Cliente.Email;
-            honorarioTxt.Text = Cliente.Honorario.ToString("C");
-            vencimentoTxt.Text = Cliente.VencimentoHonorario.ToString();
+            SetCliente(cliente);
         }
     }
 
-    private void ClienteUserControl_Click(object sender, EventArgs e)
+    public void SetCliente(Cliente novoCliente)
     {
-        if (Cliente != null && FindForm() is ClientesList form)
+        Cliente = novoCliente;
+        documentoTxt.Text = Cliente.FormatDocumento(Cliente.Documento);
+        nomeTxt.Text = Cliente.Nome;
+        telefoneTxt.Text = Cliente.FormatTelefone(Cliente.Telefone);
+        emailTxt.Text = Cliente.Email;
+        honorarioTxt.Text = Cliente.Honorario.ToString("C");
+        vencimentoTxt.Text = Cliente.VencimentoHonorario.ToString();
+    }
+
+    private void ClienteUserControl_MouseClick(object sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Right)
         {
-            form.OpenContextMenu(this);
+            ClientesList? form = (ClientesList?)FindForm();
+            form?.OpenContextMenu(this);
         }
     }
 }

@@ -13,50 +13,28 @@ namespace Conta_Certa
 
         FlowLayoutPanel? submenu = null;
         bool isMenuExpanded = false;
-        const int step = 5;
+        const int step = 10;
 
         public Main()
         {
             InitializeComponent();
         }
 
-        private void MenuTimer_Tick(object? sender, EventArgs e)
+        private void ShowMenuBtn_Click(object sender, EventArgs e)
         {
+            CloseSubmenu();
+            isMenuExpanded = !isMenuExpanded;
+
             if (isMenuExpanded)
             {
-                if (sidebarPanel.Width > 50)
-                {
-                    sidebarPanel.Width -= step;
-                }
-
-                else
-                {
-                    menuTimer.Stop();
-                    isMenuExpanded = false;
-                }
+                menu.Width = 250;
+                openMenuBtn.Image = Properties.Resources.close;
             }
 
             else
             {
-                if (sidebarPanel.Width < 250)
-                {
-                    sidebarPanel.Width += step;
-                }
-
-                else
-                {
-                    menuTimer.Stop();
-                    isMenuExpanded = true;
-                }
-            }
-        }
-
-        private void ShowMenuBtn_Click(object sender, EventArgs e)
-        {
-            if (!menuTimer.Enabled)
-            {
-                CloseSubmenu();
-                menuTimer.Start();
+                menu.Width = 50;
+                openMenuBtn.Image = Properties.Resources.menu;
             }
         }
 
@@ -71,7 +49,7 @@ namespace Conta_Certa
         private void Submenu_Click(object sender, EventArgs e)
         {
             FlowLayoutPanel? panel = (FlowLayoutPanel?)((Button)sender)?.Parent?.Parent;
-            if (panel != null && !menuTimer.Enabled)
+            if (panel != null)
             {
                 if (submenu != null && submenu != panel)
                 {

@@ -28,9 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
-            sidebarPanel = new FlowLayoutPanel();
+            menu = new FlowLayoutPanel();
             dashboard = new Panel();
             tableLayoutPanel4 = new TableLayoutPanel();
             pictureBox4 = new PictureBox();
@@ -103,9 +102,8 @@
             topbar = new Panel();
             label1 = new Label();
             openMenuBtn = new Button();
-            menuTimer = new System.Windows.Forms.Timer(components);
             mainFrame = new Panel();
-            sidebarPanel.SuspendLayout();
+            menu.SuspendLayout();
             dashboard.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
@@ -157,22 +155,22 @@
             topbar.SuspendLayout();
             SuspendLayout();
             // 
-            // sidebarPanel
+            // menu
             // 
-            sidebarPanel.BackColor = SystemColors.ControlDarkDark;
-            sidebarPanel.Controls.Add(dashboard);
-            sidebarPanel.Controls.Add(arquivo);
-            sidebarPanel.Controls.Add(clientes);
-            sidebarPanel.Controls.Add(cobrancas);
-            sidebarPanel.Controls.Add(servicos);
-            sidebarPanel.Controls.Add(relatorios);
-            sidebarPanel.Dock = DockStyle.Left;
-            sidebarPanel.FlowDirection = FlowDirection.TopDown;
-            sidebarPanel.Location = new Point(0, 50);
-            sidebarPanel.Name = "sidebarPanel";
-            sidebarPanel.Size = new Size(50, 400);
-            sidebarPanel.TabIndex = 1;
-            sidebarPanel.WrapContents = false;
+            menu.BackColor = SystemColors.ControlDarkDark;
+            menu.Controls.Add(dashboard);
+            menu.Controls.Add(arquivo);
+            menu.Controls.Add(clientes);
+            menu.Controls.Add(cobrancas);
+            menu.Controls.Add(servicos);
+            menu.Controls.Add(relatorios);
+            menu.Dock = DockStyle.Left;
+            menu.FlowDirection = FlowDirection.TopDown;
+            menu.Location = new Point(0, 50);
+            menu.Name = "menu";
+            menu.Size = new Size(50, 400);
+            menu.TabIndex = 1;
+            menu.WrapContents = false;
             // 
             // dashboard
             // 
@@ -1323,11 +1321,6 @@
             openMenuBtn.UseVisualStyleBackColor = true;
             openMenuBtn.Click += ShowMenuBtn_Click;
             // 
-            // menuTimer
-            // 
-            menuTimer.Interval = 13;
-            menuTimer.Tick += MenuTimer_Tick;
-            // 
             // mainFrame
             // 
             mainFrame.Dock = DockStyle.Fill;
@@ -1343,14 +1336,14 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(mainFrame);
-            Controls.Add(sidebarPanel);
+            Controls.Add(menu);
             Controls.Add(topbar);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MdiChildrenMinimizedAnchorBottom = false;
             Name = "Main";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Conta Certa";
-            sidebarPanel.ResumeLayout(false);
+            menu.ResumeLayout(false);
             dashboard.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
@@ -1412,7 +1405,7 @@
         }
 
         #endregion
-        private FlowLayoutPanel sidebarPanel;
+        private FlowLayoutPanel menu;
         private Panel dashboard;
         private TableLayoutPanel tableLayoutPanel4;
         private PictureBox pictureBox4;
@@ -1476,7 +1469,6 @@
         private Panel topbar;
         private Button openMenuBtn;
         private Label label1;
-        private System.Windows.Forms.Timer menuTimer;
         private Panel mainFrame;
         private TableLayoutPanel tableLayoutPanel17;
         private PictureBox pictureBox18;

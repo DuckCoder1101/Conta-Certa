@@ -59,7 +59,7 @@ public static class ClienteDAO
         }
     }
 
-    public static void UpdateCliente(Cliente cliente)
+    public static void UpdateCliente(Models.Cliente cliente)
     {
         try
         {
@@ -95,7 +95,7 @@ public static class ClienteDAO
         }
     }
 
-    public static void DeleteCliente(Cliente cliente)
+    public static void DeleteCliente(Models.Cliente cliente)
     {
         try
         {
@@ -117,7 +117,7 @@ public static class ClienteDAO
         }
     }
 
-    public static List<Cliente> GetAllClientes()
+    public static List<Models.Cliente> GetAllClientes()
     {
         try
         {
@@ -129,7 +129,7 @@ public static class ClienteDAO
             using var cmd = new SQLiteCommand(sql, conn);
             using var reader = cmd.ExecuteReader();
 
-            List<Cliente> clientes = [];
+            List<Models.Cliente> clientes = [];
 
             while (reader.Read())
             {
@@ -199,7 +199,7 @@ public static class ClienteDAO
         }
     }
 
-    public static Cliente? GetClienteByDocumento(string documento)
+    public static Models.Cliente? GetClienteByDocumento(string documento)
     {
         try
         {
