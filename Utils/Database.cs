@@ -57,7 +57,7 @@ public static class Database
         string sql = @"CREATE TABLE IF NOT EXISTS Clientes (
                             documento TEXT PRIMARY KEY CHECK(length(documento) <= 14),
                             nome TEXT NOT NULL,
-                            telefone TEXT NOT NULL CHECK(length(telefone) = 11),
+                            telefone TEXT NOT NULL CHECK(length(telefone) = 11 OR length(telefone) = 10),
                             email TEXT,
                             honorario NUMERIC NOT NULL,
                             vencimentoHonorario INTEGER NOT NULL);";

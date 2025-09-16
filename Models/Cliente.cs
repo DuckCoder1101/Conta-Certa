@@ -121,32 +121,28 @@ public class Cliente
     {
         var digits = new string([.. telefone.Where(char.IsDigit)]);
 
-        return (
-            digits.Length == telefone.Length &&
-            telefone.Length <= 11);
+        if (digits.Length < 10 || digits.Length > 11)
+        {
+            return false;
+        }
 
-        //if (digits.Length < 10 || digits.Length > 11)
-        //{
-        //    return false;
-        //}
+        // Se tem 11 dígitos → DDD + celular (9 dígitos começando com 9)
+        if (digits.Length == 11)
+        {
+            // O dígito 2 (primeiro após o DDD) precisa ser 9
+            if (digits[2] != '9')
+                return false;
+        }
 
-        //// Se tem 11 dígitos → DDD + celular (9 dígitos começando com 9)
-        //if (digits.Length == 11)
-        //{
-        //    // O dígito 2 (primeiro após o DDD) precisa ser 9
-        //    if (digits[2] != '9')
-        //        return false;
-        //}
+        // Se tem 10 dígitos → DDD + fixo (8 dígitos começando com 2–5)
+        if (digits.Length == 10)
+        {
+            // O dígito 2 (primeiro após o DDD) precisa ser 2,3,4 ou 5
+            if (!"2345".Contains(digits[2]))
+                return false;
+        }
 
-        //// Se tem 10 dígitos → DDD + fixo (8 dígitos começando com 2–5)
-        //if (digits.Length == 10)
-        //{
-        //    // O dígito 2 (primeiro após o DDD) precisa ser 2,3,4 ou 5
-        //    if (!"2345".Contains(digits[2]))
-        //        return false;
-        //}
-
-        //return true;
+        return true;
     }
 
 

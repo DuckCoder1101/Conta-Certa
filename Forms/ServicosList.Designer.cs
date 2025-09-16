@@ -67,6 +67,7 @@
             // 
             // servicosPanel
             // 
+            servicosPanel.AutoScroll = true;
             servicosPanel.Dock = DockStyle.Fill;
             servicosPanel.Location = new Point(5, 33);
             servicosPanel.Margin = new Padding(0);

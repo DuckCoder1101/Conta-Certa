@@ -64,6 +64,7 @@
             // 
             // clientesPanel
             // 
+            clientesPanel.AutoScroll = true;
             clientesPanel.Dock = DockStyle.Fill;
             clientesPanel.Location = new Point(5, 33);
             clientesPanel.Margin = new Padding(0);

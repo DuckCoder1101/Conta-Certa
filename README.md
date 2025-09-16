@@ -16,3 +16,4 @@
 <a href="https://www.flaticon.com/free-icons/excel" title="excel icons">Excel icons created by Freepik - Flaticon</a>
 <a href="https://www.flaticon.com/free-icons/export" title="export icons">Export icons created by Dixit Lakhani_02 - Flaticon</a>
 <a href="https://www.flaticon.com/free-icons/menu" title="menu icons">Menu icons created by ariefstudio - Flaticon</a>
+<a href="https://www.flaticon.com/free-icons/report" title="report icons">Report icons created by Yudhi Restu - Flaticon</a>

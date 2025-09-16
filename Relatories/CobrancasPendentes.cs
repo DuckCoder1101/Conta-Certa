@@ -5,11 +5,11 @@ using QuestPDF.Infrastructure;
 
 namespace Conta_Certa.Relatories;
 
-public class CobrancaRelatory : IDocument
+public class CobrancasPendentes : IDocument
 {
     public List<CobrancaRelatoryDTO> Cobrancas { get; }
 
-    public CobrancaRelatory(List<CobrancaRelatoryDTO> cobrancas)
+    public CobrancasPendentes(List<CobrancaRelatoryDTO> cobrancas)
     {
         QuestPDF.Settings.License = LicenseType.Community;
         Cobrancas = cobrancas;
@@ -50,7 +50,12 @@ public class CobrancaRelatory : IDocument
                 table.Cell().Element(CellStyle).Text(item.Cliente);
                 table.Cell().Element(CellStyle).Text(item.honorario.ToString("c"));
                 table.Cell().Element(CellStyle).Text(item.Status.ToString());
-                table.Cell().Element(CellStyle).Text(item.Vencimento.ToString("dd/MM/yy"));
+
+                table.Cell().Element(CellStyle)
+                    .Text(item.vencimento != null
+                        ? ((DateTime)(item.vencimento!)).ToString("dd/MM/yy")
+                        : "-");
+
                 table.Cell().Element(CellStyle)
                     .Text(item.PagoEm != null
                         ? ((DateTime)(item.pagoEm!)).ToString("dd/MM/yy")

@@ -422,6 +422,10 @@ public static class CobrancaDAO
                 }
             }
 
+            // Adiciona o valor total ao final do relatorio
+            float valorTotal = cobrancas.Sum(c => c.HonorarioTotal);
+            cobrancas.Add(new(-1, "Total: ", valorTotal, status, null, null));
+
             return cobrancas;
         }
 

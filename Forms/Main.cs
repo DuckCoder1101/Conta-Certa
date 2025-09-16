@@ -234,6 +234,8 @@ namespace Conta_Certa
         private void StartWhastappAutomation_Click(object sender, EventArgs e)
         {
             var cobrancas = CobrancaDAO.GetCobrancasByStatus(CobrancaStatus.Pendente);
+            cobrancas = cobrancas.FindAll(c => c.Cliente.Telefone.Length == 11);
+
             Server.ConnectExtension([.. cobrancas]);
         }
 
@@ -267,12 +269,22 @@ namespace Conta_Certa
             }
         }
 
-        private void GerarRelatorio_Click(object sender, EventArgs e)
+        private void RelatorioCobsPendentes(object sender, EventArgs e)
         {
             Task.Run(() =>
             {
                 var cobrancas = CobrancaDAO.GetRelatory(CobrancaStatus.Pendente);
-                var document = new CobrancaRelatory(cobrancas);
+                var document = new CobrancasPendentes(cobrancas);
+                document.GeneratePdfAndShow();
+            });
+        }
+
+        private void RelatorioCobsPagas(object sender, EventArgs e)
+        {
+            Task.Run(() =>
+            {
+                var cobrancas = CobrancaDAO.GetRelatory(CobrancaStatus.Paga);
+                var document = new CobrancasPendentes(cobrancas);
                 document.GeneratePdfAndShow();
             });
         }

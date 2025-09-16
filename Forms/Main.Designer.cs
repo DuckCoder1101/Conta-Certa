@@ -90,14 +90,21 @@
             tableLayoutPanel16 = new TableLayoutPanel();
             pictureBox17 = new PictureBox();
             novoServicoBtn = new Button();
+            relatorios = new FlowLayoutPanel();
+            tableLayoutPanel18 = new TableLayoutPanel();
+            pictureBox19 = new PictureBox();
+            button1 = new Button();
+            tableLayoutPanel17 = new TableLayoutPanel();
+            pictureBox18 = new PictureBox();
+            cobsPendentes = new Button();
+            tableLayoutPanel19 = new TableLayoutPanel();
+            pictureBox20 = new PictureBox();
+            cobsPagas = new Button();
             topbar = new Panel();
             label1 = new Label();
             openMenuBtn = new Button();
             menuTimer = new System.Windows.Forms.Timer(components);
             mainFrame = new Panel();
-            tableLayoutPanel17 = new TableLayoutPanel();
-            pictureBox18 = new PictureBox();
-            gerarRelatorio = new Button();
             sidebarPanel.SuspendLayout();
             dashboard.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
@@ -140,9 +147,14 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox16).BeginInit();
             tableLayoutPanel16.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox17).BeginInit();
-            topbar.SuspendLayout();
+            relatorios.SuspendLayout();
+            tableLayoutPanel18.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox19).BeginInit();
             tableLayoutPanel17.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox18).BeginInit();
+            tableLayoutPanel19.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox20).BeginInit();
+            topbar.SuspendLayout();
             SuspendLayout();
             // 
             // sidebarPanel
@@ -153,6 +165,7 @@
             sidebarPanel.Controls.Add(clientes);
             sidebarPanel.Controls.Add(cobrancas);
             sidebarPanel.Controls.Add(servicos);
+            sidebarPanel.Controls.Add(relatorios);
             sidebarPanel.Dock = DockStyle.Left;
             sidebarPanel.FlowDirection = FlowDirection.TopDown;
             sidebarPanel.Location = new Point(0, 50);
@@ -651,7 +664,6 @@
             cobrancas.Controls.Add(tableLayoutPanel12);
             cobrancas.Controls.Add(tableLayoutPanel13);
             cobrancas.Controls.Add(tableLayoutPanel14);
-            cobrancas.Controls.Add(tableLayoutPanel17);
             cobrancas.FlowDirection = FlowDirection.TopDown;
             cobrancas.Location = new Point(0, 189);
             cobrancas.Margin = new Padding(0, 3, 0, 3);
@@ -1113,6 +1125,168 @@
             novoServicoBtn.UseVisualStyleBackColor = false;
             novoServicoBtn.Click += CadastrarSevico_Click;
             // 
+            // relatorios
+            // 
+            relatorios.BackColor = SystemColors.ControlDarkDark;
+            relatorios.Controls.Add(tableLayoutPanel18);
+            relatorios.Controls.Add(tableLayoutPanel17);
+            relatorios.Controls.Add(tableLayoutPanel19);
+            relatorios.FlowDirection = FlowDirection.TopDown;
+            relatorios.Location = new Point(0, 313);
+            relatorios.Margin = new Padding(0, 3, 0, 3);
+            relatorios.MaximumSize = new Size(220, 0);
+            relatorios.MinimumSize = new Size(220, 56);
+            relatorios.Name = "relatorios";
+            relatorios.Size = new Size(220, 56);
+            relatorios.TabIndex = 10;
+            // 
+            // tableLayoutPanel18
+            // 
+            tableLayoutPanel18.AutoSize = true;
+            tableLayoutPanel18.ColumnCount = 2;
+            tableLayoutPanel18.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 50F));
+            tableLayoutPanel18.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel18.Controls.Add(pictureBox19, 0, 0);
+            tableLayoutPanel18.Controls.Add(button1, 1, 0);
+            tableLayoutPanel18.Dock = DockStyle.Top;
+            tableLayoutPanel18.Location = new Point(0, 3);
+            tableLayoutPanel18.Margin = new Padding(0, 3, 0, 3);
+            tableLayoutPanel18.Name = "tableLayoutPanel18";
+            tableLayoutPanel18.RowCount = 1;
+            tableLayoutPanel18.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel18.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel18.Size = new Size(200, 50);
+            tableLayoutPanel18.TabIndex = 0;
+            // 
+            // pictureBox19
+            // 
+            pictureBox19.BackgroundImageLayout = ImageLayout.None;
+            pictureBox19.Dock = DockStyle.Fill;
+            pictureBox19.Image = (Image)resources.GetObject("pictureBox19.Image");
+            pictureBox19.Location = new Point(0, 3);
+            pictureBox19.Margin = new Padding(0, 3, 3, 3);
+            pictureBox19.Name = "pictureBox19";
+            pictureBox19.Size = new Size(47, 44);
+            pictureBox19.SizeMode = PictureBoxSizeMode.CenterImage;
+            pictureBox19.TabIndex = 0;
+            pictureBox19.TabStop = false;
+            // 
+            // button1
+            // 
+            button1.AutoSize = true;
+            button1.BackColor = Color.Transparent;
+            button1.FlatAppearance.BorderSize = 0;
+            button1.FlatAppearance.MouseOverBackColor = SystemColors.ControlDark;
+            button1.FlatStyle = FlatStyle.Flat;
+            button1.Font = new Font("Arial", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            button1.ForeColor = SystemColors.ControlLightLight;
+            button1.ImageAlign = ContentAlignment.MiddleLeft;
+            button1.Location = new Point(53, 3);
+            button1.Name = "button1";
+            button1.Size = new Size(144, 44);
+            button1.TabIndex = 4;
+            button1.Text = "RELATÓRIOS";
+            button1.TextAlign = ContentAlignment.MiddleLeft;
+            button1.TextImageRelation = TextImageRelation.ImageBeforeText;
+            button1.UseVisualStyleBackColor = false;
+            button1.Click += Submenu_Click;
+            // 
+            // tableLayoutPanel17
+            // 
+            tableLayoutPanel17.ColumnCount = 2;
+            tableLayoutPanel17.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 50F));
+            tableLayoutPanel17.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel17.Controls.Add(pictureBox18, 0, 0);
+            tableLayoutPanel17.Controls.Add(cobsPendentes, 1, 0);
+            tableLayoutPanel17.Location = new Point(220, 3);
+            tableLayoutPanel17.Margin = new Padding(20, 3, 0, 3);
+            tableLayoutPanel17.Name = "tableLayoutPanel17";
+            tableLayoutPanel17.RowCount = 1;
+            tableLayoutPanel17.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel17.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel17.Size = new Size(211, 50);
+            tableLayoutPanel17.TabIndex = 7;
+            // 
+            // pictureBox18
+            // 
+            pictureBox18.BackgroundImageLayout = ImageLayout.None;
+            pictureBox18.Dock = DockStyle.Fill;
+            pictureBox18.Image = (Image)resources.GetObject("pictureBox18.Image");
+            pictureBox18.Location = new Point(0, 3);
+            pictureBox18.Margin = new Padding(0, 3, 3, 3);
+            pictureBox18.Name = "pictureBox18";
+            pictureBox18.Size = new Size(47, 44);
+            pictureBox18.SizeMode = PictureBoxSizeMode.CenterImage;
+            pictureBox18.TabIndex = 0;
+            pictureBox18.TabStop = false;
+            // 
+            // cobsPendentes
+            // 
+            cobsPendentes.BackColor = Color.Transparent;
+            cobsPendentes.FlatAppearance.BorderSize = 0;
+            cobsPendentes.FlatAppearance.MouseOverBackColor = SystemColors.ControlDark;
+            cobsPendentes.FlatStyle = FlatStyle.Flat;
+            cobsPendentes.Font = new Font("Arial", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            cobsPendentes.ForeColor = SystemColors.ControlLightLight;
+            cobsPendentes.ImageAlign = ContentAlignment.MiddleLeft;
+            cobsPendentes.Location = new Point(53, 3);
+            cobsPendentes.Name = "cobsPendentes";
+            cobsPendentes.Size = new Size(155, 44);
+            cobsPendentes.TabIndex = 4;
+            cobsPendentes.Text = "COB. PENDENTES";
+            cobsPendentes.TextAlign = ContentAlignment.MiddleLeft;
+            cobsPendentes.TextImageRelation = TextImageRelation.ImageBeforeText;
+            cobsPendentes.UseVisualStyleBackColor = false;
+            cobsPendentes.Click += RelatorioCobsPendentes;
+            // 
+            // tableLayoutPanel19
+            // 
+            tableLayoutPanel19.ColumnCount = 2;
+            tableLayoutPanel19.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 50F));
+            tableLayoutPanel19.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel19.Controls.Add(pictureBox20, 0, 0);
+            tableLayoutPanel19.Controls.Add(cobsPagas, 1, 0);
+            tableLayoutPanel19.Location = new Point(451, 3);
+            tableLayoutPanel19.Margin = new Padding(20, 3, 0, 3);
+            tableLayoutPanel19.Name = "tableLayoutPanel19";
+            tableLayoutPanel19.RowCount = 1;
+            tableLayoutPanel19.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel19.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel19.Size = new Size(211, 50);
+            tableLayoutPanel19.TabIndex = 8;
+            // 
+            // pictureBox20
+            // 
+            pictureBox20.BackgroundImageLayout = ImageLayout.None;
+            pictureBox20.Dock = DockStyle.Fill;
+            pictureBox20.Image = (Image)resources.GetObject("pictureBox20.Image");
+            pictureBox20.Location = new Point(0, 3);
+            pictureBox20.Margin = new Padding(0, 3, 3, 3);
+            pictureBox20.Name = "pictureBox20";
+            pictureBox20.Size = new Size(47, 44);
+            pictureBox20.SizeMode = PictureBoxSizeMode.CenterImage;
+            pictureBox20.TabIndex = 0;
+            pictureBox20.TabStop = false;
+            // 
+            // cobsPagas
+            // 
+            cobsPagas.BackColor = Color.Transparent;
+            cobsPagas.FlatAppearance.BorderSize = 0;
+            cobsPagas.FlatAppearance.MouseOverBackColor = SystemColors.ControlDark;
+            cobsPagas.FlatStyle = FlatStyle.Flat;
+            cobsPagas.Font = new Font("Arial", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            cobsPagas.ForeColor = SystemColors.ControlLightLight;
+            cobsPagas.ImageAlign = ContentAlignment.MiddleLeft;
+            cobsPagas.Location = new Point(53, 3);
+            cobsPagas.Name = "cobsPagas";
+            cobsPagas.Size = new Size(155, 44);
+            cobsPagas.TabIndex = 4;
+            cobsPagas.Text = "COBS. PAGAS";
+            cobsPagas.TextAlign = ContentAlignment.MiddleLeft;
+            cobsPagas.TextImageRelation = TextImageRelation.ImageBeforeText;
+            cobsPagas.UseVisualStyleBackColor = false;
+            cobsPagas.Click += RelatorioCobsPagas;
+            // 
             // topbar
             // 
             topbar.BackColor = SystemColors.ControlDarkDark;
@@ -1162,54 +1336,6 @@
             mainFrame.Name = "mainFrame";
             mainFrame.Size = new Size(750, 400);
             mainFrame.TabIndex = 3;
-            // 
-            // tableLayoutPanel17
-            // 
-            tableLayoutPanel17.ColumnCount = 2;
-            tableLayoutPanel17.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 50F));
-            tableLayoutPanel17.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel17.Controls.Add(pictureBox18, 0, 0);
-            tableLayoutPanel17.Controls.Add(gerarRelatorio, 1, 0);
-            tableLayoutPanel17.Location = new Point(20, 339);
-            tableLayoutPanel17.Margin = new Padding(20, 3, 0, 3);
-            tableLayoutPanel17.Name = "tableLayoutPanel17";
-            tableLayoutPanel17.RowCount = 1;
-            tableLayoutPanel17.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel17.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel17.Size = new Size(211, 50);
-            tableLayoutPanel17.TabIndex = 7;
-            // 
-            // pictureBox18
-            // 
-            pictureBox18.BackgroundImageLayout = ImageLayout.None;
-            pictureBox18.Dock = DockStyle.Fill;
-            pictureBox18.Image = (Image)resources.GetObject("pictureBox18.Image");
-            pictureBox18.Location = new Point(0, 3);
-            pictureBox18.Margin = new Padding(0, 3, 3, 3);
-            pictureBox18.Name = "pictureBox18";
-            pictureBox18.Size = new Size(47, 44);
-            pictureBox18.SizeMode = PictureBoxSizeMode.CenterImage;
-            pictureBox18.TabIndex = 0;
-            pictureBox18.TabStop = false;
-            // 
-            // gerarRelatorio
-            // 
-            gerarRelatorio.BackColor = Color.Transparent;
-            gerarRelatorio.FlatAppearance.BorderSize = 0;
-            gerarRelatorio.FlatAppearance.MouseOverBackColor = SystemColors.ControlDark;
-            gerarRelatorio.FlatStyle = FlatStyle.Flat;
-            gerarRelatorio.Font = new Font("Arial", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            gerarRelatorio.ForeColor = SystemColors.ControlLightLight;
-            gerarRelatorio.ImageAlign = ContentAlignment.MiddleLeft;
-            gerarRelatorio.Location = new Point(53, 3);
-            gerarRelatorio.Name = "gerarRelatorio";
-            gerarRelatorio.Size = new Size(155, 44);
-            gerarRelatorio.TabIndex = 4;
-            gerarRelatorio.Text = "GERAR RELATÓRIO";
-            gerarRelatorio.TextAlign = ContentAlignment.MiddleLeft;
-            gerarRelatorio.TextImageRelation = TextImageRelation.ImageBeforeText;
-            gerarRelatorio.UseVisualStyleBackColor = false;
-            gerarRelatorio.Click += GerarRelatorio_Click;
             // 
             // Main
             // 
@@ -1271,10 +1397,17 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox16).EndInit();
             tableLayoutPanel16.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox17).EndInit();
-            topbar.ResumeLayout(false);
-            topbar.PerformLayout();
+            relatorios.ResumeLayout(false);
+            relatorios.PerformLayout();
+            tableLayoutPanel18.ResumeLayout(false);
+            tableLayoutPanel18.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox19).EndInit();
             tableLayoutPanel17.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox18).EndInit();
+            tableLayoutPanel19.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox20).EndInit();
+            topbar.ResumeLayout(false);
+            topbar.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -1347,6 +1480,13 @@
         private Panel mainFrame;
         private TableLayoutPanel tableLayoutPanel17;
         private PictureBox pictureBox18;
-        private Button gerarRelatorio;
+        private Button cobsPendentes;
+        private FlowLayoutPanel relatorios;
+        private TableLayoutPanel tableLayoutPanel18;
+        private PictureBox pictureBox19;
+        private Button button1;
+        private TableLayoutPanel tableLayoutPanel19;
+        private PictureBox pictureBox20;
+        private Button cobsPagas;
     }
 }

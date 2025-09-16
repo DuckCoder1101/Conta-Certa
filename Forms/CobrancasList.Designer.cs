@@ -64,6 +64,7 @@
             // 
             // cobrancasPanel
             // 
+            cobrancasPanel.AutoScroll = true;
             cobrancasPanel.Dock = DockStyle.Fill;
             cobrancasPanel.Location = new Point(5, 35);
             cobrancasPanel.Margin = new Padding(0);

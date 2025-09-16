@@ -207,7 +207,7 @@
             telefoneTxt.Font = new Font("Arial", 9.75F);
             telefoneTxt.Location = new Point(241, 79);
             telefoneTxt.Margin = new Padding(4, 7, 4, 7);
-            telefoneTxt.Mask = "(99) 99999-9999";
+            telefoneTxt.Mask = "(99) 999999990";
             telefoneTxt.Name = "telefoneTxt";
             telefoneTxt.Size = new Size(229, 22);
             telefoneTxt.TabIndex = 3;
