@@ -140,7 +140,7 @@
             indexNb.Value = new decimal(new int[] { 1, 0, 0, 0 });
             indexNb.ValueChanged += IndexNb_ValueChanged;
             // 
-            // tableLayoutPanel1
+            // tablePanel
             // 
             tableLayoutPanel1.ColumnCount = 2;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle());

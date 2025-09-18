@@ -1,4 +1,5 @@
 ﻿using Conta_Certa.Components;
+using Conta_Certa.Models;
 
 namespace Conta_Certa.Forms
 {
@@ -32,63 +33,39 @@ namespace Conta_Certa.Forms
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClientesList));
-            menu = new ContextMenuStrip(components);
             alterarToolStripMenuItem = new ToolStripMenuItem();
             excluirToolStripMenuItem = new ToolStripMenuItem();
-            clientesPanel = new BufferedPanel();
-            tableLayoutPanel1 = new TableLayoutPanel();
+            tablePanel = new TableLayoutPanel();
             searchbar = new Conta_Certa.UserControls.SearchbarControl();
-            menu.SuspendLayout();
-            tableLayoutPanel1.SuspendLayout();
+            tablePanel.SuspendLayout();
             SuspendLayout();
-            // 
-            // menu
-            // 
-            menu.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            menu.Items.AddRange(new ToolStripItem[] { alterarToolStripMenuItem, excluirToolStripMenuItem });
-            menu.Name = "menu";
-            menu.Size = new Size(115, 48);
-            menu.Text = "Menu cliente";
             // 
             // alterarToolStripMenuItem
             // 
             alterarToolStripMenuItem.Name = "alterarToolStripMenuItem";
             alterarToolStripMenuItem.Size = new Size(114, 22);
             alterarToolStripMenuItem.Text = "Alterar";
-            alterarToolStripMenuItem.Click += Alterar_Menu_Click;
             // 
             // excluirToolStripMenuItem
             // 
             excluirToolStripMenuItem.Name = "excluirToolStripMenuItem";
             excluirToolStripMenuItem.Size = new Size(114, 22);
             excluirToolStripMenuItem.Text = "Excluir";
-            excluirToolStripMenuItem.Click += Excluir_Menu_Click;
             // 
-            // clientesPanel
+            // tablePanel
             // 
-            clientesPanel.AutoScroll = true;
-            clientesPanel.Dock = DockStyle.Fill;
-            clientesPanel.Location = new Point(5, 33);
-            clientesPanel.Margin = new Padding(0);
-            clientesPanel.Name = "clientesPanel";
-            clientesPanel.Size = new Size(790, 412);
-            clientesPanel.TabIndex = 3;
-            // 
-            // tableLayoutPanel1
-            // 
-            tableLayoutPanel1.ColumnCount = 1;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Controls.Add(clientesPanel, 0, 1);
-            tableLayoutPanel1.Controls.Add(searchbar, 0, 0);
-            tableLayoutPanel1.Dock = DockStyle.Fill;
-            tableLayoutPanel1.Location = new Point(0, 0);
-            tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.Padding = new Padding(5);
-            tableLayoutPanel1.RowCount = 2;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle());
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(800, 450);
-            tableLayoutPanel1.TabIndex = 0;
+            tablePanel.ColumnCount = 1;
+            tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tablePanel.Controls.Add(searchbar, 0, 0);
+            tablePanel.Dock = DockStyle.Fill;
+            tablePanel.Location = new Point(0, 0);
+            tablePanel.Name = "tablePanel";
+            tablePanel.Padding = new Padding(5);
+            tablePanel.RowCount = 2;
+            tablePanel.RowStyles.Add(new RowStyle());
+            tablePanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tablePanel.Size = new Size(800, 450);
+            tablePanel.TabIndex = 0;
             // 
             // searchbar
             // 
@@ -104,23 +81,19 @@ namespace Conta_Certa.Forms
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(tableLayoutPanel1);
+            Controls.Add(tablePanel);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "ClientesList";
             StartPosition = FormStartPosition.CenterParent;
             Text = "Lista de clientes";
-            FormClosing += ClientesList_FormClosing;
-            menu.ResumeLayout(false);
-            tableLayoutPanel1.ResumeLayout(false);
+            tablePanel.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
-        private ContextMenuStrip menu;
         private ToolStripMenuItem alterarToolStripMenuItem;
         private ToolStripMenuItem excluirToolStripMenuItem;
-        private BufferedPanel clientesPanel;
-        private TableLayoutPanel tableLayoutPanel1;
+        private TableLayoutPanel tablePanel;
         private UserControls.SearchbarControl searchbar;
     }
 }

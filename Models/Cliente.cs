@@ -145,7 +145,6 @@ public class Cliente
         return true;
     }
 
-
     public static string FormatTelefone(string telefone)
     {
         var digits = new string([.. telefone.Where(char.IsDigit)]);
@@ -156,5 +155,11 @@ public class Cliente
             11 => Regex.Replace(digits, @"(\d{2})(\d{5})(\d{4})", "($1) $2-$3"),
             _ => telefone
         };
+    }
+
+    public override string ToString()
+    {
+        var email = Email?.Length > 0 ? Email : "*";
+        return $"{Documento} - {Nome} - {Telefone} - {email} - {Honorario} - {VencimentoHonorario}";
     }
 }

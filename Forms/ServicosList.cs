@@ -1,153 +1,82 @@
-﻿using Conta_Certa.DAOs;
+﻿using Conta_Certa.Components;
+using Conta_Certa.DAOs;
 using Conta_Certa.Models;
-using Conta_Certa.UserControls;
-using Conta_Certa.Utils;
 
 namespace Conta_Certa.Forms;
 
 public partial class ServicosList : Form
 {
-    private List<Servico> servicos = [];
-    private ServicoControl? currentControl = null;
-
-    private OrderBy order = OrderBy.ID;
-    private string filter = "";
+    private List<Servico> _servicos = [];
+    private readonly LazyPanel<Servico> _lazyPanel;
 
     public ServicosList()
     {
         InitializeComponent();
 
-        searchbar.FilterChanged += OnSearchbarFilterChanged;
-        searchbar.OrderChanged += OnSearchbarOrderValueChanged;
-        searchbar.AddButtonClicked += OnAddButtonClicked;
+        _servicos = ServicoDAO.GetAllServicos();
 
-        UpdateServicosList();
-    }
-    
-    private List<Servico> GetSortedServicos()
-    {
-        switch (order)
+        _lazyPanel = new()
         {
-            case OrderBy.Nome:
-                return [.. servicos.OrderBy(s => s.Nome)];
-
-            case OrderBy.Valor:
-                return [.. servicos.OrderBy(s => s.Valor)];
-
-            default:
-                return [.. servicos.OrderBy(s => s.IdServico)];
-        }
-    }
-
-    private void UpdateServicosList()
-    {
-        servicos = ServicoDAO.GetAllServicos();
-        UpdateServicosPanel();
-    }
-
-    private void UpdateServicosPanel()
-    {
-        servicosPanel.Controls.Clear();
-
-        // Guia
-        ServicoControl guide = new(null)
-        {
-            Dock = DockStyle.Top
+            Dock = DockStyle.Fill,
+            Filter = (s) =>
+            {
+                string filter = searchbar.Filter;
+                return s.Nome.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase);
+            }
         };
 
-        servicosPanel.Controls.Add(guide);
-        servicosPanel.Controls.SetChildIndex(guide, 0);
+        // ALTERAÇÃO E EXCLUSÃO
+        _lazyPanel.ItemChange += OnMenuAlterarClicked;
+        _lazyPanel.ItemDelete += OnMenuExcluirClicked;
 
-        foreach (var servico in GetSortedServicos())
+        // COLUNAS
+        _lazyPanel.SetColumns([
+            new() { Header = "Nome", ValueSelector = s => s.Nome, Alignment = StringAlignment.Center },
+            new() { Header = "Honorário", ValueSelector = s => s.Valor.ToString("c"), Alignment = StringAlignment.Center } ]);
+
+        // ITENS
+        _lazyPanel.SetItems(_servicos);
+        tablePanel.Controls.Add(_lazyPanel);
+
+        // SEARCHBAR
+        searchbar.FilterChanged += (newFilter) =>
         {
-            if (servico.Nome.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase))
+            _lazyPanel.SortItems();
+        };
+
+        searchbar.AddButtonClicked += () =>
+        {
+            using ManageServico form = new();
+            DialogResult dialogResult = form.ShowDialog();
+
+            if (dialogResult == DialogResult.OK)
             {
-                ServicoControl servicoControl = new(servico)
-                {
-                    Dock = DockStyle.Top
-                };
-
-                servicosPanel.Controls.Add(servicoControl);
-                servicosPanel.Controls.SetChildIndex(servicoControl, 0);
+                _servicos = ServicoDAO.GetAllServicos();
+                _lazyPanel.SetItems(_servicos);
             }
-        }
+        };
     }
 
-    private void Alterar_Menu_Click(object sender, EventArgs e)
+    private void OnMenuAlterarClicked(object? sender, Servico servico)
     {
-        if (currentControl?.Servico != null)
+        using ManageServico form = new(servico);
+        DialogResult dialogResult = form.ShowDialog();
+
+        if (dialogResult == DialogResult.OK && form.Result != null)
         {
-            using ManageServico form = new(currentControl.Servico);
-            DialogResult result = form.ShowDialog();
+            int index = _servicos.IndexOf(servico);
+            _servicos[index] = form.Result;
 
-            if (result == DialogResult.OK)
-            {
-                UpdateServicosList();
-            }
+            _lazyPanel.SetItems(_servicos);
         }
     }
 
-    private void Excluir_Menu_Click(object sender, EventArgs e)
+    private void OnMenuExcluirClicked(object? sender, Servico servico)
     {
-        if (currentControl?.Servico != null)
-        {
-            var message =
-                "Deseja mesmo excluir este serviço?\nEsta ação é irreversível e apagará também as outras informações associadas a ele.";
+        ServicoDAO.DeleteServico(servico);
 
-            DialogResult result = MessageBox.Show(
-                message,
-                "Excluir cliente?",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-
-            if (result == DialogResult.Yes)
-            {
-                ServicoDAO.DeleteServico(currentControl.Servico);
-
-                servicos.Remove(currentControl.Servico);
-                currentControl.Dispose();
-            }
-        }
-    }
-
-    private void OnSearchbarFilterChanged(string filter)
-    {
-        this.filter = filter;
-        UpdateServicosList();
-    }
-
-    private void OnSearchbarOrderValueChanged(string rawOrder)
-    {
-        OrderBy order = Enum.Parse<OrderBy>(rawOrder);
-        if (this.order != order)
-        {
-            this.order = order;
-            UpdateServicosList();
-        }
-    }
-
-    private void OnAddButtonClicked()
-    {
-        using ManageServico form = new();
-        DialogResult result = form.ShowDialog();
-
-        if (result == DialogResult.OK)
-        {
-            UpdateServicosList();
-        }
-    }
-
-    private void ServicosList_FormClosing(object sender, FormClosingEventArgs e)
-    {
-        searchbar.FilterChanged -= OnSearchbarFilterChanged;
-        searchbar.OrderChanged -= OnSearchbarOrderValueChanged;
-        searchbar.AddButtonClicked -= OnAddButtonClicked;
-    }
-
-    public void OpenContextMenu(ServicoControl control)
-    {
-        currentControl = control;
-        menu.Show(Cursor.Position);
+        _servicos.Remove(servico);
+        _lazyPanel.SetItems(_servicos);
     }
 }
  

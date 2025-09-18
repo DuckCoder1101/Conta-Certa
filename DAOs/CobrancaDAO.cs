@@ -67,7 +67,7 @@ public static class CobrancaDAO
         }
     }
 
-    public static void UpdateCobranca(Cobranca cobranca)
+    public static void UpdateCobranca(long idCobranca, CobrancaCadDTO cobrancaDTO)
     {
         try
         {
@@ -76,19 +76,21 @@ public static class CobrancaDAO
 
             string sql = @"UPDATE Cobrancas 
                            SET honorario = @honorario, status = @status, 
-                               vencimento = @vencimento, pagoEm = @pagoEm  
+                               vencimento = @vencimento, pagoEm = @pagoEm, 
+                               documentoCliente = @documentoCliente
                            WHERE idCobranca = @idCobranca;";
 
-            var vencimento = cobranca.Vencimento.ToString("yyyy-MM-dd");
-            var pagoEm = cobranca.PagoEm?.ToString("yyyy-MM-dd");
+            var vencimento = cobrancaDTO.Vencimento?.ToString("yyyy-MM-dd");
+            var pagoEm = cobrancaDTO.PagoEm?.ToString("yyyy-MM-dd");
 
             using var cmd = new SQLiteCommand(sql, conn);
 
-            cmd.Parameters.AddWithValue("@honorario", cobranca.Honorario);
-            cmd.Parameters.AddWithValue("@status", cobranca.Status.ToString());
+            cmd.Parameters.AddWithValue("documentoCliente", cobrancaDTO.DocumentoCliente);
+            cmd.Parameters.AddWithValue("@honorario", cobrancaDTO.Honorario);
+            cmd.Parameters.AddWithValue("@status", cobrancaDTO.Status.ToString());
             cmd.Parameters.AddWithValue("@vencimento", vencimento);
             cmd.Parameters.AddWithValue("@pagoEm", pagoEm);
-            cmd.Parameters.AddWithValue("@idCobranca", cobranca.IdCobranca);
+            cmd.Parameters.AddWithValue("@idCobranca", idCobranca);
 
             cmd.ExecuteNonQuery();
             conn.Close();

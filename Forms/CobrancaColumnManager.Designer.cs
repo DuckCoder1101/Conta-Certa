@@ -38,7 +38,7 @@
             cobrancaPanel.SuspendLayout();
             SuspendLayout();
             // 
-            // tableLayoutPanel1
+            // tablePanel
             // 
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));

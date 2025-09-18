@@ -1,152 +1,94 @@
-﻿using Conta_Certa.DAOs;
+﻿using Conta_Certa.Components;
+using Conta_Certa.DAOs;
 using Conta_Certa.Models;
-using Conta_Certa.UserControls;
-using Conta_Certa.Utils;
 
 namespace Conta_Certa.Forms;
 
 public partial class ClientesList : Form
 {
-    private List<Cliente> clientes = [];
-    private ClienteControl? currentControl = null;
-
-    private OrderBy order = OrderBy.ID;
-    private string filter = "";
+    private List<Cliente> _clientes = [];
+    private readonly LazyPanel<Cliente> _lazyPanel;
 
     public ClientesList()
     {
         InitializeComponent();
 
-        searchbar.FilterChanged += OnSearchbarFilterChanged;
-        searchbar.OrderChanged += OnSearchbarOrderValueChanged;
-        searchbar.AddButtonClicked += OnAddButtonClicked;
+        _clientes = ClienteDAO.GetAllClientes();
 
-        UpdateClientesList();
-    }
-
-    private List<Cliente> GetSortedClientes()
-    {
-        switch (order)
+        _lazyPanel = new()
         {
-            case OrderBy.Nome:
-                return [.. clientes.OrderBy(c => c.Nome)];
-
-            case OrderBy.Valor:
-                return [.. clientes.OrderBy(c => c.Honorario)];
-
-            default:
-                return [.. clientes.OrderBy(c => c.Documento)];
-        }
-    }
-
-    private void UpdateClientesList()
-    {
-        clientes = ClienteDAO.GetAllClientes();
-        UpdateClientesPanel();
-    }
-
-    private void UpdateClientesPanel()
-    {
-        clientesPanel.Controls.Clear();
-
-        // Guia
-        ClienteControl guide = new(null)
-        {
-            Dock = DockStyle.Top
+            Dock = DockStyle.Fill,
+            Filter = (c) =>
+            {
+                string filter = searchbar.Filter;
+                return c.Documento.StartsWith(filter) || c.Nome.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase);
+            }
         };
 
-        clientesPanel.Controls.Add(guide);
-        clientesPanel.Controls.SetChildIndex(guide, 0);
+        // ALTERAÇÃO E EXCLUSÃO
+        _lazyPanel.ItemChange += OnMenuAlterarClicked;
+        _lazyPanel.ItemDelete += OnMenuExcluirClicked;
 
-        foreach (var cliente in GetSortedClientes())
+        // COLUNAS
+        _lazyPanel.SetColumns([
+            new() { Header = "Documento", ValueSelector = c => c.Documento },
+            new() { Header = "Nome", ValueSelector = c => c.Nome },
+            new() { Header = "Telefone", ValueSelector = c => c.Telefone },
+            new() { Header = "Email", ValueSelector = c => c.Email ?? "-" },
+            new() { Header = "Honorário", ValueSelector = c => c.Honorario.ToString("c") },
+            new() { Header = "Vencimento honorário", ValueSelector = c => c.VencimentoHonorario.ToString(), Alignment = StringAlignment.Center }]);
+
+        // ITENS
+        _lazyPanel.SetItems(_clientes);
+        tablePanel.Controls.Add(_lazyPanel);
+
+        // SEARCHBAR
+        searchbar.FilterChanged += (newFilter) =>
         {
-            if (cliente.Nome.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase))
-            {
-                ClienteControl control = new(cliente)
-                {
-                    Dock = DockStyle.Top,
-                };
+            _lazyPanel.SortItems();
+        };
 
-                clientesPanel.Controls.Add(control);
-                clientesPanel.Controls.SetChildIndex(control, 0);
-            }
-        }
-    }
-
-    private void Alterar_Menu_Click(object sender, EventArgs e)
-    {
-        if (currentControl?.Cliente != null)
+        searchbar.AddButtonClicked += () =>
         {
-            using ManageCliente form = new(currentControl.Cliente);
+            using ManageCliente form = new();
             DialogResult dialogResult = form.ShowDialog();
 
-            if (dialogResult == DialogResult.OK && form.Result != null)
+            if (dialogResult == DialogResult.OK)
             {
-                UpdateClientesPanel();
+                _clientes = ClienteDAO.GetAllClientes();
+                _lazyPanel.SetItems(_clientes);
             }
-        }
+        };
     }
 
-    private void Excluir_Menu_Click(object sender, EventArgs e)
+    private void OnMenuAlterarClicked(object? sender, Cliente cliente)
     {
-        if (currentControl?.Cliente != null)
-        {
-            var message = 
-                "Deseja mesmo excluir este cliente?\nEsta ação é irreversível e apagará também as outras informações associadas a ele";
 
-            DialogResult result = MessageBox.Show(
-                message,
-                "Excluir cliente?",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-
-            if (result == DialogResult.Yes)
-            {
-                ClienteDAO.DeleteCliente(currentControl.Cliente);
-
-                clientes.Remove(currentControl.Cliente);
-                currentControl.Dispose();
-            }
-        }
-    }
-
-    private void OnSearchbarOrderValueChanged(string rawOrder)
-    {
-        OrderBy order = Enum.Parse<OrderBy>(rawOrder);
-        if (this.order != order)
-        {
-            this.order = order;
-            UpdateClientesPanel();
-        }
-    }
-
-    private void OnSearchbarFilterChanged(string filter)
-    {
-        this.filter = filter;
-        UpdateClientesPanel();
-    }
-
-    private void OnAddButtonClicked()
-    {
-        using ManageCliente form = new();
+        using ManageCliente form = new(cliente);
         DialogResult dialogResult = form.ShowDialog();
 
         if (dialogResult == DialogResult.OK && form.Result != null)
         {
-            UpdateClientesPanel();
+            if (cliente.Documento == form.Result.Documento)
+            {
+                int index = _clientes.IndexOf(cliente);
+                _clientes[index] = form.Result;
+            }
+
+            else
+            {
+                _clientes.Add(form.Result);
+            }
+
+            _lazyPanel.SetItems(_clientes);
         }
     }
 
-    private void ClientesList_FormClosing(object sender, FormClosingEventArgs e)
+    private void OnMenuExcluirClicked(object? sender, Cliente cliente)
     {
-        searchbar.FilterChanged -= OnSearchbarFilterChanged;
-        searchbar.OrderChanged -= OnSearchbarOrderValueChanged;
-        searchbar.AddButtonClicked -= OnAddButtonClicked;
-    }
+        ClienteDAO.DeleteCliente(cliente);
 
-    public void OpenContextMenu(ClienteControl control)
-    {
-        currentControl = control;
-        menu.Show(Cursor.Position);
+        _clientes.Remove(cliente);
+        _lazyPanel.SetItems(_clientes);
     }
 }

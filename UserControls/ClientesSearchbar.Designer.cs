@@ -34,7 +34,7 @@
             tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
-            // tableLayoutPanel1
+            // tablePanel
             // 
             tableLayoutPanel1.CellBorderStyle = TableLayoutPanelCellBorderStyle.Outset;
             tableLayoutPanel1.ColumnCount = 2;

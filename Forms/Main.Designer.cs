@@ -507,7 +507,7 @@
             clientes.TabIndex = 7;
             clientes.WrapContents = false;
             // 
-            // tableLayoutPanel1
+            // tablePanel
             // 
             tableLayoutPanel1.AutoSize = true;
             tableLayoutPanel1.ColumnCount = 2;

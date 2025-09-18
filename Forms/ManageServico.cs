@@ -3,70 +3,77 @@ using Conta_Certa.DAOs;
 using Conta_Certa.DTOs;
 using Conta_Certa.Models;
 
-namespace Conta_Certa.Forms
+namespace Conta_Certa.Forms;
+
+public partial class ManageServico : InputForm
 {
-    public partial class ManageServico : InputForm
+    public Servico? Result { get; private set; }
+
+    private readonly long? _idServico;
+
+    public ManageServico(Servico? servico = null)
     {
-        private readonly Servico? servicoBase;
+        InitializeComponent();
 
-        public ManageServico(Servico? servico = null)
+        if (servico != null)
         {
-            InitializeComponent();
+            _idServico = servico.IdServico;
 
-            if (servico != null)
+            nomeTxt.Text = servico.Nome;
+            valorNb.Value = (decimal)servico.Valor;
+
+            cadastrarBtn.Text = "ALTERAR";
+        }
+    }
+
+    private void CadastrarBtn_Click(object sender, EventArgs e)
+    {
+        string nome = nomeTxt.Text.Trim();
+        float valor = (float) valorNb.Value;
+
+        if (nome.Length == 0 || valor == 0)
+        {
+            MessageBox.Show(
+                "Os campos marcados com * são obrigatórios!",
+                "Faltam informações!",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+
+            return;
+        }
+
+        if (_idServico == null)
+        {
+            ServicoCadDTO servicoCadDTO = new(nome, valor);
+            long? id = ServicoDAO.InsertServicos(servicoCadDTO).ElementAtOrDefault(0);
+
+            if (id != null)
             {
-                servicoBase = servico;
-
-                nomeTxt.Text = servico.Nome;
-                valorNb.Value = (decimal)servico.Valor;
-
-                cadastrarBtn.Text = "ALTERAR";
+                Result = new((long) id, nome, valor);
             }
         }
 
-        private void CadastrarBtn_Click(object sender, EventArgs e)
+        else
         {
-            string nome = nomeTxt.Text.Trim();
-            float valor = (float) valorNb.Value;
+            Servico servico = new(
+                (long) _idServico,
+                nome,
+                valor);
 
-            if (nome.Length == 0 || valor == 0)
-            {
-                MessageBox.Show(
-                    "Os campos marcados com * são obrigatórios!",
-                    "Faltam informações!",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+            ServicoDAO.UpdateServico(servico);
+            Result = servico;
+        }
 
-                return;
-            }
 
-            if (servicoBase == null)
-            {
-                ServicoCadDTO servicoCadDTO = new(nome, valor);
-                ServicoDAO.InsertServicos(servicoCadDTO);
-            }
-
-            else
-            {
-                Servico servico = new(
-                    servicoBase.IdServico,
-                    nome,
-                    valor);
-
-                ServicoDAO.UpdateServico(servico);
-            }
-
+        if (Modal)
+        {
             DialogResult = DialogResult.OK;
+            Close();
+        }
 
-            if (Modal)
-            {
-                Close();
-            }
-
-            else
-            {
-                ClearInputs();
-            }
+        else
+        {
+            ClearInputs();
         }
     }
 }

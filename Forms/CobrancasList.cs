@@ -1,176 +1,87 @@
-﻿using Conta_Certa.DAOs;
+﻿using Conta_Certa.Components;
+using Conta_Certa.DAOs;
 using Conta_Certa.Models;
-using Conta_Certa.UserControls;
-using Conta_Certa.Utils;
-using System.Diagnostics;
 
 namespace Conta_Certa.Forms;
 
 public partial class CobrancasList : Form
 {
-    private readonly CobrancaStatus? statusFilter = null;
+    private List<Cobranca> _cobrancas = [];
+    private readonly LazyPanel<Cobranca> _lazyPanel;
+    private readonly CobrancaStatus _status;
 
-    private List<Cobranca> cobrancas = [];
-    private CobrancaControl? currentCobranca = null;
-
-    private string filter = "";
-    private OrderBy order = OrderBy.ID;
-
-    public CobrancasList()
+    public CobrancasList(CobrancaStatus status = CobrancaStatus.Pendente)
     {
         InitializeComponent();
 
-        searchbar.FilterChanged += OnSearchbarFilterChanged;
-        searchbar.OrderChanged += OnSearchbarOrderValueChanged;
-        searchbar.AddButtonClicked += OnAddButtonClicked;
+        _status = status;
+        _cobrancas = CobrancaDAO.GetCobrancasByStatus(status);
 
-        UpdateCobrancasList();
-    }
-
-    public CobrancasList(CobrancaStatus statusFilter)
-    {
-        InitializeComponent();
-
-        this.statusFilter = statusFilter;
-
-        searchbar.FilterChanged += OnSearchbarFilterChanged;
-        searchbar.OrderChanged += OnSearchbarOrderValueChanged;
-        searchbar.AddButtonClicked += OnAddButtonClicked;
-
-        UpdateCobrancasList();
-    }
-
-    private List<Cobranca> GetSortedCobrancas()
-    {
-        switch (order)
+        _lazyPanel = new()
         {
-            case OrderBy.Nome:
-                return [.. cobrancas.OrderBy(c => c.Cliente.Nome)];
-
-            case OrderBy.Valor:
-                return [.. cobrancas.OrderBy(c => c.Honorario)];
-
-            default:
-                return [.. cobrancas.OrderBy(c => c.IdCobranca)];
-        }
-    }
-
-    private void UpdateCobrancasList()
-    {
-        if (statusFilter != null)
-        {
-            cobrancas = CobrancaDAO.GetCobrancasByStatus((CobrancaStatus)statusFilter);
-        }
-
-        else
-        {
-            cobrancas = CobrancaDAO.GetAllCobrancas();
-        }
-
-        UpdateCobrancasPanel();
-    }
-
-    private void UpdateCobrancasPanel()
-    {
-        cobrancasPanel.Controls.Clear();
-
-        CobrancaControl guide = new(null)
-        {
-            Dock = DockStyle.Top
+            Dock = DockStyle.Fill,
+            Filter = (c) =>
+            {
+                string filter = searchbar.Filter;
+                return c.IdCobranca.ToString().StartsWith(filter) || 
+                    c.Cliente.Nome.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase) ||
+                    c.HonorarioTotal.ToString().StartsWith(filter);
+            }
         };
 
-        cobrancasPanel.Controls.Add(guide);
-        cobrancasPanel.Controls.SetChildIndex(guide, 0);
+        // ALTERAÇÃO E EXCLUSÃO
+        _lazyPanel.ItemChange += OnMenuAlterarClicked;
+        _lazyPanel.ItemDelete += OnMenuExcluirClicked;
 
-        foreach (var cobranca in GetSortedCobrancas())
+        // COLUNAS
+        _lazyPanel.SetColumns([
+            new() { Header = "ID", ValueSelector = c => c.IdCobranca.ToString(), Alignment = StringAlignment.Center },
+            new() { Header = "Cliente", ValueSelector = c => c.Cliente.Nome },
+            new() { Header = "Honorário Total", ValueSelector = c => c.HonorarioTotal.ToString("c") },
+            new() { Header = "Status", ValueSelector = c => c.Status.ToString(), Alignment = StringAlignment.Center },
+            new() { Header = "Vencimento", ValueSelector = c => c.Vencimento.ToString("dd/MM/yy"), Alignment = StringAlignment.Center },
+            new() { Header = "Pago em", ValueSelector = c => c.PagoEm != null ? ((DateTime)c.PagoEm).ToString("dd/MM/yy") : "-", Alignment = StringAlignment.Center }]);
+
+        // ITENS
+        _lazyPanel.SetItems(_cobrancas);
+        tablePanel.Controls.Add(_lazyPanel);
+
+        // SEARCHBAR
+        searchbar.FilterChanged += (newFilter) =>
         {
-            if (cobranca.Cliente.Nome.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase))
+            _lazyPanel.SortItems();
+        };
+
+        searchbar.AddButtonClicked += () =>
+        {
+            using ManageCobranca form = new();
+            DialogResult dialogResult = form.ShowDialog();
+
+            if (dialogResult == DialogResult.OK)
             {
-                CobrancaControl control = new(cobranca)
-                {
-                    Dock = DockStyle.Top
-                };
-
-                cobrancasPanel.Controls.Add(control);
-                cobrancasPanel.Controls.SetChildIndex(control, 0);
+                _cobrancas = CobrancaDAO.GetAllCobrancas();
+                _lazyPanel.SetItems(_cobrancas);
             }
-        }
+        };
     }
 
-    private void OnSearchbarFilterChanged(string filter)
+    private void OnMenuAlterarClicked(object? sender, Cobranca cobranca)
     {
-        this.filter = filter;
-        UpdateCobrancasPanel();
-    }
+        using ManageCobranca form = new(cobranca);
+        DialogResult dialogResult = form.ShowDialog();
 
-    private void OnSearchbarOrderValueChanged(string rawOrder)
-    {
-        OrderBy order = Enum.Parse<OrderBy>(rawOrder);
-        if (this.order != order)
+        if (dialogResult == DialogResult.OK)
         {
-            this.order = order;
-            UpdateCobrancasList();
+            _cobrancas = CobrancaDAO.GetCobrancasByStatus(_status);   
+            _lazyPanel.SetItems(_cobrancas);
         }
     }
 
-    private void OnAddButtonClicked()
+    private void OnMenuExcluirClicked(object? sender, Cobranca cobranca)
     {
-        using ManageCobranca form = new();
-        DialogResult result = form.ShowDialog();
+        CobrancaDAO.DeleteCobranca(cobranca);
 
-        if (result == DialogResult.OK)
-        {
-            UpdateCobrancasList();
-        }
-    }
-
-    private void AlterarToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-        if (currentCobranca?.Cobranca != null)
-        {
-            using ManageCobranca form = new(currentCobranca.Cobranca);
-            DialogResult result = form.ShowDialog();
-
-            if (result == DialogResult.OK)
-            {
-                UpdateCobrancasList();
-            }
-        }
-    }
-
-    private void ExcluirToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-        if (currentCobranca?.Cobranca != null)
-        {
-            var message =
-                "Deseja mesmo excluir esta cobrança?\nEsta ação é irreversível e apagará também todas as informações associadas a ela.";
-
-            DialogResult result = MessageBox.Show(
-                message,
-                "Excluir cliente?",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-
-            if (result == DialogResult.Yes)
-            {
-                CobrancaDAO.DeleteCobranca(currentCobranca.Cobranca);
-
-                cobrancasPanel.Controls.Remove(currentCobranca);
-                currentCobranca.Dispose();
-            }
-        }
-    }
-
-    public void OpenContextMenu(CobrancaControl control)
-    {
-        currentCobranca = control;
-        menu.Show(Cursor.Position);
-    }
-
-    private void CobrancasList_FormClosing(object sender, FormClosingEventArgs e)
-    {
-        searchbar.FilterChanged -= OnSearchbarFilterChanged;
-        searchbar.OrderChanged -= OnSearchbarOrderValueChanged;
-        searchbar.AddButtonClicked -= OnAddButtonClicked;
+        _cobrancas.Remove(cobranca);
+        _lazyPanel.SetItems(_cobrancas);
     }
 }

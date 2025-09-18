@@ -39,7 +39,7 @@
             ((System.ComponentModel.ISupportInitialize)valorNb).BeginInit();
             SuspendLayout();
             // 
-            // tableLayoutPanel1
+            // tablePanel
             // 
             tableLayoutPanel1.ColumnCount = 2;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));

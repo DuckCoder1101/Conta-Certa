@@ -1,6 +1,6 @@
 ﻿namespace Conta_Certa.Components;
 
-public partial class InputForm : Form
+public class InputForm : Form
 {
     public void ClearInputs(Control? c = null)
     {

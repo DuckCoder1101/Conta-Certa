@@ -36,7 +36,7 @@
             ((System.ComponentModel.ISupportInitialize)quantidadeServicoNb).BeginInit();
             SuspendLayout();
             // 
-            // tableLayoutPanel1
+            // tablePanel
             // 
             tableLayoutPanel1.CellBorderStyle = TableLayoutPanelCellBorderStyle.Outset;
             tableLayoutPanel1.ColumnCount = 3;
