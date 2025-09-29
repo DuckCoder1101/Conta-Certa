@@ -15,15 +15,6 @@ public record CobrancaCadDTO
 
     }
 
-    public CobrancaCadDTO(CobrancaJSONDTO @base)
-    {
-        DocumentoCliente = @base.DocumentoCliente;
-        Honorario = @base.Honorario;
-        Status = @base.Status;
-        Vencimento = @base.Vencimento;
-        PagoEm = @base.PagoEm;
-    }
-
     public CobrancaCadDTO(string documentoCliente, float honorario, CobrancaStatus status, DateTime vencimento, DateTime? pagoEm)
     {
         DocumentoCliente = documentoCliente;

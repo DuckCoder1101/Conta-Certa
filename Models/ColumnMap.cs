@@ -11,7 +11,7 @@ public class ColumnMap
     public ColumnMap(string nome, string propertyName, string toolTip = "")
     {
         Nome = nome;
-        PropertyName = propertyName; 
+        PropertyName = propertyName;
         ToolTip = toolTip;
     }
 }

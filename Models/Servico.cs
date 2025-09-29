@@ -1,15 +1,31 @@
-﻿namespace Conta_Certa.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Conta_Certa.Models;
 
 public class Servico
 {
-    public long IdServico { get; }
-    public string Nome { get; private set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public long? IdServico { get; private set; }
+
+    [Required]
+    [Index(IsUnique = true)]
+    public string Nome { get; private set; } = string.Empty;
+
+    [Required]
     public float Valor { get; private set; }
 
-    public Servico(long idServico, string nome, float valor)
+    public Servico() { }
+
+    public Servico(string nome, float valor)
     {
-        IdServico = idServico;
         Nome = nome;
         Valor = valor;
+    }
+
+    public void SetId(long? id)
+    {
+        IdServico = id;
     }
 }

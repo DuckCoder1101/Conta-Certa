@@ -1,13 +1,12 @@
-﻿using Conta_Certa.DAOs;
-using Conta_Certa.DTOs;
+﻿using Conta_Certa.DTOs;
 using Conta_Certa.Models;
-using System.Diagnostics;
 
 namespace Conta_Certa.UserControls;
 
 public partial class ClientesSearchbar : UserControl
 {
-    private readonly List<ClienteResumoDTO> clientes = [];
+    private readonly List<ClienteResumoDTO> _clientes = [];
+    private readonly AppDBContext _dbContext;
 
     public event Action<Cliente?>? OnClienteChange;
 
@@ -15,8 +14,11 @@ public partial class ClientesSearchbar : UserControl
     {
         InitializeComponent();
 
-        clientes = ClienteDAO.SelectAllClientesResumos();
-        clientes = [.. clientes.OrderBy(c => c.Nome)];
+        _dbContext = new();
+        _clientes = _dbContext.Clientes
+                        .OrderBy(c => c.Nome)
+                        .Select(c => new ClienteResumoDTO(c.Documento, c.Nome))
+                        .ToList();
 
         UpdateClientesList();
     }
@@ -26,7 +28,7 @@ public partial class ClientesSearchbar : UserControl
         clientesCB.BeginUpdate();
         clientesCB.Items.Clear();
 
-        foreach (var cliente in clientes)
+        foreach (var cliente in _clientes)
         {
             if (cliente.Nome.StartsWith(filter, StringComparison.InvariantCultureIgnoreCase) ||
                 cliente.Documento.StartsWith(filter))
@@ -61,9 +63,9 @@ public partial class ClientesSearchbar : UserControl
 
         if (clientesCB.SelectedItem is ClienteResumoDTO clienteResumo)
         {
-            cliente = ClienteDAO.GetClienteByDocumento(clienteResumo.Documento);
+            cliente = _dbContext.Clientes.Find(clienteResumo.Documento);
         }
-        
+
         OnClienteChange?.Invoke(cliente);
     }
 }

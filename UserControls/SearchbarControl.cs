@@ -16,9 +16,9 @@ public partial class SearchbarControl : UserControl
         InitializeComponent();
     }
 
-    private void SearchboxTxt_TextChanged(object sender, EventArgs e)
+    private void SearchbarTxt_TextChanged(object sender, EventArgs e)
     {
-        FilterChanged?.Invoke(searchboxTxt.Text.Trim().ToUpper());
+        FilterChanged?.Invoke(searchboxTxt.Text.Trim());
     }
 
     private void AddBtn_Click(object sender, EventArgs e)

@@ -22,23 +22,13 @@ public record ClienteCadDTO
         VencimentoHonorario = vencimentoHonorario;
     }
 
-    public ClienteCadDTO(ClienteJSONDTO @base)
-    {
-        Nome = @base.Nome;
-        Documento = @base.Documento;
-        Telefone= @base.Telefone;
-        Email = @base.Email;
-        Honorario = @base.Honorario;
-        VencimentoHonorario = @base.VencimentoHonorario;
-    }
-
     public bool IsFull()
     {
         return (
             Documento != null &&
-            Nome != null && 
-            Telefone != null && 
-            Honorario != null && 
+            Nome != null &&
+            Telefone != null &&
+            Honorario != null &&
             VencimentoHonorario != null
         );
     }

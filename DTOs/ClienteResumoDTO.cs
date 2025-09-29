@@ -6,13 +6,11 @@ public record ClienteResumoDTO
 {
     public string Nome { get; }
     public string Documento { get; }
-    public string Telefone { get; }
 
-    public ClienteResumoDTO(string documento, string nome, string telefone)
+    public ClienteResumoDTO(string documento, string nome)
     {
         Documento = documento;
         Nome = nome;
-        Telefone = telefone;
     }
 
     public override string ToString()

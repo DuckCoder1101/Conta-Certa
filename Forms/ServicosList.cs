@@ -1,47 +1,50 @@
 ﻿using Conta_Certa.Components;
-using Conta_Certa.DAOs;
+using Conta_Certa.DataProviders;
 using Conta_Certa.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Conta_Certa.Forms;
 
 public partial class ServicosList : Form
 {
-    private List<Servico> _servicos = [];
     private readonly LazyPanel<Servico> _lazyPanel;
+    private readonly ServicoDataProvider _provider;
+    private readonly AppDBContext _dbContext;
 
     public ServicosList()
     {
         InitializeComponent();
 
-        _servicos = ServicoDAO.GetAllServicos();
+        _dbContext = new();
+        _provider = new(_dbContext);
 
         _lazyPanel = new()
         {
             Dock = DockStyle.Fill,
-            Filter = (s) =>
-            {
-                string filter = searchbar.Filter;
-                return s.Nome.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase);
-            }
         };
 
         // ALTERAÇÃO E EXCLUSÃO
-        _lazyPanel.ItemChange += OnMenuAlterarClicked;
-        _lazyPanel.ItemDelete += OnMenuExcluirClicked;
+        _lazyPanel.ItemChange += OnItemChanged;
+        _lazyPanel.ItemDelete += OnItemDeleted;
 
         // COLUNAS
         _lazyPanel.SetColumns([
-            new() { Header = "Nome", ValueSelector = s => s.Nome, Alignment = StringAlignment.Center },
-            new() { Header = "Honorário", ValueSelector = s => s.Valor.ToString("c"), Alignment = StringAlignment.Center } ]);
+            new() { Header = "Nome", ValueSelector = s => s.Nome, OrderBySelector = s => s.Nome,Alignment = StringAlignment.Center },
+            new() { Header = "Valor", ValueSelector = s => s.Valor.ToString("c"), OrderBySelector = s => s.Valor, Alignment = StringAlignment.Center } ]);
 
-        // ITENS
-        _lazyPanel.SetItems(_servicos);
+        // DATA PROVIDER
+        _lazyPanel.SetProvider(_provider);
+
         tablePanel.Controls.Add(_lazyPanel);
 
         // SEARCHBAR
-        searchbar.FilterChanged += (newFilter) =>
+        searchbar.FilterChanged += (filter) =>
         {
-            _lazyPanel.SortItems();
+            _provider.Filter = s =>
+                EF.Functions.Like(s.Nome, filter + "%") ||
+                EF.Functions.Like(s.IdServico.ToString(), filter + "%");
+
+            _lazyPanel.RemakeCache();
         };
 
         searchbar.AddButtonClicked += () =>
@@ -51,32 +54,27 @@ public partial class ServicosList : Form
 
             if (dialogResult == DialogResult.OK)
             {
-                _servicos = ServicoDAO.GetAllServicos();
-                _lazyPanel.SetItems(_servicos);
+                _lazyPanel.RemakeCache();
             }
         };
     }
 
-    private void OnMenuAlterarClicked(object? sender, Servico servico)
+    private void OnItemChanged(object? sender, Servico servico)
     {
         using ManageServico form = new(servico);
         DialogResult dialogResult = form.ShowDialog();
 
-        if (dialogResult == DialogResult.OK && form.Result != null)
+        if (dialogResult == DialogResult.OK && form.Servico != null)
         {
-            int index = _servicos.IndexOf(servico);
-            _servicos[index] = form.Result;
-
-            _lazyPanel.SetItems(_servicos);
+            _lazyPanel.RemakeCache();
         }
     }
 
-    private void OnMenuExcluirClicked(object? sender, Servico servico)
+    private void OnItemDeleted(object? sender, Servico servico)
     {
-        ServicoDAO.DeleteServico(servico);
+        _dbContext.Servicos.Remove(servico);
+        _dbContext.SaveChanges();
 
-        _servicos.Remove(servico);
-        _lazyPanel.SetItems(_servicos);
+        _lazyPanel.RemakeCache();
     }
 }
- 

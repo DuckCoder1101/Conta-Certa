@@ -1,90 +1,41 @@
-﻿using System.Data;
+﻿using Conta_Certa.Models;
 using System.Text.Json;
-using Conta_Certa.DAOs;
-using Conta_Certa.DTOs;
-using Conta_Certa.Models;
 
 namespace Conta_Certa.Utils;
 
 public static class JSONImporter
 {
-    private static readonly JsonSerializerOptions jsonOptions = new()
+    private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         WriteIndented = true,
     };
 
-    private static Dictionary<long, long?> MapIds<T>(IEnumerable<T> originals, IEnumerable<long?> newIds, Func<T, long> getOldId)
+    private static void ImportClientes(AppDBContext dbContext, ICollection<Cliente> clientes)
     {
-        if (newIds.Any(id => id == 0))
-        {
-            MessageBox.Show(
-                "Não foi possível importar o arquivo!",
-                "Erro de importação!",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
+        dbContext.Clientes.AddRange(clientes);
+        dbContext.SaveChanges();
+    }
 
-            return [];
+    private static void ImportCobrancas(AppDBContext dbContext, ICollection<Cobranca> cobrancas)
+    {
+        foreach (var cobranca in cobrancas)
+        {
+            cobranca.SetId(null);
         }
 
-        Dictionary<long, long?> map = [];
-        using var enumOrig = originals.GetEnumerator();
-        using var enumNews = newIds.GetEnumerator();
-        
-        while (enumOrig.MoveNext() && enumNews.MoveNext())
+        dbContext.Cobrancas.AddRange(cobrancas);
+        dbContext.SaveChanges();
+    }
+
+    private static void ImportServicos(AppDBContext dbContext, ICollection<Servico> servicos)
+    {
+        foreach (var servico in servicos)
         {
-            map[getOldId(enumOrig.Current)] = enumNews.Current;
+            servico.SetId(null);
         }
 
-        return map;
-    }
-
-    private static void ImportClientes(List<ClienteJSONDTO> clientes)
-    {
-        ClienteCadDTO[] dtos = [.. clientes.Select(c => new ClienteCadDTO(c))];
-        ClienteDAO.InsertClientes(dtos);
-    }
-
-    private static Dictionary<long, long?> ImportCobrancas(List<CobrancaJSONDTO> cobrancas)
-    {
-        List<CobrancaCadDTO> dtos = [.. cobrancas.Select(c => new CobrancaCadDTO(c))];
-
-        var ids = CobrancaDAO.InsertCobrancas([..dtos]);
-        return MapIds(cobrancas, ids, c => c.TransitionIdCobranca);
-    }
-
-    private static Dictionary<long, long?> ImportServicos(List<ServicoJSONDTO> servicos)
-    {
-        ServicoCadDTO[] dtos = [.. servicos.Select(s => new ServicoCadDTO(s))];
-        var ids = ServicoDAO.InsertServicos(dtos);
-
-        return MapIds(servicos, ids, s => s.TransitionIdServico);
-    }
-
-    private static void ImportServicosCobranca(List<CobrancaJSONDTO> cobrancas, Dictionary<long, long?> idCobrancas, Dictionary<long, long?> idServicos)
-    {
-        List<ServicoCobrancaCadDTO> dtos = [];
-
-        foreach (var c in cobrancas)
-        {
-            long? idCobranca = idCobrancas[c.TransitionIdCobranca];
-            if (idCobranca != null)
-            {
-                foreach (var sc in c.ServicosCobranca)
-                {
-                    long? idServico = idServicos[sc.IdServico];
-                    if (idServico != null)
-                    {
-                        dtos.Add(new(
-                            (long)idCobranca,
-                            (long)idServico,
-                            sc.Valor,
-                            sc.Quantidade));
-                    }
-                }
-            }
-        }
-
-        ServicoCobrancaDAO.InsertServicosCobranca([..dtos]);
+        dbContext.Servicos.AddRange(servicos);
+        dbContext.SaveChanges();
     }
 
     public static void ExportToJSON(string filePath)
@@ -92,7 +43,7 @@ public static class JSONImporter
         try
         {
             AppData appData = new();
-            string json = JsonSerializer.Serialize(appData, jsonOptions);
+            string json = JsonSerializer.Serialize(appData, _jsonOptions);
 
             File.WriteAllText(filePath, json, System.Text.Encoding.UTF8);
 
@@ -113,11 +64,13 @@ public static class JSONImporter
     {
         try
         {
+            using AppDBContext dbContext = new();
+
             var result = MessageBox.Show(
-                "Deseja mesmo importar os dados?\nOs registros iguais serão sobrescritos.",
-                "Importar os dados?",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
+                        "Deseja mesmo importar os dados?\nOs registros iguais serão sobrescritos.",
+                        "Importar os dados?",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
 
             if (result == DialogResult.Yes)
             {
@@ -126,10 +79,9 @@ public static class JSONImporter
 
                 if (appData != null)
                 {
-                    ImportClientes(appData.Clientes);
-                    var idCobrancas = ImportCobrancas(appData.Cobrancas);
-                    var idServicos = ImportServicos(appData.Servicos);
-                    ImportServicosCobranca(appData.Cobrancas, idCobrancas, idServicos);
+                    ImportClientes(dbContext, appData.Clientes);
+                    ImportCobrancas(dbContext, appData.Cobrancas);
+                    ImportServicos(dbContext, appData.Servicos);
 
                     MessageBox.Show(
                         "Os dados foram importados com sucesso!",

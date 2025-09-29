@@ -1,9 +1,8 @@
-﻿using System.Data;
-using ExcelDataReader;
-using Conta_Certa.DAOs;
-using Conta_Certa.DTOs;
+﻿using Conta_Certa.DTOs;
 using Conta_Certa.Forms;
 using Conta_Certa.Models;
+using ExcelDataReader;
+using System.Data;
 
 namespace Conta_Certa.Utils;
 
@@ -186,7 +185,12 @@ public static class ExcelImporter
                         cobrancas.Add(cobrancaDTO);
                     }
 
-                    CobrancaDAO.InsertCobrancas([.. cobrancas.Where(c => c.IsFull())]);
+                    using AppDBContext dbContext = new();
+                    var cobrancasCompletas = cobrancas
+                        .Where(dto => dto.IsFull())
+                        .Select(dto => new Cobranca(dto));
+
+                    dbContext.Cobrancas.AddRange(cobrancasCompletas);
                 }
             }
         }

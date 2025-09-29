@@ -1,36 +1,45 @@
-﻿
+﻿using Conta_Certa.DataProviders;
+using System.Diagnostics;
+using System.Linq.Expressions;
+
 namespace Conta_Certa.Components;
 
 public class ColumnDefinition<T>
 {
     public required string Header { get; set; }
     public required Func<T, string> ValueSelector { get; set; }
+    public Expression<Func<T, object?>>? OrderBySelector { get; set; }
     public StringAlignment Alignment { get; set; } = StringAlignment.Near;
 }
 
 public partial class LazyPanel<T> : Panel
 {
-    private List<T> _items = [], _sortedItems = [];
+    // CACHE
+    private IDataProvider<T>? _provider;
+    private Dictionary<int, T> _cache = [];
     private List<ColumnDefinition<T>> _columns = [];
 
     // TAMANHO
     private int _itemHeight = 40, _itemWidth = 0;
+    private readonly int _cacheSize = 50, _blockSize = 25;
+    private int _cacheStart = 0, _cacheEnd = -1;
 
     // FONTES
-    private Font _headerFont = new("Arial", 11, FontStyle.Bold);
-    private Font _itemFont = new("Arial", 11);
+    private readonly Font _headerFont = new("Arial", 11, FontStyle.Bold);
+    private readonly Font _itemFont = new("Arial", 11);
 
     // SELEÇÃO
     private int _selectedIndex = -1, _hoverIndex = -1;
-    
-    // ORDEM E FILTRO
-    private int _sortColumnIndex = 0;
-    private bool _sortAscending = true;
 
+    // ORDEM E FILTRO
+    private Expression<Func<T, object?>>? _orderBy;
+    private bool _orderAscending = true;
+    private int _sortColumnIndex = 0;
+
+    // CONTEXT MENU
     private readonly ContextMenuStrip _menuStrip;
 
     public event EventHandler<T>? ItemChange, ItemDelete;
-    public Func<T, bool> Filter = (item) => true;
 
     public LazyPanel()
     {
@@ -43,68 +52,104 @@ public partial class LazyPanel<T> : Panel
         _menuStrip = new ContextMenuStrip();
 
         _menuStrip.Leave += MenuStrip_Leave;
-
-        _menuStrip.Items.Add("Alterar", null, (s, e) =>
+        _menuStrip.Items.Add("Alterar", null, (EventHandler?)((s, e) =>
         {
-            if (_selectedIndex >= 0 && _selectedIndex < _sortedItems.Count)
+            if (_selectedIndex >= 0 && _selectedIndex < _cache.Count)
             {
-                ItemChange?.Invoke(this, _sortedItems.ElementAt(_selectedIndex));
+                ItemChange?.Invoke(this, _cache[_selectedIndex]);
             }
-        });
+        }));
 
-        _menuStrip.Items.Add("Excluir", null, (s, e) =>
+        _menuStrip.Items.Add("Excluir", null, (EventHandler?)((s, e) =>
         {
-            if (_selectedIndex >= 0 && _selectedIndex < _sortedItems.Count)
+            if (_selectedIndex >= 0 && _selectedIndex < _cache.Count)
             {
-                ItemDelete?.Invoke(this, _sortedItems.ElementAt(_selectedIndex));
+                ItemDelete?.Invoke(this, _cache[_selectedIndex]);
             }
-        });
+        }));
     }
-    
+
     public void SetColumns(List<ColumnDefinition<T>> columns)
     {
         _columns = columns;
+        _orderBy = columns[0].OrderBySelector;
 
         RecalcScrollSize();
         Invalidate();
     }
 
-    public void SetItems(List<T> items, int itemHeight = 40)
+    public void SetProvider(IDataProvider<T> provider, int itemHeight = 40)
     {
-        _items = items;      
+        _provider = provider;
         _itemHeight = itemHeight;
 
-        RecalcScrollSize();
-        SortItems();
+        if (provider != null)
+        {
+            RecalcScrollSize();
+        }
     }
-  
-    public void SortItems()
+
+    public void RemakeCache()
     {
-        var filtered = _items.FindAll(i => Filter(i));
-        var col = _columns[_sortColumnIndex];
+        _cache.Clear();
 
-        if (_sortAscending)
+        if (_provider != null && _orderBy != null)
         {
-            _sortedItems = [.. filtered.OrderBy(col.ValueSelector)];
-        }
+            // Carrega o cache novo
+            var items = _provider!.GetRange(
+                _cacheStart,
+                _cacheEnd - _cacheStart + 1,
+                _orderBy,
+                _orderAscending).ToArray();
 
-        else
-        {
-            _sortedItems = [.. filtered.OrderByDescending(col.ValueSelector)];
+            for (int i = 0; i < items.Length; i++)
+            {
+                _cache[_cacheStart + i] = items[i];
+            }
+            
+            Invalidate();
         }
-
-        RecalcScrollSize();
-        Invalidate();
     }
 
     private void RecalcScrollSize()
     {
-        AutoScrollMinSize = new(ClientSize.Width, (_sortedItems.Count + 1) * _itemHeight);
+        if (_provider == null) return;
+
+        AutoScrollMinSize = new(
+            ClientSize.Width, 
+            (_cache.Count + 1) * _itemHeight);
+
+        Invalidate();
     }
 
     private void MenuStrip_Leave(object? sender, EventArgs e)
     {
         _selectedIndex = -1;
+    }
+
+    private T GetItem(int index)
+    {
+        if (_cache.TryGetValue(index, out var item)) return item;
+
+        if (index < 0 || index >= _provider!.GetTotalCount())
+        {
+            throw new IndexOutOfRangeException($"Índice {index} fora do intervalo de itens disponíveis.");
+        }
+
+        int start = Math.Max(0, index - _blockSize);
+        int end = Math.Min(_provider!.GetTotalCount() - 1, start + _cacheSize);
+
+        _cacheStart = start;
+        _cacheEnd = end;
+
+        RemakeCache();
+
+        if (_cache.TryGetValue(index, out var reloaded))
+        {
+            return reloaded;
+        }
+
+        throw new InvalidOperationException($"Nenhum item disponível para o índice {index}");
     }
 
     private int GetColumnHit(int contentX)
@@ -130,7 +175,7 @@ public partial class LazyPanel<T> : Panel
         int contentY = e.Y + VerticalScroll.Value;
         int index = (contentY - _itemHeight) / _itemHeight;
 
-        if (index >= 0 && index < _sortedItems.Count)
+        if (index >= 0 && index < _cache.Count)
         {
             if (_hoverIndex != index)
             {
@@ -138,6 +183,7 @@ public partial class LazyPanel<T> : Panel
                 Invalidate();
             }
         }
+
         else if (_hoverIndex != -1)
         {
             _hoverIndex = -1;
@@ -159,7 +205,7 @@ public partial class LazyPanel<T> : Panel
             {
                 int index = (contentY - _itemHeight) / _itemHeight;
 
-                if (index >= 0 && index < _sortedItems.Count)
+                if (index >= 0 && index < _cache.Count)
                 {
                     _selectedIndex = index;
 
@@ -177,26 +223,31 @@ public partial class LazyPanel<T> : Panel
 
             if (col >= 0)
             {
+                var clickedCol = _columns[col];
+
                 if (_sortColumnIndex == col)
                 {
-                    _sortAscending = !_sortAscending;
+                    _orderAscending = !_orderAscending;
                 }
 
-                else 
-                { 
-                    _sortColumnIndex = col; 
-                    _sortAscending = true; 
+                else
+                {
+                    _orderAscending = true;
+                    _sortColumnIndex = col;
                 }
 
-                SortItems();
+                _orderBy = clickedCol.OrderBySelector;
+
+                RemakeCache();
             }
         }
     }
-
+   
     protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
-     
+
+        if (_provider == null || _columns.Count == 0) return;
         _itemWidth = ClientSize.Width / _columns.Count;
 
         var g = e.Graphics;
@@ -225,7 +276,7 @@ public partial class LazyPanel<T> : Panel
 
             if (_sortColumnIndex == j)
             {
-                txt += (_sortAscending ? " ▲" : " ▼");
+                txt += (_orderAscending ? " ▲" : " ▼");
             }
 
             g.DrawString(txt, _headerFont, Brushes.Black, rect, sf);
@@ -233,15 +284,24 @@ public partial class LazyPanel<T> : Panel
             x += _itemWidth;
         }
 
+        // SEM RESULTADOS
+        if (_provider.GetTotalCount() == 0)
+        {
+            g.DrawString("Nenhum item encontrado", _headerFont, Brushes.Gray, new PointF(10, _itemHeight + 10));
+            return;
+        }
+
         // RANGE VISÍVEL
         int firstVisible = Math.Max(0, scrollY / _itemHeight);
         int lastVisible = Math.Min(
-            _sortedItems.Count - 1, 
+            _provider.GetTotalCount() - 1,
             firstVisible + (ClientSize.Height + _itemHeight) / _itemHeight);
 
         // ITENS
         for (int i = firstVisible; i <= lastVisible; i++)
         {
+            var item = GetItem(i);
+
             x = 0;
 
             int rowTop = _itemHeight + i * _itemHeight - scrollY;
@@ -263,7 +323,6 @@ public partial class LazyPanel<T> : Panel
 
             foreach (var col in _columns)
             {
-                var item = _sortedItems[i];
 
                 Rectangle rect = new(x, rowTop, _itemWidth, _itemHeight);
                 g.DrawRectangle(Pens.Gray, rect);
@@ -282,5 +341,18 @@ public partial class LazyPanel<T> : Panel
                 x += _itemWidth;
             }
         }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _headerFont.Dispose();
+            _itemFont.Dispose();
+
+            _menuStrip.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 }

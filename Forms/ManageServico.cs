@@ -1,15 +1,14 @@
 ﻿using Conta_Certa.Components;
-using Conta_Certa.DAOs;
-using Conta_Certa.DTOs;
 using Conta_Certa.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Conta_Certa.Forms;
 
 public partial class ManageServico : InputForm
 {
-    public Servico? Result { get; private set; }
+    private long? _idServico;
 
-    private readonly long? _idServico;
+    public Servico? Servico { get; private set; }
 
     public ManageServico(Servico? servico = null)
     {
@@ -29,7 +28,7 @@ public partial class ManageServico : InputForm
     private void CadastrarBtn_Click(object sender, EventArgs e)
     {
         string nome = nomeTxt.Text.Trim();
-        float valor = (float) valorNb.Value;
+        float valor = (float)valorNb.Value;
 
         if (nome.Length == 0 || valor == 0)
         {
@@ -42,26 +41,24 @@ public partial class ManageServico : InputForm
             return;
         }
 
-        if (_idServico == null)
-        {
-            ServicoCadDTO servicoCadDTO = new(nome, valor);
-            long? id = ServicoDAO.InsertServicos(servicoCadDTO).ElementAtOrDefault(0);
+        using AppDBContext dbContext = new();
+        Servico = new(nome, valor);
 
-            if (id != null)
-            {
-                Result = new((long) id, nome, valor);
-            }
+        if (_idServico != null)
+        {
+            Servico.SetId((long)_idServico);
         }
 
-        else
+        try
         {
-            Servico servico = new(
-                (long) _idServico,
-                nome,
-                valor);
+            dbContext.Servicos.Add(Servico);
+            dbContext.SaveChanges();
+        }
 
-            ServicoDAO.UpdateServico(servico);
-            Result = servico;
+        catch (DbUpdateException)
+        {
+            dbContext.Entry(Servico).State = EntityState.Modified;
+            dbContext.SaveChanges();
         }
 
 

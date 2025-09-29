@@ -1,22 +1,26 @@
-﻿using Conta_Certa.DAOs;
-using Conta_Certa.DTOs;
-using Conta_Certa.Models;
+﻿using Conta_Certa.Models;
 
 namespace Conta_Certa.Utils;
 
 public static class CobrancasScheduler
 {
-
     public static void GenCobrancasDoMes()
     {
-        var cobrancasDoMes = CobrancaDAO.GetCobrancasDoMes();
-        var clientes = ClienteDAO.GetAllClientes();
+        using AppDBContext dbContext = new();
 
-        List<CobrancaCadDTO> novasCobrancas = [];
+        DateTime inicioMes = new(DateTime.Now.Year, DateTime.Now.Month, 1);
+        DateTime inicioProxMes = inicioMes.AddMonths(1);
+
+        var clientes = dbContext.Clientes.ToList();
+        var cobrancasDoMes = dbContext.Cobrancas
+            .Where(c => c.Vencimento >= inicioMes && c.Vencimento < inicioProxMes)
+            .ToList();
+
+        List<Cobranca> novasCobrancas = [];
 
         foreach (var cliente in clientes)
         {
-            if (!cobrancasDoMes.Any(c => c.Cliente.Documento == cliente.Documento))
+            if (!cobrancasDoMes.Any(c => c.DocumentoCliente == cliente.Documento))
             {
                 DateTime vencimento = new(
                     DateTime.Now.Year,
@@ -32,7 +36,8 @@ public static class CobrancasScheduler
             }
         }
 
-        CobrancaDAO.InsertCobrancas([.. novasCobrancas]);
+        dbContext.Cobrancas.AddRange(novasCobrancas);
+        dbContext.SaveChanges();
 
         if (novasCobrancas.Count > 0)
         {

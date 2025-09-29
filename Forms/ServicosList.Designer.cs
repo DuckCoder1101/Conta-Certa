@@ -18,6 +18,7 @@ namespace Conta_Certa.Forms
             if (disposing && (components != null))
             {
                 components.Dispose();
+                _dbContext.Dispose();
             }
             base.Dispose(disposing);
         }

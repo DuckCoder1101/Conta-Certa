@@ -1,11 +1,11 @@
-﻿using Microsoft.Win32;
+﻿using Conta_Certa.DTOs;
+using Conta_Certa.Models;
+using Microsoft.Win32;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using Conta_Certa.DTOs;
-using Conta_Certa.Models;
 
 namespace Conta_Certa.Utils;
 

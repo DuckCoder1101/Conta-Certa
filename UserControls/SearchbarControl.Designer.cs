@@ -68,7 +68,7 @@
             searchboxTxt.Size = new Size(316, 18);
             searchboxTxt.TabIndex = 0;
             searchboxTxt.WordWrap = false;
-            searchboxTxt.TextChanged += SearchboxTxt_TextChanged;
+            searchboxTxt.TextChanged += SearchbarTxt_TextChanged;
             // 
             // searchBtn
             // 

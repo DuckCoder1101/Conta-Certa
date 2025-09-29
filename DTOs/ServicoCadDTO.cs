@@ -1,6 +1,4 @@
-﻿using Conta_Certa.Models;
-
-namespace Conta_Certa.DTOs;
+﻿namespace Conta_Certa.DTOs;
 
 public record ServicoCadDTO
 {
@@ -11,11 +9,5 @@ public record ServicoCadDTO
     {
         Nome = nome;
         Valor = valor;
-    }
-
-    public ServicoCadDTO(ServicoJSONDTO @base)
-    {
-        Nome = @base.Nome;
-        Valor = @base.Valor;
     }
 }

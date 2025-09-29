@@ -1,15 +1,15 @@
-﻿using Conta_Certa.DTOs;
+﻿using Conta_Certa.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace Conta_Certa.Relatories;
 
-public class CobrancasPendentes : IDocument
+public class RelatorioCobrancas : IDocument
 {
-    public List<CobrancaRelatoryDTO> Cobrancas { get; }
+    public List<Cobranca> Cobrancas { get; }
 
-    public CobrancasPendentes(List<CobrancaRelatoryDTO> cobrancas)
+    public RelatorioCobrancas(List<Cobranca> cobrancas)
     {
         QuestPDF.Settings.License = LicenseType.Community;
         Cobrancas = cobrancas;
@@ -47,18 +47,16 @@ public class CobrancasPendentes : IDocument
 
             foreach (var item in Cobrancas)
             {
-                table.Cell().Element(CellStyle).Text(item.Cliente);
-                table.Cell().Element(CellStyle).Text(item.honorario.ToString("c"));
+                table.Cell().Element(CellStyle).Text(item.Cliente!.Nome);
+                table.Cell().Element(CellStyle).Text(item.Honorario.ToString("c"));
                 table.Cell().Element(CellStyle).Text(item.Status.ToString());
 
                 table.Cell().Element(CellStyle)
-                    .Text(item.vencimento != null
-                        ? ((DateTime)(item.vencimento!)).ToString("dd/MM/yy")
-                        : "-");
+                    .Text(item.Vencimento.ToString("dd/MM/yy"));
 
                 table.Cell().Element(CellStyle)
                     .Text(item.PagoEm != null
-                        ? ((DateTime)(item.pagoEm!)).ToString("dd/MM/yy")
+                        ? ((DateTime)(item.PagoEm!)).ToString("dd/MM/yy")
                         : "-");
 
                 static IContainer CellStyle(IContainer container)

@@ -1,4 +1,3 @@
-using Conta_Certa.DAOs;
 using Conta_Certa.Forms;
 using Conta_Certa.Models;
 using Conta_Certa.Relatories;
@@ -9,11 +8,9 @@ namespace Conta_Certa
 {
     public partial class Main : Form
     {
-        Form? currentForm = null;
-
-        FlowLayoutPanel? submenu = null;
-        bool isMenuExpanded = false;
-        const int step = 10;
+        private Form? _currentForm = null;
+        private FlowLayoutPanel? _submenu = null;
+        private bool _isMenuExpanded = false;
 
         public Main()
         {
@@ -23,9 +20,9 @@ namespace Conta_Certa
         private void ShowMenuBtn_Click(object sender, EventArgs e)
         {
             CloseSubmenu();
-            isMenuExpanded = !isMenuExpanded;
+            _isMenuExpanded = !_isMenuExpanded;
 
-            if (isMenuExpanded)
+            if (_isMenuExpanded)
             {
                 menu.Width = 250;
                 openMenuBtn.Image = Properties.Resources.close;
@@ -40,9 +37,9 @@ namespace Conta_Certa
 
         private void CloseSubmenu()
         {
-            if (submenu != null)
+            if (_submenu != null)
             {
-                submenu.Height = 56;
+                _submenu.Height = 56;
             }
         }
 
@@ -51,28 +48,28 @@ namespace Conta_Certa
             FlowLayoutPanel? panel = (FlowLayoutPanel?)((Button)sender)?.Parent?.Parent;
             if (panel != null)
             {
-                if (submenu != null && submenu != panel)
+                if (_submenu != null && _submenu != panel)
                 {
                     CloseSubmenu();
                 }
 
                 if (panel.Height == 56)
                 {
-                    submenu = panel;
-                    submenu.Height = 56 * submenu.Controls.Count;
+                    _submenu = panel;
+                    _submenu.Height = 56 * _submenu.Controls.Count;
                 }
 
                 else
                 {
                     CloseSubmenu();
-                    submenu = null;
+                    _submenu = null;
                 }
             }
         }
 
         private void CadastrarCliente_Click(object sender, EventArgs e)
         {
-            currentForm?.Close();
+            _currentForm?.Close();
 
             ManageCliente form = new()
             {
@@ -84,12 +81,12 @@ namespace Conta_Certa
             mainFrame.Controls.Add(form);
             form.Show();
 
-            currentForm = form;
+            _currentForm = form;
         }
 
         private void AbrirClientesList_Click(object sender, EventArgs e)
         {
-            currentForm?.Close();
+            _currentForm?.Close();
 
             ClientesList form = new()
             {
@@ -101,7 +98,7 @@ namespace Conta_Certa
             mainFrame.Controls.Add(form);
             form.Show();
 
-            currentForm = form;
+            _currentForm = form;
         }
 
         private void ImportJSON_Click(object sender, EventArgs e)
@@ -137,7 +134,7 @@ namespace Conta_Certa
 
         private void CobrancasPendentes_Menu_Click(object sender, EventArgs e)
         {
-            currentForm?.Close();
+            _currentForm?.Close();
 
             CobrancasList form = new(CobrancaStatus.Pendente)
             {
@@ -149,12 +146,12 @@ namespace Conta_Certa
             mainFrame.Controls.Add(form);
             form.Show();
 
-            currentForm = form;
+            _currentForm = form;
         }
 
         private void CobrancasPagas_Click(object sender, EventArgs e)
         {
-            currentForm?.Close();
+            _currentForm?.Close();
 
             CobrancasList form = new(CobrancaStatus.Paga)
             {
@@ -166,12 +163,12 @@ namespace Conta_Certa
             mainFrame.Controls.Add(form);
             form.Show();
 
-            currentForm = form;
+            _currentForm = form;
         }
 
         private void ListaServicos_Click(object sender, EventArgs e)
         {
-            currentForm?.Close();
+            _currentForm?.Close();
 
             ServicosList form = new()
             {
@@ -183,12 +180,12 @@ namespace Conta_Certa
             mainFrame.Controls.Add(form);
             form.Show();
 
-            currentForm = form;
+            _currentForm = form;
         }
 
         private void CadastrarSevico_Click(object sender, EventArgs e)
         {
-            currentForm?.Close();
+            _currentForm?.Close();
 
             ManageServico form = new()
             {
@@ -200,7 +197,7 @@ namespace Conta_Certa
             mainFrame.Controls.Add(form);
             form.Show();
 
-            currentForm = form;
+            _currentForm = form;
         }
 
         private void GerarCobrancas_Click(object sender, EventArgs e)
@@ -211,8 +208,9 @@ namespace Conta_Certa
 
         private void StartWhastappAutomation_Click(object sender, EventArgs e)
         {
-            var cobrancas = CobrancaDAO.GetCobrancasByStatus(CobrancaStatus.Pendente);
-            cobrancas = cobrancas.FindAll(c => c.Cliente.Telefone.Length == 11);
+            using AppDBContext dBContext = new();
+            var cobrancas = dBContext.Cobrancas
+                .Where(c => c.Status == CobrancaStatus.Pendente && c.Cliente!.Telefone.Length == 11);
 
             Server.ConnectExtension([.. cobrancas]);
         }
@@ -249,20 +247,24 @@ namespace Conta_Certa
 
         private void RelatorioCobsPendentes(object sender, EventArgs e)
         {
+            using AppDBContext dBContext = new();
             Task.Run(() =>
             {
-                var cobrancas = CobrancaDAO.GetRelatory(CobrancaStatus.Pendente);
-                var document = new CobrancasPendentes(cobrancas);
+                List<Cobranca> cobrancas = [.. dBContext.Cobrancas.Where(c => c.Status == CobrancaStatus.Pendente)];
+
+                var document = new RelatorioCobrancas(cobrancas);
                 document.GeneratePdfAndShow();
             });
         }
 
         private void RelatorioCobsPagas(object sender, EventArgs e)
         {
+            using AppDBContext dBContext = new();
             Task.Run(() =>
             {
-                var cobrancas = CobrancaDAO.GetRelatory(CobrancaStatus.Paga);
-                var document = new CobrancasPendentes(cobrancas);
+                List<Cobranca> cobrancas = [.. dBContext.Cobrancas.Where(c => c.Status == CobrancaStatus.Paga)];
+
+                var document = new RelatorioCobrancas(cobrancas);
                 document.GeneratePdfAndShow();
             });
         }

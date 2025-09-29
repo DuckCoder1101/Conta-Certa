@@ -1,15 +1,15 @@
 ﻿using Conta_Certa.Components;
-using Conta_Certa.DAOs;
 using Conta_Certa.DTOs;
 using Conta_Certa.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Conta_Certa.Forms;
 
 public partial class ManageCliente : InputForm
 {
-    public Cliente? Result { get; private set; }
+    public Cliente? Cliente { get; private set; }
 
-    public ManageCliente(Models.Cliente? cliente = null)
+    public ManageCliente(Cliente? cliente = null)
     {
         InitializeComponent();
 
@@ -83,7 +83,7 @@ public partial class ManageCliente : InputForm
         }
 
         // Verificação do documento
-        if (!Models.Cliente.CheckDocumento(documento))
+        if (!Cliente.CheckDocumento(documento))
         {
             MessageBox.Show(
                 "O CPF/CNPJ escrito é inválido!\nCorrija e tente novamente.",
@@ -94,14 +94,24 @@ public partial class ManageCliente : InputForm
             return;
         }
 
-        ClienteCadDTO cliente = new(documento, nome, telefone, email, honorario, vencimentoHonorario);
-        ClienteDAO.InsertClientes(cliente);
+        using AppDBContext _dbContext = new();
+        Cliente = new(documento, nome, telefone, email, honorario, vencimentoHonorario);
 
-        DialogResult = DialogResult.OK;
+        try
+        {
+            _dbContext.Clientes.Add(Cliente);
+            _dbContext.SaveChanges();
+        }
+
+        catch (DbUpdateException)
+        {
+            _dbContext.Entry(Cliente).State = EntityState.Modified;
+            _dbContext.SaveChanges();
+        }
 
         if (Modal)
         {
-            Result = new(documento, nome, telefone, email, honorario, vencimentoHonorario);
+            DialogResult = DialogResult.OK;
             Close();
         }
 

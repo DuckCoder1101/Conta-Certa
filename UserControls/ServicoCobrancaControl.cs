@@ -4,23 +4,20 @@ namespace Conta_Certa.UserControls;
 
 public partial class ServicoCobrancaControl : UserControl
 {
-    public Servico Servico { get; }
-    public int Quantidade { get; private set; }
+    public ServicoCobranca ServicoCobranca;
 
-    public ServicoCobrancaControl(Servico servico, int quantidade)
+    public ServicoCobrancaControl(ServicoCobranca sc)
     {
         InitializeComponent();
+        ServicoCobranca = sc;
 
-        Servico = servico;
-        Quantidade = quantidade;
-
-        nomeServicoTxt.Text = Servico.Nome;
-        valorServicoTxt.Text = servico.Valor.ToString("c");
-        quantidadeServicoNb.Value = Quantidade;
+        nomeServicoTxt.Text = sc.Nome;
+        valorServicoTxt.Text = sc.Valor.ToString("c");
+        quantidadeServicoNb.Value = sc.Quantidade;
     }
 
     private void QuantidadeServicoNb_ValueChanged(object sender, EventArgs e)
     {
-        Quantidade = (int) quantidadeServicoNb.Value;
+        ServicoCobranca.SetQuantidade((int)quantidadeServicoNb.Value);
     }
 }

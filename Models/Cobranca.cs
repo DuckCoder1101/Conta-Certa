@@ -1,4 +1,6 @@
 ﻿using Conta_Certa.DTOs;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Conta_Certa.Models;
 
@@ -10,24 +12,67 @@ public enum CobrancaStatus
 
 public class Cobranca
 {
-    public long IdCobranca { get; }
-    public ClienteResumoDTO Cliente { get; }
-    public float Honorario { get; }
-    public float HonorarioTotal
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public long? IdCobranca { get; private set; }
+
+    [Required]
+    public float Honorario { get; private set; }
+
+    [NotMapped]
+    public float HonorarioTotal => Honorario +
+        ServicosCobranca?.Sum(sc => sc.Valor * sc.Quantidade) ?? 0;
+
+    [Required]
+    public CobrancaStatus Status { get; private set; }
+
+    [Required]
+    public DateTime Vencimento { get; private set; }
+
+    public DateTime? PagoEm { get; private set; }
+
+    // Relacionamento cliente
+    [Required]
+    public string DocumentoCliente { get; private set; } = string.Empty;
+    public Cliente? Cliente { get; set; } = null;
+
+    // Relacionamento servicos
+    public ICollection<ServicoCobranca> ServicosCobranca { get; private set; } = [];
+
+    // Construtor vazio para EF
+    protected Cobranca() { }
+
+    public Cobranca(string documentoCliente, float honorario, CobrancaStatus status, DateTime vencimento, DateTime? pagoEm, ICollection<ServicoCobranca>? scs = null)
     {
-        get => Honorario + 
-            ServicosCobranca.Sum(sc => sc.Servico.Valor * sc.Quantidade);
+        DocumentoCliente = documentoCliente;
+        Honorario = honorario;
+        Status = status;
+        Vencimento = vencimento;
+        PagoEm = pagoEm;
+
+        if (scs != null)
+        {
+            ServicosCobranca = scs;
+        }
     }
 
-    public CobrancaStatus Status { get; private set; }
-    public DateTime Vencimento { get; private set; }
-    public DateTime? PagoEm { get; private set; }
-    public List<ServicoCobranca> ServicosCobranca { get; set; } = [];
-
-    public Cobranca(long idCobranca, ClienteResumoDTO cliente, float honorario, CobrancaStatus status, DateTime vencimento, DateTime? pagoEm)
+    public Cobranca(CobrancaCadDTO dto)
     {
-        IdCobranca = idCobranca;
-        Cliente = cliente;
+        Honorario = (float)dto.Honorario!;
+        Status = (CobrancaStatus)dto.Status!;
+        Vencimento = (DateTime)dto.Vencimento!;
+        PagoEm = dto.PagoEm;
+        DocumentoCliente = dto.DocumentoCliente!;
+    }
+
+    public void SetId(long? id)
+    {
+        IdCobranca = id;
+    }
+
+    public void Update(string documentoCliente, float honorario, CobrancaStatus status, DateTime vencimento, DateTime? pagoEm)
+    {
+        DocumentoCliente = documentoCliente;
         Honorario = honorario;
         Status = status;
         Vencimento = vencimento;

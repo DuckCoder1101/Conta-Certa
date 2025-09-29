@@ -1,16 +1,40 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace Conta_Certa.Models;
 
 public class Cliente
 {
-    public string Documento { get; private set; }
-    public string Nome { get; private set; }
-    public string Telefone { get; private set; }
+    [Key]
+    [MaxLength(14)]
+    public string Documento { get; private set; } = string.Empty;
+
+    [Required]
+    public string Nome { get; private set; } = string.Empty;
+
+    [Required]
+    [Index(IsUnique = true)]
+    public string Telefone { get; private set; } = string.Empty;
+
+    [Required]
+    [Index(IsUnique = true)]
     public string? Email { get; private set; }
+
+    [Required]
     public float Honorario { get; private set; }
+
+    [Required]
     public int VencimentoHonorario { get; private set; }
 
+    // Relacionamento com Cobranca
+    public ICollection<Cobranca> Cobrancas { get; private set; } = [];
+
+    // Construtor vazio para EF
+    protected Cliente() { }
+
+    [JsonConstructor]
     public Cliente(string documento, string nome, string telefone, string email, float honorario, int vencimentoHonorario)
     {
         Documento = documento;
@@ -23,7 +47,7 @@ public class Cliente
 
     public static bool CheckDocumento(string documento)
     {
-        string numeros = new([.. documento.Where(char.IsDigit)]);
+        string numeros = new string(documento.Where(char.IsDigit).ToArray());
 
         return numeros.Length switch
         {
@@ -37,8 +61,8 @@ public class Cliente
     {
         if (cpf.Distinct().Count() == 1) return false;
 
-        int[] multiplicador1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
-        int[] multiplicador2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+        int[] multiplicador1 = { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+        int[] multiplicador2 = { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
 
         string tempCpf = cpf[..9];
         int soma = 0;
@@ -67,13 +91,10 @@ public class Cliente
 
     private static bool CheckCPNJ(string cnpj)
     {
-        if (cnpj.Distinct().Count() == 1)
-        {
-            return false;
-        }
+        if (cnpj.Distinct().Count() == 1) return false;
 
-        int[] multiplicador1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-        int[] multiplicador2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        int[] multiplicador1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+        int[] multiplicador2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
 
         string tempCnpj = cnpj[..12];
         int soma = 0;
@@ -102,52 +123,33 @@ public class Cliente
 
     public static string FormatDocumento(string documento)
     {
-        if (string.IsNullOrWhiteSpace(documento))
-        {
-            return string.Empty;
-        }
+        if (string.IsNullOrWhiteSpace(documento)) return string.Empty;
 
         var digits = new string(documento.Where(char.IsDigit).ToArray());
 
         return digits.Length switch
         {
-            11 => Convert.ToUInt64(digits).ToString(@"000\.000\.000\-00"),       // Documento
-            14 => Convert.ToUInt64(digits).ToString(@"00\.000\.000\/0000\-00"),  // CNPJ
+            11 => Convert.ToUInt64(digits).ToString(@"000\.000\.000\-00"),
+            14 => Convert.ToUInt64(digits).ToString(@"00\.000\.000\/0000\-00"),
             _ => documento
         };
     }
 
     public static bool CheckTelefone(string telefone)
     {
-        var digits = new string([.. telefone.Where(char.IsDigit)]);
+        var digits = new string(telefone.Where(char.IsDigit).ToArray());
 
-        if (digits.Length < 10 || digits.Length > 11)
-        {
-            return false;
-        }
+        if (digits.Length < 10 || digits.Length > 11) return false;
 
-        // Se tem 11 dígitos → DDD + celular (9 dígitos começando com 9)
-        if (digits.Length == 11)
-        {
-            // O dígito 2 (primeiro após o DDD) precisa ser 9
-            if (digits[2] != '9')
-                return false;
-        }
-
-        // Se tem 10 dígitos → DDD + fixo (8 dígitos começando com 2–5)
-        if (digits.Length == 10)
-        {
-            // O dígito 2 (primeiro após o DDD) precisa ser 2,3,4 ou 5
-            if (!"2345".Contains(digits[2]))
-                return false;
-        }
+        if (digits.Length == 11 && digits[2] != '9') return false;
+        if (digits.Length == 10 && !"2345".Contains(digits[2])) return false;
 
         return true;
     }
 
     public static string FormatTelefone(string telefone)
     {
-        var digits = new string([.. telefone.Where(char.IsDigit)]);
+        var digits = new string(telefone.Where(char.IsDigit).ToArray());
 
         return digits.Length switch
         {
@@ -159,7 +161,6 @@ public class Cliente
 
     public override string ToString()
     {
-        var email = Email?.Length > 0 ? Email : "*";
-        return $"{Documento} - {Nome} - {Telefone} - {email} - {Honorario} - {VencimentoHonorario}";
+        return $"{Documento} - {Nome}";
     }
 }

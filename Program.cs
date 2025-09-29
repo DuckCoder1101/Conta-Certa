@@ -1,4 +1,6 @@
+using Conta_Certa.Models;
 using Conta_Certa.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace Conta_Certa
 {
@@ -14,8 +16,8 @@ namespace Conta_Certa
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
 
-            // Cria o banco de dados
-            Database.CreateDatabase();
+            using AppDBContext context = new();
+            context.Database.Migrate();
 
             // Agenda as cobranças
             Task.Run(() => CobrancasScheduler.GenCobrancasDoMes());

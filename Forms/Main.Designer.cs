@@ -491,7 +491,7 @@
             importarCobrancasBtn.UseVisualStyleBackColor = false;
             importarCobrancasBtn.Click += ImportCobrancaTable_Click;
             // 
-            // clientes
+            // _clientes
             // 
             clientes.BackColor = SystemColors.ControlDarkDark;
             clientes.Controls.Add(tableLayoutPanel1);
@@ -1409,7 +1409,6 @@
         private Panel dashboard;
         private TableLayoutPanel tableLayoutPanel4;
         private PictureBox pictureBox4;
-        private Label label4;
         private FlowLayoutPanel arquivo;
         private FlowLayoutPanel clientes;
         private TableLayoutPanel tableLayoutPanel1;
