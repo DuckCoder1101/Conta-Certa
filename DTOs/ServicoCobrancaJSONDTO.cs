@@ -4,20 +4,18 @@ namespace Conta_Certa.DTOs;
 
 public class ServicoCobrancaJSONDTO
 {
-    public long IdServico { get; private set; }
-    public string Nome { get; private set; } = string.Empty;
-    public float Valor { get; private set; }
+    public long TransitionIdServicoOrigem { get; set; }
+    public string Nome { get; set; } = string.Empty;
+    public float Valor { get; set; }
+    public int Quantidade { get; set; } = 0;
 
-    public Servico() { }
+    public ServicoCobrancaJSONDTO() { }
 
-    public Servico(string nome, float valor)
+    public ServicoCobrancaJSONDTO(ServicoCobranca servicoCobranca)
     {
-        Nome = nome;
-        Valor = valor;
-    }
-
-    public void SetId(long id)
-    {
-        IdServico = id;
+        TransitionIdServicoOrigem = servicoCobranca.IdServicoOrigem;
+        Nome = servicoCobranca.Nome;
+        Valor = servicoCobranca.Valor;
+        Quantidade = servicoCobranca.Quantidade;
     }
 }

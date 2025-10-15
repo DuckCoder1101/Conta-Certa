@@ -29,7 +29,7 @@ public partial class CobrancasList : Form
 
         // COLUNAS
         _lazyPanel.SetColumns([
-            new() { Header = "ID", ValueSelector = c => c.IdCobranca?.ToString() ?? "", OrderBySelector = c => c.IdCobranca, Alignment = StringAlignment.Center },
+            new() { Header = "ID", ValueSelector = c => c.IdCobranca.ToString() ?? "", OrderBySelector = c => c.IdCobranca, Alignment = StringAlignment.Center },
             new() { Header = "Cliente", ValueSelector = c => c.Cliente!.Nome, OrderBySelector = c => c.Cliente!.Nome },
             new() { Header = "Honorário Total", ValueSelector = c => c.HonorarioTotal.ToString("c"), OrderBySelector = c => c.HonorarioTotal },
             new() { Header = "Status", ValueSelector = c => c.Status.ToString(), OrderBySelector = c => c.Status, Alignment = StringAlignment.Center },
@@ -53,7 +53,7 @@ public partial class CobrancasList : Form
 
         searchbar.AddButtonClicked += () =>
         {
-            using ManageCobranca form = new();
+            using CobrancaForm form = new();
             DialogResult dialogResult = form.ShowDialog();
 
             if (dialogResult == DialogResult.OK)
@@ -65,10 +65,10 @@ public partial class CobrancasList : Form
 
     private void OnItemChanged(object? sender, Cobranca cobranca)
     {
-        using ManageCobranca form = new(cobranca);
+        using CobrancaForm form = new(cobranca);
         DialogResult dialogResult = form.ShowDialog();
 
-        if (dialogResult == DialogResult.OK && form.Cobranca != null)
+        if (dialogResult == DialogResult.OK)
         {
             _lazyPanel.RemakeCache();
         }

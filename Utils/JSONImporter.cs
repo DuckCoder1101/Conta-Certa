@@ -1,41 +1,115 @@
-﻿using Conta_Certa.Models;
+﻿using System.Diagnostics;
 using System.Text.Json;
+using Conta_Certa.DTOs;
+using Conta_Certa.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Conta_Certa.Utils;
 
 public static class JSONImporter
 {
-    private static readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        WriteIndented = true,
-    };
+    private static readonly JsonSerializerOptions _jsonOptions = new();
 
-    private static void ImportClientes(AppDBContext dbContext, ICollection<Cliente> clientes)
+    private static void ImportClientes(AppDBContext dbContext, ICollection<ClienteJSONDTO> clientes)
     {
-        dbContext.Clientes.AddRange(clientes);
+        foreach (var dto in clientes)
+        {
+            var clienteExistente = dbContext.Clientes
+                .FirstOrDefault(c => c.Documento == dto.Documento);
+
+            if (clienteExistente != null)
+            {
+                clienteExistente.Telefone = dto.Telefone;
+                clienteExistente.Email = dto.Email;
+                clienteExistente.VencimentoHonorario = dto.VencimentoHonorario;
+                clienteExistente.Honorario = dto.Honorario;
+
+                dbContext.Update(clienteExistente);
+            }
+
+            else
+            {
+                Cliente cliente = new(dto);
+                dbContext.Add(cliente);
+            }
+        }
+
         dbContext.SaveChanges();
     }
 
-    private static void ImportCobrancas(AppDBContext dbContext, ICollection<Cobranca> cobrancas)
+    private static void ImportCobrancas(AppDBContext dbContext, ICollection<CobrancaJSONDTO> cobrancas)
     {
-        foreach (var cobranca in cobrancas)
+        foreach (var dto in cobrancas)
         {
-            cobranca.SetId(null);
+            var cobrancaExistente = dbContext.Cobrancas
+                .Include(c => c.ServicosCobranca)
+                .FirstOrDefault(c => 
+                    c.DocumentoCliente == dto.DocumentoCliente &&
+                    (
+                        c.Vencimento.Month == dto.Vencimento.Month && 
+                        c.Vencimento.Year == dto.Vencimento.Year
+                    )
+                );
+
+            if (cobrancaExistente != null)
+            {
+                cobrancaExistente.Honorario = dto.Honorario;
+                cobrancaExistente.Status = dto.Status;
+                cobrancaExistente.PagoEm = dto.PagoEm;
+
+                dbContext.ServicosCobranca.RemoveRange(cobrancaExistente.ServicosCobranca);
+                cobrancaExistente.ServicosCobranca = [.. dto.ServicosCobranca.Select(dto => new ServicoCobranca(dto))];
+
+                dbContext.Update(cobrancaExistente);
+            }
+
+            else
+            {
+                Cobranca cobranca = new(dto);
+                dbContext.Add(cobranca);
+            }
         }
 
-        dbContext.Cobrancas.AddRange(cobrancas);
         dbContext.SaveChanges();
     }
 
-    private static void ImportServicos(AppDBContext dbContext, ICollection<Servico> servicos)
+    private static Dictionary<long, long> ImportServicos(AppDBContext dbContext, ICollection<ServicoJSONDTO> servicos)
     {
-        foreach (var servico in servicos)
+        var entidades = new List<Servico>();
+
+        foreach (var dto in servicos)
         {
-            servico.SetId(null);
+            var servico = dbContext.Servicos
+                .FirstOrDefault(s => s.Nome == dto.Nome);
+
+            if (servico != null)
+            {
+                servico.Valor = dto.Valor;
+            }
+            else
+            {
+                servico = new Servico(dto);
+                dbContext.Servicos.Add(servico);
+            }
+
+            entidades.Add(servico);
         }
 
-        dbContext.Servicos.AddRange(servicos);
         dbContext.SaveChanges();
+
+        var mappedIds = servicos.Zip(entidades, (dto, entity) => new
+            {
+                OldId = dto.TransitionIdServico,
+                NewId = entity.IdServico
+            })
+            .ToDictionary(x => x.OldId, x => x.NewId);
+
+        foreach (var id in mappedIds)
+        {
+            Debug.WriteLine($"{id.Key} - {id.Value}");
+        }
+
+        return mappedIds;
     }
 
     public static void ExportToJSON(string filePath)
@@ -80,8 +154,21 @@ public static class JSONImporter
                 if (appData != null)
                 {
                     ImportClientes(dbContext, appData.Clientes);
+
+                    // Mapeia os IDs dos servicos
+                    var mappedIds = ImportServicos(dbContext, appData.Servicos);
+                    foreach (var cobranca in appData.Cobrancas)
+                    {
+                        foreach (var sc in cobranca.ServicosCobranca)
+                        {
+                            if (mappedIds.TryGetValue(sc.TransitionIdServicoOrigem, out long newId))
+                            {
+                                sc.TransitionIdServicoOrigem = newId;
+                            }
+                        }
+                    }
+
                     ImportCobrancas(dbContext, appData.Cobrancas);
-                    ImportServicos(dbContext, appData.Servicos);
 
                     MessageBox.Show(
                         "Os dados foram importados com sucesso!",

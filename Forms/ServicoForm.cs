@@ -1,6 +1,6 @@
-﻿using Conta_Certa.Components;
+﻿using Microsoft.EntityFrameworkCore;
+using Conta_Certa.Components;
 using Conta_Certa.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Conta_Certa.Forms;
 
@@ -46,7 +46,7 @@ public partial class ManageServico : InputForm
 
         if (_idServico != null)
         {
-            Servico.SetId((long)_idServico);
+            Servico.IdServico = (long) _idServico;
         }
 
         try

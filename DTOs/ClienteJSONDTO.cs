@@ -1,7 +1,7 @@
 ﻿
 using Conta_Certa.Models;
 
-namespace Conta_Certa.DTO;
+namespace Conta_Certa.DTOs;
 
 public class ClienteJSONDTO
 {

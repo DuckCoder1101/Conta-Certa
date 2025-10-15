@@ -1,9 +1,11 @@
 ﻿using Conta_Certa.DataProviders;
-using System.Diagnostics;
+
 using System.Linq.Expressions;
+using System.Drawing;
 
 namespace Conta_Certa.Components;
 
+// Definição de Coluna (mantida)
 public class ColumnDefinition<T>
 {
     public required string Header { get; set; }
@@ -43,28 +45,34 @@ public partial class LazyPanel<T> : Panel
 
     public LazyPanel()
     {
+        // Força estilos de pintura melhores
+        SetStyle(ControlStyles.UserPaint |
+                 ControlStyles.AllPaintingInWmPaint |
+                 ControlStyles.OptimizedDoubleBuffer |
+                 ControlStyles.ResizeRedraw, true);
+
         DoubleBuffered = true;
         AutoScroll = true;
-        SetStyle(ControlStyles.ResizeRedraw, true);
-
-        // MENU STRIP
 
         _menuStrip = new ContextMenuStrip();
 
         _menuStrip.Leave += MenuStrip_Leave;
         _menuStrip.Items.Add("Alterar", null, (EventHandler?)((s, e) =>
         {
-            if (_selectedIndex >= 0 && _selectedIndex < _cache.Count)
+            // Usa _selectedIndex que é definido no OnMouseClick antes de mostrar o menu
+            if (_selectedIndex >= 0 && _provider != null && _selectedIndex < _provider.GetTotalCount())
             {
-                ItemChange?.Invoke(this, _cache[_selectedIndex]);
+                var item = GetItem(_selectedIndex); // Garante que o item está carregado
+                ItemChange?.Invoke(this, item);
             }
         }));
 
         _menuStrip.Items.Add("Excluir", null, (EventHandler?)((s, e) =>
         {
-            if (_selectedIndex >= 0 && _selectedIndex < _cache.Count)
+            if (_selectedIndex >= 0 && _provider != null && _selectedIndex < _provider.GetTotalCount())
             {
-                ItemDelete?.Invoke(this, _cache[_selectedIndex]);
+                var item = GetItem(_selectedIndex); // Garante que o item está carregado
+                ItemDelete?.Invoke(this, item);
             }
         }));
     }
@@ -72,7 +80,10 @@ public partial class LazyPanel<T> : Panel
     public void SetColumns(List<ColumnDefinition<T>> columns)
     {
         _columns = columns;
-        _orderBy = columns[0].OrderBySelector;
+        if (columns.Count > 0)
+        {
+            _orderBy = columns[0].OrderBySelector;
+        }
 
         RecalcScrollSize();
         Invalidate();
@@ -85,7 +96,13 @@ public partial class LazyPanel<T> : Panel
 
         if (provider != null)
         {
+            // Zera cache e recarrega o scroll size
+            _cache.Clear();
+            _cacheStart = 0;
+            _cacheEnd = -1;
+
             RecalcScrollSize();
+            RemakeCache(); // Carrega o primeiro bloco
         }
     }
 
@@ -95,10 +112,19 @@ public partial class LazyPanel<T> : Panel
 
         if (_provider != null && _orderBy != null)
         {
+            int totalCount = _provider.GetTotalCount();
+
+            // Garante que o intervalo de cache seja válido
+            if (_cacheStart < 0) _cacheStart = 0;
+            _cacheEnd = Math.Min(totalCount - 1, _cacheStart + _cacheSize - 1);
+
+            int count = _cacheEnd - _cacheStart + 1;
+            if (count <= 0) return;
+
             // Carrega o cache novo
             var items = _provider!.GetRange(
                 _cacheStart,
-                _cacheEnd - _cacheStart + 1,
+                count,
                 _orderBy,
                 _orderAscending).ToArray();
 
@@ -106,7 +132,7 @@ public partial class LazyPanel<T> : Panel
             {
                 _cache[_cacheStart + i] = items[i];
             }
-            
+
             Invalidate();
         }
     }
@@ -115,9 +141,10 @@ public partial class LazyPanel<T> : Panel
     {
         if (_provider == null) return;
 
+        // O tamanho mínimo deve ser baseado na contagem total para que a barra de rolagem funcione.
         AutoScrollMinSize = new(
-            ClientSize.Width, 
-            (_cache.Count + 1) * _itemHeight);
+            ClientSize.Width,
+            _provider.GetTotalCount() * _itemHeight);
 
         Invalidate();
     }
@@ -125,31 +152,33 @@ public partial class LazyPanel<T> : Panel
     private void MenuStrip_Leave(object? sender, EventArgs e)
     {
         _selectedIndex = -1;
+        Invalidate(); // Redesenha para remover a seleção visual se necessário
     }
 
     private T GetItem(int index)
     {
         if (_cache.TryGetValue(index, out var item)) return item;
 
-        if (index < 0 || index >= _provider!.GetTotalCount())
+        if (_provider == null || index < 0 || index >= _provider!.GetTotalCount())
         {
             throw new IndexOutOfRangeException($"Índice {index} fora do intervalo de itens disponíveis.");
         }
 
+        // Calcula o novo bloco de cache centrado no índice
         int start = Math.Max(0, index - _blockSize);
-        int end = Math.Min(_provider!.GetTotalCount() - 1, start + _cacheSize);
 
+        // Define os novos limites
         _cacheStart = start;
-        _cacheEnd = end;
+        _cacheEnd = -1;
 
-        RemakeCache();
+        RemakeCache(); // Carrega o novo bloco sincronicamente
 
         if (_cache.TryGetValue(index, out var reloaded))
         {
             return reloaded;
         }
 
-        throw new InvalidOperationException($"Nenhum item disponível para o índice {index}");
+        throw new InvalidOperationException($"Nenhum item disponível para o índice {index} após recarga.");
     }
 
     private int GetColumnHit(int contentX)
@@ -168,14 +197,36 @@ public partial class LazyPanel<T> : Panel
         return -1;
     }
 
+    protected override void OnScroll(ScrollEventArgs se)
+    {
+        base.OnScroll(se);
+        Invalidate();
+    }
+
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e);
 
+        if (_provider == null) return;
+
         int contentY = e.Y + VerticalScroll.Value;
+
+        // Se o mouse está sobre o cabeçalho
+        if (contentY < _itemHeight)
+        {
+            if (_hoverIndex != -1)
+            {
+                _hoverIndex = -1;
+                Invalidate();
+            }
+            return;
+        }
+
+        // O índice do item de dados começa após o cabeçalho (linha 1)
         int index = (contentY - _itemHeight) / _itemHeight;
 
-        if (index >= 0 && index < _cache.Count)
+        // Valida contra o total de itens.
+        if (index >= 0 && index < _provider.GetTotalCount())
         {
             if (_hoverIndex != index)
             {
@@ -183,7 +234,6 @@ public partial class LazyPanel<T> : Panel
                 Invalidate();
             }
         }
-
         else if (_hoverIndex != -1)
         {
             _hoverIndex = -1;
@@ -195,35 +245,42 @@ public partial class LazyPanel<T> : Panel
     {
         base.OnMouseClick(e);
 
+        if (_provider == null) return;
+
         int contentX = e.X + HorizontalScroll.Value;
         int contentY = e.Y + VerticalScroll.Value;
 
-        // MENU
+        // MENU (Botão Direito)
         if (e.Button == MouseButtons.Right)
         {
+            // Se o clique for abaixo do cabeçalho
             if (e.Y > _itemHeight)
             {
+                // O índice do item de dados começa após o cabeçalho (linha 1)
                 int index = (contentY - _itemHeight) / _itemHeight;
 
-                if (index >= 0 && index < _cache.Count)
+                // Valida contra o total de itens.
+                if (index >= 0 && index < _provider.GetTotalCount())
                 {
                     _selectedIndex = index;
 
                     _menuStrip.Show(this, e.Location);
-                    Invalidate();
+                    Invalidate(); // Força o redesenho para destacar o item selecionado
                 }
             }
-
         }
 
-        // ORDENAÇÃO
-        else if (e.Y <= _itemHeight)
+        // ORDENAÇÃO (Botão Esquerdo no Cabeçalho)
+        else if (e.Button == MouseButtons.Left && e.Y <= _itemHeight)
         {
             int col = GetColumnHit(contentX);
 
             if (col >= 0)
             {
                 var clickedCol = _columns[col];
+
+                // Só permite ordenar se a coluna tiver um OrderBySelector
+                if (clickedCol.OrderBySelector == null) return;
 
                 if (_sortColumnIndex == col)
                 {
@@ -238,31 +295,41 @@ public partial class LazyPanel<T> : Panel
 
                 _orderBy = clickedCol.OrderBySelector;
 
-                RemakeCache();
+                // Reseta a rolagem e o cache para o início da lista
+                _cacheStart = 0;
+                VerticalScroll.Value = VerticalScroll.Minimum;
+                AutoScrollPosition = new Point(0, 0);
+
+                RemakeCache(); // Carrega o novo bloco ordenado
+                Invalidate();
             }
         }
     }
-   
+
     protected override void OnPaint(PaintEventArgs e)
     {
-        base.OnPaint(e);
+        var g = e.Graphics;
+
+        g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+        g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
 
         if (_provider == null || _columns.Count == 0) return;
+
+        // Calcula a largura das colunas
         _itemWidth = ClientSize.Width / _columns.Count;
 
-        var g = e.Graphics;
-        g.TranslateTransform(0, -VerticalScroll.Value);
-        g.Clear(BackColor);
+        // Limpa fundo da área de pintura
+        g.FillRectangle(new SolidBrush(BackColor), e.ClipRectangle);
 
         int x = 0;
-        int scrollY = VerticalScroll.Value;
 
-        // CABEÇALHO
+        // --- CABEÇALHO FIXO ---
         for (int j = 0; j < _columns.Count; j++)
         {
             var col = _columns[j];
-
             Rectangle rect = new(x, 0, _itemWidth, _itemHeight);
+
             g.FillRectangle(Brushes.LightGray, rect);
             g.DrawRectangle(Pens.Gray, rect);
 
@@ -273,28 +340,28 @@ public partial class LazyPanel<T> : Panel
             };
 
             var txt = col.Header;
-
             if (_sortColumnIndex == j)
-            {
                 txt += (_orderAscending ? " ▲" : " ▼");
-            }
 
             g.DrawString(txt, _headerFont, Brushes.Black, rect, sf);
-
             x += _itemWidth;
         }
 
+        g.TranslateTransform(0, _itemHeight - VerticalScroll.Value);
+
+        int totalCount = _provider.GetTotalCount();
+
         // SEM RESULTADOS
-        if (_provider.GetTotalCount() == 0)
+        if (totalCount == 0)
         {
             g.DrawString("Nenhum item encontrado", _headerFont, Brushes.Gray, new PointF(10, _itemHeight + 10));
             return;
         }
 
-        // RANGE VISÍVEL
-        int firstVisible = Math.Max(0, scrollY / _itemHeight);
+        // RANGE VISÍVEL - Calcula quais índices devem ser desenhados
+        int firstVisible = Math.Max(0, VerticalScroll.Value / _itemHeight);
         int lastVisible = Math.Min(
-            _provider.GetTotalCount() - 1,
+            totalCount - 1,
             firstVisible + (ClientSize.Height + _itemHeight) / _itemHeight);
 
         // ITENS
@@ -304,42 +371,72 @@ public partial class LazyPanel<T> : Panel
 
             x = 0;
 
-            int rowTop = _itemHeight + i * _itemHeight - scrollY;
+            int rowTop = i * _itemHeight;
             Rectangle rowRectWhole = new(0, rowTop, ClientSize.Width, _itemHeight);
 
             // BACKGROUND
             bool isHover = (i == _hoverIndex);
+            bool isSelected = (i == _selectedIndex);
 
-            if (isHover)
+            if (isSelected)
+            {
+                using SolidBrush selectBackBrush = new(Color.FromArgb(100, Color.DeepSkyBlue));
+                g.FillRectangle(selectBackBrush, rowRectWhole);
+            }
+
+            else if (isHover)
             {
                 using SolidBrush hoverBackBrush = new(Color.FromArgb(50, Color.LightBlue));
-                g.FillRectangle(hoverBackBrush, new Rectangle(rowRectWhole.Left, rowTop, rowRectWhole.Width, rowRectWhole.Height));
+                g.FillRectangle(hoverBackBrush, rowRectWhole);
             }
 
             else
             {
-                g.FillRectangle(i % 2 == 0 ? Brushes.White : Brushes.WhiteSmoke, new Rectangle(rowRectWhole.Left, rowTop, rowRectWhole.Width, rowRectWhole.Height));
+                g.FillRectangle(i % 2 == 0 ? Brushes.White : Brushes.WhiteSmoke, rowRectWhole);
             }
 
+            // DESENHO DAS CÉLULAS
             foreach (var col in _columns)
             {
-
                 Rectangle rect = new(x, rowTop, _itemWidth, _itemHeight);
                 g.DrawRectangle(Pens.Gray, rect);
 
                 using var sf = new StringFormat()
                 {
                     Alignment = col.Alignment,
-                    LineAlignment = StringAlignment.Center
+                    LineAlignment = StringAlignment.Center,
+                    Trimming = StringTrimming.EllipsisCharacter
                 };
 
                 if (col.ValueSelector != null)
                 {
-                    g.DrawString(col.ValueSelector(item), _itemFont, Brushes.Black, rect, sf);
+                    // Adiciona um padding
+                    Rectangle textRect = new(rect.X + 5, rect.Y, rect.Width - 10, rect.Height);
+                    g.DrawString(col.ValueSelector(item), _itemFont, Brushes.Black, textRect, sf);
                 }
 
                 x += _itemWidth;
             }
+        }
+    }
+
+    protected override void WndProc(ref Message m)
+    {
+        const int WM_VSCROLL = 0x115;
+        const int WM_MOUSEWHEEL = 0x20A;
+        const int WM_ERASEBKGND = 0x14; // Mensagem de apagar o fundo (causa flicker)
+
+        // Ignora a mensagem de apagar fundo
+        if (m.Msg == WM_ERASEBKGND)
+        {
+            return;
+        }
+
+        base.WndProc(ref m);
+
+        if (m.Msg == WM_VSCROLL || m.Msg == WM_MOUSEWHEEL)
+        {
+            Invalidate();
         }
     }
 
@@ -349,7 +446,6 @@ public partial class LazyPanel<T> : Panel
         {
             _headerFont.Dispose();
             _itemFont.Dispose();
-
             _menuStrip.Dispose();
         }
 

@@ -54,7 +54,7 @@ public partial class ClientesList : Form
 
         searchbar.AddButtonClicked += () =>
         {
-            using ManageCliente form = new();
+            using ClienteForm form = new();
             DialogResult dialogResult = form.ShowDialog();
 
             if (dialogResult == DialogResult.OK)
@@ -67,10 +67,10 @@ public partial class ClientesList : Form
     private void OnItemChanged(object? sender, Cliente cliente)
     {
 
-        using ManageCliente form = new(cliente);
+        using ClienteForm form = new(cliente);
         DialogResult dialogResult = form.ShowDialog();
 
-        if (dialogResult == DialogResult.OK && form.Cliente != null)
+        if (dialogResult == DialogResult.OK)
         {
             _lazyPanel.RemakeCache();
         }

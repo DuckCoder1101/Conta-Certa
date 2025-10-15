@@ -6,7 +6,7 @@ public class ServicoJSONDTO
 {
     public long TransitionIdServico { get; set; }
     public string Nome { get; set; } = string.Empty;
-    public float Valor { get; private set; }
+    public float Valor { get; set; }
 
     public ServicoJSONDTO() { }
 

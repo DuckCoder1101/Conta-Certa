@@ -44,12 +44,6 @@
             tableLayoutPanel5 = new TableLayoutPanel();
             pictureBox6 = new PictureBox();
             exportarJSONBtn = new Button();
-            tableLayoutPanel6 = new TableLayoutPanel();
-            pictureBox7 = new PictureBox();
-            importarClientesBtn = new Button();
-            tableLayoutPanel7 = new TableLayoutPanel();
-            pictureBox8 = new PictureBox();
-            importarCobrancasBtn = new Button();
             clientes = new FlowLayoutPanel();
             tableLayoutPanel1 = new TableLayoutPanel();
             pictureBox1 = new PictureBox();
@@ -114,10 +108,6 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             tableLayoutPanel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
-            tableLayoutPanel6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox7).BeginInit();
-            tableLayoutPanel7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox8).BeginInit();
             clientes.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
@@ -237,8 +227,6 @@
             arquivo.Controls.Add(header);
             arquivo.Controls.Add(importJSON);
             arquivo.Controls.Add(tableLayoutPanel5);
-            arquivo.Controls.Add(tableLayoutPanel6);
-            arquivo.Controls.Add(tableLayoutPanel7);
             arquivo.FlowDirection = FlowDirection.TopDown;
             arquivo.Location = new Point(0, 65);
             arquivo.Margin = new Padding(0, 3, 0, 3);
@@ -395,103 +383,7 @@
             exportarJSONBtn.UseVisualStyleBackColor = false;
             exportarJSONBtn.Click += ExportToJSON_Click;
             // 
-            // tableLayoutPanel6
-            // 
-            tableLayoutPanel6.ColumnCount = 2;
-            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 50F));
-            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel6.Controls.Add(pictureBox7, 0, 0);
-            tableLayoutPanel6.Controls.Add(importarClientesBtn, 1, 0);
-            tableLayoutPanel6.Location = new Point(20, 171);
-            tableLayoutPanel6.Margin = new Padding(20, 3, 0, 3);
-            tableLayoutPanel6.Name = "tableLayoutPanel6";
-            tableLayoutPanel6.RowCount = 1;
-            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel6.Size = new Size(211, 50);
-            tableLayoutPanel6.TabIndex = 3;
-            // 
-            // pictureBox7
-            // 
-            pictureBox7.BackgroundImageLayout = ImageLayout.None;
-            pictureBox7.Dock = DockStyle.Fill;
-            pictureBox7.Image = (Image)resources.GetObject("pictureBox7.Image");
-            pictureBox7.Location = new Point(0, 3);
-            pictureBox7.Margin = new Padding(0, 3, 3, 3);
-            pictureBox7.Name = "pictureBox7";
-            pictureBox7.Size = new Size(47, 44);
-            pictureBox7.SizeMode = PictureBoxSizeMode.CenterImage;
-            pictureBox7.TabIndex = 0;
-            pictureBox7.TabStop = false;
-            // 
-            // importarClientesBtn
-            // 
-            importarClientesBtn.BackColor = Color.Transparent;
-            importarClientesBtn.FlatAppearance.BorderSize = 0;
-            importarClientesBtn.FlatAppearance.MouseOverBackColor = SystemColors.ControlDark;
-            importarClientesBtn.FlatStyle = FlatStyle.Flat;
-            importarClientesBtn.Font = new Font("Arial", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            importarClientesBtn.ForeColor = SystemColors.ControlLightLight;
-            importarClientesBtn.ImageAlign = ContentAlignment.MiddleLeft;
-            importarClientesBtn.Location = new Point(53, 3);
-            importarClientesBtn.Name = "importarClientesBtn";
-            importarClientesBtn.Size = new Size(155, 44);
-            importarClientesBtn.TabIndex = 4;
-            importarClientesBtn.Text = "IMPORTAR TABELA CLIENTES";
-            importarClientesBtn.TextAlign = ContentAlignment.MiddleLeft;
-            importarClientesBtn.TextImageRelation = TextImageRelation.ImageBeforeText;
-            importarClientesBtn.UseVisualStyleBackColor = false;
-            importarClientesBtn.Click += ImportClientesTable_Click;
-            // 
-            // tableLayoutPanel7
-            // 
-            tableLayoutPanel7.ColumnCount = 2;
-            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 50F));
-            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel7.Controls.Add(pictureBox8, 0, 0);
-            tableLayoutPanel7.Controls.Add(importarCobrancasBtn, 1, 0);
-            tableLayoutPanel7.Location = new Point(20, 227);
-            tableLayoutPanel7.Margin = new Padding(20, 3, 0, 3);
-            tableLayoutPanel7.Name = "tableLayoutPanel7";
-            tableLayoutPanel7.RowCount = 1;
-            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel7.Size = new Size(211, 50);
-            tableLayoutPanel7.TabIndex = 4;
-            // 
-            // pictureBox8
-            // 
-            pictureBox8.BackgroundImageLayout = ImageLayout.None;
-            pictureBox8.Dock = DockStyle.Fill;
-            pictureBox8.Image = (Image)resources.GetObject("pictureBox8.Image");
-            pictureBox8.Location = new Point(0, 3);
-            pictureBox8.Margin = new Padding(0, 3, 3, 3);
-            pictureBox8.Name = "pictureBox8";
-            pictureBox8.Size = new Size(47, 44);
-            pictureBox8.SizeMode = PictureBoxSizeMode.CenterImage;
-            pictureBox8.TabIndex = 0;
-            pictureBox8.TabStop = false;
-            // 
-            // importarCobrancasBtn
-            // 
-            importarCobrancasBtn.BackColor = Color.Transparent;
-            importarCobrancasBtn.FlatAppearance.BorderSize = 0;
-            importarCobrancasBtn.FlatAppearance.MouseOverBackColor = SystemColors.ControlDark;
-            importarCobrancasBtn.FlatStyle = FlatStyle.Flat;
-            importarCobrancasBtn.Font = new Font("Arial", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            importarCobrancasBtn.ForeColor = SystemColors.ControlLightLight;
-            importarCobrancasBtn.ImageAlign = ContentAlignment.MiddleLeft;
-            importarCobrancasBtn.Location = new Point(53, 3);
-            importarCobrancasBtn.Name = "importarCobrancasBtn";
-            importarCobrancasBtn.Size = new Size(155, 44);
-            importarCobrancasBtn.TabIndex = 4;
-            importarCobrancasBtn.Text = "IMPORTAR TABELA COBRANÇAS";
-            importarCobrancasBtn.TextAlign = ContentAlignment.MiddleLeft;
-            importarCobrancasBtn.TextImageRelation = TextImageRelation.ImageBeforeText;
-            importarCobrancasBtn.UseVisualStyleBackColor = false;
-            importarCobrancasBtn.Click += ImportCobrancaTable_Click;
-            // 
-            // _clientes
+            // clientes
             // 
             clientes.BackColor = SystemColors.ControlDarkDark;
             clientes.Controls.Add(tableLayoutPanel1);
@@ -507,7 +399,7 @@
             clientes.TabIndex = 7;
             clientes.WrapContents = false;
             // 
-            // tablePanel
+            // tableLayoutPanel1
             // 
             tableLayoutPanel1.AutoSize = true;
             tableLayoutPanel1.ColumnCount = 2;
@@ -1355,10 +1247,6 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             tableLayoutPanel5.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
-            tableLayoutPanel6.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)pictureBox7).EndInit();
-            tableLayoutPanel7.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)pictureBox8).EndInit();
             clientes.ResumeLayout(false);
             clientes.PerformLayout();
             tableLayoutPanel1.ResumeLayout(false);
@@ -1440,15 +1328,9 @@
         private PictureBox pictureBox5;
         private TableLayoutPanel tableLayoutPanel5;
         private PictureBox pictureBox6;
-        private TableLayoutPanel tableLayoutPanel6;
-        private PictureBox pictureBox7;
-        private TableLayoutPanel tableLayoutPanel7;
-        private PictureBox pictureBox8;
         private Button arquivoBtn;
         private Button importarJSONBtn;
         private Button exportarJSONBtn;
-        private Button importarClientesBtn;
-        private Button importarCobrancasBtn;
         private Button clientesBtn;
         private Button clientesListBtn;
         private Button novoClienteBtn;

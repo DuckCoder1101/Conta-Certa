@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Conta_Certa.DTOs;
 
 namespace Conta_Certa.Models;
 
@@ -7,14 +8,14 @@ public class Servico
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long? IdServico { get; private set; }
+    public long IdServico { get; set; }
 
     [Required]
     [Index(IsUnique = true)]
-    public string Nome { get; private set; } = string.Empty;
+    public string Nome { get; set; } = string.Empty;
 
     [Required]
-    public float Valor { get; private set; }
+    public float Valor { get; set; }
 
     public Servico() { }
 
@@ -24,8 +25,9 @@ public class Servico
         Valor = valor;
     }
 
-    public void SetId(long? id)
+    public Servico(ServicoJSONDTO dto)
     {
-        IdServico = id;
+        Nome = dto.Nome;
+        Valor = dto.Valor;
     }
 }

@@ -1,15 +1,14 @@
-﻿using Conta_Certa.Components;
-using Conta_Certa.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using Conta_Certa.Components;
 using Conta_Certa.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Conta_Certa.Forms;
 
-public partial class ManageCliente : InputForm
+public partial class ClienteForm : InputForm
 {
     public Cliente? Cliente { get; private set; }
 
-    public ManageCliente(Cliente? cliente = null)
+    public ClienteForm(Cliente? cliente = null)
     {
         InitializeComponent();
 
@@ -25,42 +24,6 @@ public partial class ManageCliente : InputForm
             cadastrarBtn.Text = "ALTERAR";
         }
     }
-
-    public ManageCliente(ClienteCadDTO clienteDTO)
-    {
-        InitializeComponent();
-
-        var textFields = new (string? valor, TextBox controle)[]
-        {
-            (clienteDTO.Nome, nomeTxt),
-            (clienteDTO.Email, emailTxt),
-            (clienteDTO.Documento, documentoTxt)
-        };
-
-        foreach (var (valor, controle) in textFields)
-        {
-            if (!string.IsNullOrWhiteSpace(valor))
-            {
-                controle.Text = valor;
-            }
-        }
-
-        if (!string.IsNullOrEmpty(clienteDTO.Telefone))
-        {
-            telefoneTxt.Text = clienteDTO.Telefone;
-        }
-
-        if (clienteDTO.Honorario is float honorario)
-        {
-            honorarioNumber.Value = (decimal)honorario;
-        }
-
-        if (clienteDTO.VencimentoHonorario is int vencimento)
-        {
-            vencimentoNumber.Value = vencimento;
-        }
-    }
-
     private void Cadastrar_Click(object sender, EventArgs e)
     {
         string nome = nomeTxt.Text.Trim();

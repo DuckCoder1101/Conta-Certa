@@ -29,7 +29,23 @@ public class AppDBContext : DbContext
             .HasOne(sc => sc.Cobranca)
             .WithMany(c => c.ServicosCobranca)
             .HasForeignKey(sc => sc.IdCobranca)
-            .HasPrincipalKey(sc => sc.IdCobranca);
+            .HasPrincipalKey(c => c.IdCobranca);
+
+        // RELACIONAMENTO, SERVICO COBRANCA -> SERVICO
+        modelBuilder.Entity<ServicoCobranca>()
+            .HasOne<Servico>()
+            .WithMany()
+            .HasForeignKey(sc => sc.IdServicoOrigem);
+
+        // SERVICO UNICO
+        modelBuilder.Entity<Servico>()
+            .HasIndex(s => s.Nome)
+            .IsUnique();
+
+        // SERVICO COBRANCA UNICO
+        modelBuilder.Entity<ServicoCobranca>()
+            .HasIndex(sc => new { sc.IdCobranca, sc.IdServicoOrigem })
+            .IsUnique();
 
         // COBRANÇA UNICA
         modelBuilder.Entity<Cobranca>()

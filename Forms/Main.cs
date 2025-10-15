@@ -71,7 +71,7 @@ namespace Conta_Certa
         {
             _currentForm?.Close();
 
-            ManageCliente form = new()
+            ClienteForm form = new()
             {
                 FormBorderStyle = FormBorderStyle.None,
                 TopLevel = false,
@@ -213,36 +213,6 @@ namespace Conta_Certa
                 .Where(c => c.Status == CobrancaStatus.Pendente && c.Cliente!.Telefone.Length == 11);
 
             Server.ConnectExtension([.. cobrancas]);
-        }
-
-        private void ImportClientesTable_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog dialog = new()
-            {
-                Title = "Importar tabela Excel",
-                Filter = "Arquivo JSON (*.xls;*.xlsx)|*.xls;*.xlsx",
-                DefaultExt = "json"
-            };
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                ExcelImporter.ImportClientesTable(dialog.FileName);
-            }
-        }
-
-        private void ImportCobrancaTable_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog dialog = new()
-            {
-                Title = "Importar tabela Excel",
-                Filter = "Arquivo JSON (*.xls;*.xlsx)|*.xls;*.xlsx",
-                DefaultExt = "json"
-            };
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                ExcelImporter.ImportCobrancasTable(dialog.FileName);
-            }
         }
 
         private void RelatorioCobsPendentes(object sender, EventArgs e)

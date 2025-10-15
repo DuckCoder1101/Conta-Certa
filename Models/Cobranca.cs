@@ -1,6 +1,6 @@
-﻿using Conta_Certa.DTOs;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Conta_Certa.DTOs;
 
 namespace Conta_Certa.Models;
 
@@ -14,33 +14,32 @@ public class Cobranca
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long? IdCobranca { get; private set; }
+    public long IdCobranca { get; set; }
 
     [Required]
-    public float Honorario { get; private set; }
+    public float Honorario { get; set; }
 
     [NotMapped]
-    public float HonorarioTotal => Honorario +
-        ServicosCobranca?.Sum(sc => sc.Valor * sc.Quantidade) ?? 0;
+    public float HonorarioTotal => Honorario + ServicosCobranca?.Sum(sc => sc.Valor * sc.Quantidade) ?? 0;
 
     [Required]
-    public CobrancaStatus Status { get; private set; }
+    public CobrancaStatus Status { get; set; }
 
     [Required]
-    public DateTime Vencimento { get; private set; }
+    public DateTime Vencimento { get; set; }
 
-    public DateTime? PagoEm { get; private set; }
+    public DateTime? PagoEm { get; set; }
 
     // Relacionamento cliente
     [Required]
-    public string DocumentoCliente { get; private set; } = string.Empty;
+    public string DocumentoCliente { get; set; } = string.Empty;
     public Cliente? Cliente { get; set; } = null;
 
     // Relacionamento servicos
-    public ICollection<ServicoCobranca> ServicosCobranca { get; private set; } = [];
+    public ICollection<ServicoCobranca> ServicosCobranca { get; set; } = [];
 
     // Construtor vazio para EF
-    protected Cobranca() { }
+    public Cobranca() { }
 
     public Cobranca(string documentoCliente, float honorario, CobrancaStatus status, DateTime vencimento, DateTime? pagoEm, ICollection<ServicoCobranca>? scs = null)
     {
@@ -56,26 +55,13 @@ public class Cobranca
         }
     }
 
-    public Cobranca(CobrancaCadDTO dto)
+    public Cobranca(CobrancaJSONDTO dto)
     {
-        Honorario = (float)dto.Honorario!;
-        Status = (CobrancaStatus)dto.Status!;
-        Vencimento = (DateTime)dto.Vencimento!;
+        DocumentoCliente = dto.DocumentoCliente;
+        Honorario = dto.Honorario;
+        Status = dto.Status;
+        Vencimento = dto.Vencimento;
         PagoEm = dto.PagoEm;
-        DocumentoCliente = dto.DocumentoCliente!;
-    }
-
-    public void SetId(long? id)
-    {
-        IdCobranca = id;
-    }
-
-    public void Update(string documentoCliente, float honorario, CobrancaStatus status, DateTime vencimento, DateTime? pagoEm)
-    {
-        DocumentoCliente = documentoCliente;
-        Honorario = honorario;
-        Status = status;
-        Vencimento = vencimento;
-        PagoEm = pagoEm;
+        ServicosCobranca = [.. dto.ServicosCobranca.Select(dto => new ServicoCobranca(dto))];
     }
 }

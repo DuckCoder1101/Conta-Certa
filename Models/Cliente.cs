@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Conta_Certa.DTOs;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Conta_Certa.Models;
@@ -9,32 +9,31 @@ public class Cliente
 {
     [Key]
     [MaxLength(14)]
-    public string Documento { get; private set; } = string.Empty;
+    public string Documento { get; set; } = string.Empty;
 
     [Required]
-    public string Nome { get; private set; } = string.Empty;
-
-    [Required]
-    [Index(IsUnique = true)]
-    public string Telefone { get; private set; } = string.Empty;
+    public string Nome { get; set; } = string.Empty;
 
     [Required]
     [Index(IsUnique = true)]
-    public string? Email { get; private set; }
+    public string Telefone { get; set; } = string.Empty;
 
     [Required]
-    public float Honorario { get; private set; }
+    [Index(IsUnique = true)]
+    public string? Email { get; set; }
 
     [Required]
-    public int VencimentoHonorario { get; private set; }
+    public float Honorario { get; set; }
+
+    [Required]
+    public int VencimentoHonorario { get; set; }
 
     // Relacionamento com Cobranca
-    public ICollection<Cobranca> Cobrancas { get; private set; } = [];
+    public ICollection<Cobranca> Cobrancas { get; set; } = [];
 
     // Construtor vazio para EF
     protected Cliente() { }
 
-    [JsonConstructor]
     public Cliente(string documento, string nome, string telefone, string email, float honorario, int vencimentoHonorario)
     {
         Documento = documento;
@@ -43,6 +42,16 @@ public class Cliente
         Email = email;
         Honorario = honorario;
         VencimentoHonorario = vencimentoHonorario;
+    }
+
+    public Cliente(ClienteJSONDTO dto)
+    {
+        Documento = dto.Documento;
+        Nome = dto.Nome;
+        Telefone = dto.Telefone;
+        Email = dto.Email;
+        Honorario = dto.Honorario;
+        VencimentoHonorario = dto.VencimentoHonorario;
     }
 
     public static bool CheckDocumento(string documento)

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Conta_Certa.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250927124424_Initial")]
-    partial class Initial
+    [Migration("20251015140821_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -96,16 +96,22 @@ namespace Conta_Certa.Migrations
 
                     b.HasKey("IdServico");
 
+                    b.HasIndex("Nome")
+                        .IsUnique();
+
                     b.ToTable("Servicos");
                 });
 
             modelBuilder.Entity("Conta_Certa.Models.ServicoCobranca", b =>
                 {
-                    b.Property<long>("IdServico")
+                    b.Property<long>("IdServicoCobranca")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("IdCobranca")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("IdServicoOrigem")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Nome")
@@ -118,9 +124,12 @@ namespace Conta_Certa.Migrations
                     b.Property<float>("Valor")
                         .HasColumnType("REAL");
 
-                    b.HasKey("IdServico");
+                    b.HasKey("IdServicoCobranca");
 
-                    b.HasIndex("IdCobranca");
+                    b.HasIndex("IdServicoOrigem");
+
+                    b.HasIndex("IdCobranca", "IdServicoOrigem")
+                        .IsUnique();
 
                     b.ToTable("ServicosCobranca");
                 });
@@ -141,6 +150,12 @@ namespace Conta_Certa.Migrations
                     b.HasOne("Conta_Certa.Models.Cobranca", "Cobranca")
                         .WithMany("ServicosCobranca")
                         .HasForeignKey("IdCobranca")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Conta_Certa.Models.Servico", null)
+                        .WithMany()
+                        .HasForeignKey("IdServicoOrigem")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
