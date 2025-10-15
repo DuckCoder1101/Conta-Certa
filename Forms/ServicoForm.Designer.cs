@@ -2,7 +2,7 @@
 
 namespace Conta_Certa.Forms
 {
-    partial class ServicosList
+    partial class ServicoForm
     {
         /// <summary>
         /// Required designer variable.
@@ -31,7 +31,7 @@ namespace Conta_Certa.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServicosList));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServicoForm));
             tablePanel = new TableLayoutPanel();
             searchbar = new Conta_Certa.UserControls.SearchbarControl();
             tablePanel.SuspendLayout();

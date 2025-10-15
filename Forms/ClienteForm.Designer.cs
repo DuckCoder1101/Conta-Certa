@@ -1,6 +1,6 @@
 ﻿namespace Conta_Certa.Forms
 {
-    partial class ManageCliente
+    partial class ClienteForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ManageCliente));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClienteForm));
             tableLayoutPanel1 = new TableLayoutPanel();
             cadastrarBtn = new Button();
             label6 = new Label();

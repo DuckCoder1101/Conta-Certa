@@ -1,4 +1,6 @@
 ﻿
+using Conta_Certa.Models;
+
 namespace Conta_Certa.DTOs;
 
 public record ClienteCadDTO
@@ -12,10 +14,20 @@ public record ClienteCadDTO
 
     public ClienteCadDTO() { }
 
+    public ClienteCadDTO(Cliente cliente)
+    {
+        Documento = cliente.Documento;
+        Nome = cliente.Nome;
+        Telefone = cliente.Telefone;
+        Email = cliente.Email;
+        Honorario = cliente.Honorario;
+        VencimentoHonorario = cliente.VencimentoHonorario
+    }
+
     public ClienteCadDTO(string documento, string nome, string telefone, string? email, float honorario, int vencimentoHonorario)
     {
-        Nome = nome;
         Documento = documento;
+        Nome = nome;
         Telefone = telefone;
         Email = email;
         Honorario = honorario;

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Conta_Certa.DTOs;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Conta_Certa.Models;
@@ -24,8 +25,19 @@ public class Servico
         Valor = valor;
     }
 
+    public Servico(ServicoCadDTO dto)
+    {
+        Nome = dto.Nome!;
+        Valor = (float) dto.Valor!;
+    }
+
     public void SetId(long? id)
     {
         IdServico = id;
+    }
+
+    public void SetValor(float valor)
+    {
+        Valor = valor;
     }
 }

@@ -1,40 +1,85 @@
-﻿using Conta_Certa.Models;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Conta_Certa.DTOs;
+using Conta_Certa.Forms;
+using Conta_Certa.Models;
 
 namespace Conta_Certa.Utils;
 
 public static class JSONImporter
 {
-    private static readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        WriteIndented = true,
-    };
+    private static readonly JsonSerializerOptions _jsonOptions = new();
 
-    private static void ImportClientes(AppDBContext dbContext, ICollection<Cliente> clientes)
+    private static void ImportClientes(AppDBContext dbContext, ICollection<ClienteCadDTO> dtos)
     {
-        dbContext.Clientes.AddRange(clientes);
+        foreach (var dto in dtos)
+        {
+            if (!dto.IsFull())
+            {
+                ClienteForm form = new(dto);
+                form.ShowDialog();
+                return;
+            }
+
+            var clienteExistente = dbContext.Clientes
+                .FirstOrDefault(c => c.Documento == dto.Documento);
+
+            if (clienteExistente != null)
+            {
+                clienteExistente.Telefone = dto.Telefone!;
+                clienteExistente.Email = dto.Email;
+                clienteExistente.VencimentoHonorario = (int) dto.VencimentoHonorario!;
+                clienteExistente.Honorario = (float) dto.Honorario!;
+
+                dbContext.Update(clienteExistente);
+            }
+
+            else
+            {
+                Cliente cliente = new(dto);
+                dbContext.Add(cliente);
+            }
+        }
+
         dbContext.SaveChanges();
     }
 
-    private static void ImportCobrancas(AppDBContext dbContext, ICollection<Cobranca> cobrancas)
+    private static void ImportCobrancas(AppDBContext dbContext, ICollection<CobrancaCadDTO> dtos)
     {
-        foreach (var cobranca in cobrancas)
+        foreach (var dto in dtos)
         {
-            cobranca.SetId(null);
+            if (!dto.IsFull())
+            {
+                CobrancaForm form = new(dto);
+                form.ShowDialog();
+                return;
+            }
+
+            var cobrancaExistente = dbContext.Cobrancas
+                .FirstOrDefault(c => c.DocumentoCliente == dto.DocumentoCliente &&
+                (c.Vencimento.Month == dto.Vencimento!.Value.Month && c.Vencimento.Year == dto.Vencimento.Value.Year));
+
+            if (cobrancaExistente != null)
+            {
+                cobrancaExistente.Honorario = dto.Honorario!.Value;
+                cobrancaExistente.PagoEm = dto.PagoEm;
+                cobrancaExistente.ServicosCobranca = dto.ServicosCobranca.Select(sc => new ServicoCobranca(sc)));
+
+                dbContext.Update(cobrancaExistente);
+            }
+
+            else
+            {
+                Cliente cliente = new(dto);
+                dbContext.Add(cliente);
+            }
         }
 
-        dbContext.Cobrancas.AddRange(cobrancas);
         dbContext.SaveChanges();
     }
 
-    private static void ImportServicos(AppDBContext dbContext, ICollection<Servico> servicos)
+    private static void ImportServicos(AppDBContext dbContext, ICollection<ServicoCadDTO> dtos)
     {
-        foreach (var servico in servicos)
-        {
-            servico.SetId(null);
-        }
-
-        dbContext.Servicos.AddRange(servicos);
+        dbContext.Servicos.AddRange(dtos.Select(dto => new Servico(dto)));
         dbContext.SaveChanges();
     }
 

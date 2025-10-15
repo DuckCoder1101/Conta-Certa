@@ -53,7 +53,7 @@ public partial class CobrancasList : Form
 
         searchbar.AddButtonClicked += () =>
         {
-            using ManageCobranca form = new();
+            using CobrancaForm form = new();
             DialogResult dialogResult = form.ShowDialog();
 
             if (dialogResult == DialogResult.OK)
@@ -65,10 +65,10 @@ public partial class CobrancasList : Form
 
     private void OnItemChanged(object? sender, Cobranca cobranca)
     {
-        using ManageCobranca form = new(cobranca);
+        using CobrancaForm form = new(cobranca);
         DialogResult dialogResult = form.ShowDialog();
 
-        if (dialogResult == DialogResult.OK && form.Cobranca != null)
+        if (dialogResult == DialogResult.OK)
         {
             _lazyPanel.RemakeCache();
         }

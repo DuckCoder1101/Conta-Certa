@@ -104,7 +104,7 @@ public static class ExcelImporter
 
                     if (!clienteDTO.IsFull())
                     {
-                        ManageCliente cadForm = new(clienteDTO);
+                        ClienteForm cadForm = new(clienteDTO);
                         cadForm.ShowDialog();
                     }
                 }
@@ -176,7 +176,7 @@ public static class ExcelImporter
 
                     if (!cobrancaDTO.IsFull())
                     {
-                        ManageCobranca cadForm = new(cobrancaDTO);
+                        CobrancaForm cadForm = new(cobrancaDTO);
                         cadForm.ShowDialog();
                     }
 

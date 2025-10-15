@@ -71,7 +71,7 @@ namespace Conta_Certa
         {
             _currentForm?.Close();
 
-            ManageCliente form = new()
+            ClienteForm form = new()
             {
                 FormBorderStyle = FormBorderStyle.None,
                 TopLevel = false,
@@ -170,7 +170,7 @@ namespace Conta_Certa
         {
             _currentForm?.Close();
 
-            ServicosList form = new()
+            ServicoForm form = new()
             {
                 FormBorderStyle = FormBorderStyle.None,
                 TopLevel = false,

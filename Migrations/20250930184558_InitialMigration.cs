@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Conta_Certa.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -68,8 +68,9 @@ namespace Conta_Certa.Migrations
                 name: "ServicosCobranca",
                 columns: table => new
                 {
-                    IdServico = table.Column<long>(type: "INTEGER", nullable: false)
+                    IdServicoCobranca = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    IdServicoOrigem = table.Column<long>(type: "INTEGER", nullable: false),
                     Nome = table.Column<string>(type: "TEXT", nullable: false),
                     Valor = table.Column<float>(type: "REAL", nullable: false),
                     Quantidade = table.Column<int>(type: "INTEGER", nullable: false),
@@ -77,12 +78,18 @@ namespace Conta_Certa.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServicosCobranca", x => x.IdServico);
+                    table.PrimaryKey("PK_ServicosCobranca", x => x.IdServicoCobranca);
                     table.ForeignKey(
                         name: "FK_ServicosCobranca_Cobrancas_IdCobranca",
                         column: x => x.IdCobranca,
                         principalTable: "Cobrancas",
                         principalColumn: "IdCobranca",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ServicosCobranca_Servicos_IdServicoOrigem",
+                        column: x => x.IdServicoOrigem,
+                        principalTable: "Servicos",
+                        principalColumn: "IdServico",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -98,22 +105,27 @@ namespace Conta_Certa.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServicosCobranca_IdCobranca",
+                name: "IX_ServicosCobranca_IdCobranca_IdServicoOrigem",
                 table: "ServicosCobranca",
-                column: "IdCobranca");
+                columns: new[] { "IdCobranca", "IdServicoOrigem" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServicosCobranca_IdServicoOrigem",
+                table: "ServicosCobranca",
+                column: "IdServicoOrigem");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Servicos");
-
-            migrationBuilder.DropTable(
                 name: "ServicosCobranca");
 
             migrationBuilder.DropTable(
                 name: "Cobrancas");
+
+            migrationBuilder.DropTable(
+                name: "Servicos");
 
             migrationBuilder.DropTable(
                 name: "Clientes");

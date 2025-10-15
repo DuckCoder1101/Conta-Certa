@@ -10,9 +10,21 @@ public record CobrancaCadDTO
     public DateTime? Vencimento { get; set; }
     public DateTime? PagoEm { get; set; }
 
+    public List<ServicoCobrancaCadDTO> ServicosCobranca = [];
+
     public CobrancaCadDTO()
     {
 
+    }
+
+    public CobrancaCadDTO(Cobranca cobranca)
+    {
+        DocumentoCliente = cobranca.DocumentoCliente;
+        Honorario = cobranca.Honorario;
+        Status = cobranca.Status;
+        Vencimento = cobranca.Vencimento;
+        PagoEm = cobranca.PagoEm;
+        ServicosCobranca = [.. cobranca.ServicosCobranca.Select(sc => new ServicoCobrancaCadDTO(sc))];
     }
 
     public CobrancaCadDTO(string documentoCliente, float honorario, CobrancaStatus status, DateTime vencimento, DateTime? pagoEm)

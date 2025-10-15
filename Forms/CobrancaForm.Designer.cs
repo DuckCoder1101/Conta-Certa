@@ -1,6 +1,6 @@
 ﻿namespace Conta_Certa.Forms
 {
-    partial class ManageCobranca
+    partial class CobrancaForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ManageCobranca));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CobrancaForm));
             tableLayoutPanel2 = new TableLayoutPanel();
             label1 = new Label();
             label7 = new Label();

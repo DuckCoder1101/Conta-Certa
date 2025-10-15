@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Conta_Certa.Forms;
 
-public partial class ManageCliente : InputForm
+public partial class ClienteForm : InputForm
 {
     public Cliente? Cliente { get; private set; }
 
-    public ManageCliente(Cliente? cliente = null)
+    public ClienteForm(Cliente? cliente = null)
     {
         InitializeComponent();
 
@@ -26,7 +26,7 @@ public partial class ManageCliente : InputForm
         }
     }
 
-    public ManageCliente(ClienteCadDTO clienteDTO)
+    public ClienteForm(ClienteCadDTO clienteDTO)
     {
         InitializeComponent();
 

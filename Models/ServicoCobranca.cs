@@ -7,7 +7,10 @@ public class ServicoCobranca
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long IdServico { get; private set; }
+    public long IdServicoCobranca { get; private set; }
+
+    [Required]
+    public long IdServicoOrigem { get; private set; }
 
     [Required]
     public string Nome { get; private set; } = string.Empty;
@@ -22,9 +25,11 @@ public class ServicoCobranca
     public long IdCobranca { get; private set; }
     public Cobranca? Cobranca { get; private set; }
 
-    public ServicoCobranca(long idServico, string nome, float valor, int quantidade)
+    public ServicoCobranca() { }
+
+    public ServicoCobranca(long idServicoOrigem, string nome, float valor, int quantidade)
     {
-        IdServico = idServico;
+        IdServicoOrigem = idServicoOrigem;
         Nome = nome;
         Valor = valor;
         Quantidade = quantidade;

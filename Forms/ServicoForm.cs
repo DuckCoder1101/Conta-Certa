@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Conta_Certa.Forms;
 
-public partial class ServicosList : Form
+public partial class ServicoForm : Form
 {
     private readonly LazyPanel<Servico> _lazyPanel;
     private readonly ServicoDataProvider _provider;
     private readonly AppDBContext _dbContext;
 
-    public ServicosList()
+    public ServicoForm()
     {
         InitializeComponent();
 
