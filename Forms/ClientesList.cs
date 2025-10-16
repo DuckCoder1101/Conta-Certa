@@ -1,7 +1,7 @@
-﻿using Conta_Certa.Components;
+﻿using Microsoft.EntityFrameworkCore;
+using Conta_Certa.Components;
 using Conta_Certa.DataProviders;
 using Conta_Certa.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Conta_Certa.Forms;
 
@@ -31,12 +31,45 @@ public partial class ClientesList : Form
         // COLUNAS
         _lazyPanel.SetProvider(_provider);
         _lazyPanel.SetColumns([
-            new() { Header = "Documento", ValueSelector = c => c.Documento, OrderBySelector = c => c.Documento },
-            new() { Header = "Nome", ValueSelector = c => c.Nome, OrderBySelector = c => c.Nome },
-            new() { Header = "Telefone", ValueSelector = c => c.Telefone, OrderBySelector = c => c.Telefone },
-            new() { Header = "Email", ValueSelector = c => c.Email ?? "-", OrderBySelector = c => c.Email },
-            new() { Header = "Honorário", ValueSelector = c => c.Honorario.ToString("c"), OrderBySelector = c => c.Honorario },
-            new() { Header = "Vencimento honorário", ValueSelector = c => c.VencimentoHonorario.ToString(), OrderBySelector = c => c.VencimentoHonorario, Alignment = StringAlignment.Center }]);
+            new() 
+            { 
+                Header = "Documento", 
+                ValueSelector = c => c.Documento, 
+                OrderBySelector = c => c.Documento 
+            },
+            new() 
+            { 
+                Header = "Nome",
+                ValueSelector = c => c.Nome, 
+                OrderBySelector = c => c.Nome,
+                Weight = 2
+            },
+            new() 
+            { 
+                Header = "Telefone", 
+                ValueSelector = c => c.Telefone, 
+                OrderBySelector = c => c.Telefone 
+            },
+            new() 
+            { 
+                Header = "Email", 
+                ValueSelector = c => c.Email ?? "-", 
+                OrderBySelector = c => c.Email,
+                Weight = 2
+            },
+            new()
+            { 
+                Header = "Honorário", 
+                ValueSelector = c => c.Honorario.ToString("c"), 
+                OrderBySelector = c => c.Honorario
+            },
+            new() 
+            { 
+                Header = "Vencimento honorário", 
+                ValueSelector = c => c.VencimentoHonorario.ToString(), 
+                OrderBySelector = c => c.VencimentoHonorario, 
+                Alignment = StringAlignment.Center 
+            }]);
 
         // DATA PROVIDER
 

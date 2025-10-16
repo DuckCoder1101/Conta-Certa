@@ -29,12 +29,48 @@ public partial class CobrancasList : Form
 
         // COLUNAS
         _lazyPanel.SetColumns([
-            new() { Header = "ID", ValueSelector = c => c.IdCobranca.ToString() ?? "", OrderBySelector = c => c.IdCobranca, Alignment = StringAlignment.Center },
-            new() { Header = "Cliente", ValueSelector = c => c.Cliente!.Nome, OrderBySelector = c => c.Cliente!.Nome },
-            new() { Header = "Honorário Total", ValueSelector = c => c.HonorarioTotal.ToString("c"), OrderBySelector = c => c.HonorarioTotal },
-            new() { Header = "Status", ValueSelector = c => c.Status.ToString(), OrderBySelector = c => c.Status, Alignment = StringAlignment.Center },
-            new() { Header = "Vencimento", ValueSelector = c => c.Vencimento.ToString("dd/MM/yy"), OrderBySelector = c => c.Vencimento, Alignment = StringAlignment.Center },
-            new() { Header = "Pago em", ValueSelector = c => c.PagoEm != null ? ((DateTime)c.PagoEm).ToString("dd/MM/yy") : "-", OrderBySelector = c => c.PagoEm, Alignment = StringAlignment.Center }]);
+            new() 
+            {
+                Header = "ID", 
+                ValueSelector = c => c.IdCobranca.ToString() ?? "", 
+                OrderBySelector = c => c.IdCobranca, 
+                Alignment = StringAlignment.Center 
+            },
+            new() 
+            {
+                Header = "Cliente",
+                ValueSelector = c => c.Cliente!.Nome,
+                OrderBySelector = c => c.Cliente!.Nome,
+                Weight = 2
+            },
+            new() 
+            { 
+                Header = "Honorário Total", 
+                ValueSelector = c => c.HonorarioTotal.ToString("c"), 
+                OrderBySelector = c => c.HonorarioTotal
+            },
+            new() 
+            { 
+                Header = "Status", 
+                ValueSelector = c => c.Status.ToString(), 
+                OrderBySelector = c => c.Status,
+                Alignment = StringAlignment.Center 
+            },
+            new() 
+            {
+                Header = "Vencimento", 
+                ValueSelector = c => c.Vencimento.ToString("dd/MM/yy"), 
+                OrderBySelector = c => c.Vencimento, 
+                Alignment = StringAlignment.Center 
+            },
+            new() 
+            { 
+                Header = "Pago em", 
+                ValueSelector = c => 
+                    c.PagoEm != null ? ((DateTime)c.PagoEm).ToString("dd/MM/yy") : "-", 
+                OrderBySelector = c => c.PagoEm, 
+                Alignment = StringAlignment.Center 
+            }]);
 
         // DATA PROVIDER
         _lazyPanel.SetProvider(_provider);

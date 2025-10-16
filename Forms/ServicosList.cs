@@ -29,8 +29,28 @@ public partial class ServicosList : Form
 
         // COLUNAS
         _lazyPanel.SetColumns([
-            new() { Header = "Nome", ValueSelector = s => s.Nome, OrderBySelector = s => s.Nome,Alignment = StringAlignment.Center },
-            new() { Header = "Valor", ValueSelector = s => s.Valor.ToString("c"), OrderBySelector = s => s.Valor, Alignment = StringAlignment.Center } ]);
+            new() 
+            { 
+                Header = "ID", 
+                ValueSelector = s => s.IdServico.ToString(), 
+                OrderBySelector = s => s.IdServico, 
+                Alignment = StringAlignment.Center 
+            },
+            new() 
+            { 
+                Header = "Nome", 
+                ValueSelector = s => s.Nome, 
+                OrderBySelector = s => s.Nome, 
+                Alignment = StringAlignment.Center,
+                Weight = 2
+            },
+            new() 
+            { 
+                Header = "Valor", 
+                ValueSelector = s => s.Valor.ToString("c"),
+                OrderBySelector = s => s.Valor,
+                Alignment = StringAlignment.Center 
+            } ]);
 
         // DATA PROVIDER
         _lazyPanel.SetProvider(_provider);
