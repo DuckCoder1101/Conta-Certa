@@ -206,13 +206,27 @@ namespace Conta_Certa
             Task.Run(() => CobrancasScheduler.GenCobrancasDoMes());
         }
 
-        private void StartWhastappAutomation_Click(object sender, EventArgs e)
+        private async void StartWhatsappAutomation_Click(object sender, EventArgs e)
         {
-            using AppDBContext dBContext = new();
-            var cobrancas = dBContext.Cobrancas
-                .Where(c => c.Status == CobrancaStatus.Pendente && c.Cliente!.Telefone.Length == 11);
+            //using AppDBContext dBContext = new();
+            //var cobrancas = dBContext.Cobrancas
+            //    .Where(c => c.Status == CobrancaStatus.Pendente && c.Cliente!.Telefone.Length == 11);
 
-            Server.ConnectExtension([.. cobrancas]);
+            //Server.ConnectExtension([.. cobrancas]);
+
+            try
+            {
+                WhatsAppService waService = new();
+                await waService.Initialize(false);
+
+                await waService.SendCobrancas();
+
+                MessageBox.Show("Envio de cobranças finalizado.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"ERRO CRÍTICO NO ENVIO: {ex.Message}");
+            }
         }
 
         private void RelatorioCobsPendentes(object sender, EventArgs e)

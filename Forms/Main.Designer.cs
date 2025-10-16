@@ -804,7 +804,7 @@
             enviarCobrancasWhatsapp.TextAlign = ContentAlignment.MiddleLeft;
             enviarCobrancasWhatsapp.TextImageRelation = TextImageRelation.ImageBeforeText;
             enviarCobrancasWhatsapp.UseVisualStyleBackColor = false;
-            enviarCobrancasWhatsapp.Click += StartWhastappAutomation_Click;
+            enviarCobrancasWhatsapp.Click += StartWhatsappAutomation_Click;
             // 
             // tableLayoutPanel14
             // 
