@@ -1,6 +1,6 @@
-﻿using Conta_Certa.DTOs;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Conta_Certa.DTOs;
 
 namespace Conta_Certa.Models;
 

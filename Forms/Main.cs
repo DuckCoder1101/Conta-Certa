@@ -217,9 +217,9 @@ namespace Conta_Certa
             try
             {
                 WhatsAppService waService = new();
-                await waService.Initialize(false);
+                await waService.InitializeAsync(false);
 
-                await waService.SendCobrancas();
+                await waService.SendCobrancasAsync();
 
                 MessageBox.Show("Envio de cobranças finalizado.");
             }

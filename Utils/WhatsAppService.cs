@@ -1,160 +1,218 @@
-﻿using Conta_Certa.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Playwright;
-using System.Diagnostics;
+using Conta_Certa.Models;
 
 namespace Conta_Certa.Utils;
 
-public class WhatsAppService : IDisposable
+public class WhatsAppService : IAsyncDisposable, IDisposable
 {
     private IPlaywright? _playwright;
-    private IBrowser? _browser;
     private IBrowserContext? _browserContext;
     private IPage? _page;
+    private readonly SemaphoreSlim _sendLock = new(1, 1);
+    private bool _initialized = false;
 
-    // Arquivo de sessão
-    private readonly string STORAGE_STATE_FILE = $"{Application.UserAppDataPath}/whatsapp.lock";
+    // Pasta para persistencia do perfil (cookies, localStorage, etc.)
+    private readonly string _userDataDir;
 
-    private async Task SendMessage(string phoneNumber, string message)
+    // Tempo de timeout padrão
+    private const int DefaultTimeout = 30000;
+
+    public WhatsAppService()
     {
-        string fullNumber = $"55{phoneNumber}";
-        string encodedMessage = Uri.EscapeDataString(message);
+        _userDataDir = Path.Combine(Application.UserAppDataPath, "playwright_profile");
+        Directory.CreateDirectory(_userDataDir);
+    }
 
-        string waMeUrl = $"https://web.whatsapp.com/send?phone={fullNumber}&text={encodedMessage}";
-        await _page!.GotoAsync(waMeUrl);
+    public async Task InitializeAsync(bool headless = true)
+    {
+        if (_initialized) return;
+
+        _playwright = await Playwright.CreateAsync();
+
+        var launchOptions = new BrowserTypeLaunchPersistentContextOptions
+        {
+            Headless = headless,
+        };
+
+        // LaunchPersistentContext cria um contexto "persistente" ligado a uma pasta -> salva sessão automaticamente
+        _browserContext = await _playwright.Chromium.LaunchPersistentContextAsync(
+            _userDataDir, new BrowserTypeLaunchPersistentContextOptions
+            {
+                Headless = headless,
+                // viewport size, userAgent, etc. podem ser configurados aqui
+            });
+
+        // garanta que exista uma página
+        _page = _browserContext.Pages.FirstOrDefault() ?? await _browserContext.NewPageAsync();
+
+        // opcional: navegue pro WhatsApp para garantir load / QR
+        await _page.GotoAsync("https://web.whatsapp.com/", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
 
         try
         {
-            // 1. Aguarda a página de transição/confirmação carregar.
-            const string TRANSITION_SELECTOR = "div[role='button']:has-text('Continuar para o chat')";
-
-            var options = new PageWaitForSelectorOptions { Timeout = 10000 };
-
-            // 2. Tenta encontrar e clicar no botão "Continuar para o chat" (Seletor pode variar)
-            if (await _page.Locator(TRANSITION_SELECTOR).IsVisibleAsync())
-            {
-                await _page.ClickAsync(TRANSITION_SELECTOR);
-            }
-
-
-            // Se a mensagem já estiver pré-preenchida pelo URL, o WhatsApp apenas espera o botão de envio.
-            const string SEND_BUTTON_SELECTOR = "button[data-testid='send']";
-            const string MESSAGE_AREA_SELECTOR = "div[data-testid='conversation-compose-box']";
-
-            // 3. Aguarda o botão de envio *final* (dentro do chat) aparecer.
-            await _page.WaitForSelectorAsync(SEND_BUTTON_SELECTOR, new PageWaitForSelectorOptions { Timeout = 20000 });
-
-            // 4. Garante que o input de mensagem existe, se o URL não tiver preenchido (ou por segurança).
-            if (string.IsNullOrWhiteSpace(await _page.Locator(MESSAGE_AREA_SELECTOR).InputValueAsync()))
-            {
-                await _page.FillAsync(MESSAGE_AREA_SELECTOR, message);
-            }
-
-            // 5. Clica no botão de enviar
-            await _page.WaitForTimeoutAsync(1000); // Pequeno atraso para estabilidade
-            await _page.ClickAsync(SEND_BUTTON_SELECTOR);
-
-            await _page.WaitForSelectorAsync("span[data-testid='msg-check']", new PageWaitForSelectorOptions { Timeout = 5000 });
-
+            await _page.WaitForSelectorAsync("div[id='pane-side']", new PageWaitForSelectorOptions { Timeout = 20000 });
         }
 
         catch (TimeoutException)
         {
-            Logger.LogException(new($"Erro ou Timeout: Não foi possível encontrar o botão de enviar. O chat pode não ter sido carregado."));
+            var qrVisible = await _page.Locator("canvas").IsVisibleAsync().ConfigureAwait(false);
+            if (qrVisible)
+            {
+                throw new InvalidOperationException("Sessão não autenticada. Abra o app em modo não-headless para escanear o QR code.");
+            }
+            else
+            {
+                throw new InvalidOperationException("Falha ao carregar WhatsApp Web (timeout).");
+            }
+        }
+
+        _initialized = true;
+    }
+
+    public async Task SendMessageAsync(string phoneNumber, string message)
+    {
+        if (!_initialized)
+        {
+            throw new InvalidOperationException("WhatsAppService não inicializado. Chame InitializeAsync primeiro.");
+        }
+
+        if (phoneNumber.Length < 11) return;
+
+        // evita concorrência entre envios
+        await _sendLock.WaitAsync();
+
+        try
+        {
+            //string fullNumber = phoneNumber.StartsWith("55") ? phoneNumber : $"55{phoneNumber}";
+            string fullNumber = "5519997834256";
+            string encodedMessage = Uri.EscapeDataString(message);
+            string waMeUrl = $"https://web.whatsapp.com/send?phone={fullNumber}&text={encodedMessage}";
+
+            await _page!.GotoAsync(waMeUrl,
+                new PageGotoOptions
+                {
+                    WaitUntil = WaitUntilState.NetworkIdle,
+                    Timeout = DefaultTimeout
+                });
+
+            // Espera o redirecionamento interno terminar (WhatsApp às vezes faz 2 loads)
+            await _page.WaitForTimeoutAsync(2000);
+
+            // Clica em “Continuar para o chat” se aparecer
+            var transitionLocator = _page.Locator("div[role='button']:has-text('Continuar para o chat')");
+            if (await transitionLocator.IsVisibleAsync())
+            {
+                await transitionLocator.ClickAsync();
+                await _page.WaitForTimeoutAsync(2000);
+            }
+
+            // Aguarda explicitamente até que o campo de mensagem esteja interativo
+            ILocator? inputLocator = null;
+            string[] candidateInputSelectors =
+            [
+                "[contenteditable='true'][data-tab='10']",
+                "div[contenteditable='true'][data-testid='conversation-compose-box']",
+                "div[contenteditable='true']"
+            ];
+
+            for (int attempt = 0; attempt < 5 && inputLocator == null; attempt++)
+            {
+                foreach (var sel in candidateInputSelectors)
+                {
+                    var loc = _page.Locator(sel);
+                    if (await loc.CountAsync() > 0 && await loc.First.IsVisibleAsync())
+                    {
+                        inputLocator = loc.First;
+                        break;
+                    }
+                }
+
+                if (inputLocator == null)
+                    await _page.WaitForTimeoutAsync(1000); // tenta novamente
+            }
+
+            if (inputLocator == null)
+                throw new InvalidOperationException("Campo de mensagem não encontrado após múltiplas tentativas.");
+
+            // Garante que o campo esteja realmente focado e editável
+            await inputLocator.FocusAsync();
+            await _page.WaitForFunctionAsync(
+                "el => el.isContentEditable && el.offsetParent !== null",
+                inputLocator,
+                new PageWaitForFunctionOptions { Timeout = 10000 }
+            );
+
+            // Preenche e envia
+            await _page.Keyboard.TypeAsync(message);
+            await _page.Keyboard.PressAsync("Enter");
+        }
+
+        catch
+        {
+
+        }
+    }
+
+    public async Task SendCobrancasAsync()
+    {
+        // Exemplo com EF: traga lista em memória (ToListAsync) para não iterar com DB aberto indevidamente.
+        using AppDBContext dbContext = new();
+        var cobrancas = await dbContext.Cobrancas
+            .Include(c => c.Cliente)
+            .Where(c => c.Status == CobrancaStatus.Pendente)
+            .ToListAsync();
+
+        foreach (var cobranca in cobrancas)
+        {
+            var phone = cobranca.Cliente?.Telefone;
+            var msg = $"Olá {cobranca.Cliente!.Nome}, seu honorário de valor {cobranca.HonorarioTotal:C} com vencimento {cobranca.Vencimento:dd/MM} está pendente.";
+            
+            try
+            {
+                await SendMessageAsync(phone, msg);
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogException(new($"Erro ao enviar cobrança para {phone}: {ex.Message}"));
+            }
+        }
+    }
+
+    // Dispose assíncrono recomendado
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (_browserContext != null)
+            {
+                await _browserContext.CloseAsync();
+                _browserContext = null;
+            }
+
+            if (_playwright != null)
+            {
+                _playwright.Dispose();
+                _playwright = null;
+            }
         }
 
         catch (Exception ex)
         {
-            Logger.LogException(new($"Erro ao enviar mensagem: {ex.Message}"));
+            Logger.LogException(new($"Erro durante DisposeAsync: {ex.Message}"));
+        }
+
+        finally
+        {
+            _initialized = false;
         }
     }
 
-    public async Task Initialize(bool headless = true)
+    // Implementa IDisposable chamando o DisposeAsync de forma síncrona segura
+    public void Dispose()
     {
-        _playwright = await Playwright.CreateAsync();
-
-        BrowserTypeLaunchOptions launchOptions = new()
-        {
-            Headless = headless,
-            SlowMo = 50
-        };
-
-        BrowserNewContextOptions contextOptions = new();
-
-        // Verifica se a sessão existe
-        if (File.Exists(STORAGE_STATE_FILE))
-        {
-            contextOptions.StorageStatePath = STORAGE_STATE_FILE;
-        }
-
-        _browser = await _playwright.Chromium.LaunchAsync(launchOptions);
-        _browserContext = await _browser.NewContextAsync(contextOptions);
-        _page = await _browserContext!.NewPageAsync();
-
-        await _page.GotoAsync("https://web.whatsapp.com/");
-
-        const string CONVERSATION_LIST_SELECTOR = "div[data-testid='conversation-list']";
-        const string QR_CODE_SELECTOR = "div[data-testid='qrcode']";
-
-        try
-        {
-            await _page.WaitForSelectorAsync(CONVERSATION_LIST_SELECTOR,
-                new PageWaitForSelectorOptions
-                {
-                    Timeout = 5000
-                });
-
-            await _browserContext.StorageStateAsync(new BrowserContextStorageStateOptions { Path = STORAGE_STATE_FILE });
-
-            if (!headless)
-            {
-                await _browser.CloseAsync();
-
-                _browser = null;
-                _browserContext = null;
-                _page = null;
-
-                await Initialize(true);
-            }
-        }
-
-        catch (TimeoutException)
-        {
-            if (await _page.Locator(QR_CODE_SELECTOR).IsVisibleAsync())
-            {
-                Logger.LogException(new("Sessão expirada. Por favor, reinicie o aplicativo com 'headless: false' para escanear o QR Code."));
-            }
-
-            else
-            {
-                Logger.LogException(new("Falha ao carregar a interface do WhatsApp Web após 60s."));
-            }
-        }
-    }
-
-    public async Task SendCobrancas()
-    {
-        using AppDBContext dbContext = new();
-
-        var cobrancas = dbContext.Cobrancas
-            .Include(c => c.Cliente)
-            .Where(c => c.Status == CobrancaStatus.Pendente);
-
-        foreach (var cobranca in cobrancas)
-        {
-            var phone = cobranca.Cliente!.Telefone;
-            var msg = $"Olá ${cobranca.Cliente.Nome}, seu honorário de valor {cobranca.HonorarioTotal:c} com vencimento {cobranca.Vencimento:dd/MM} está pendente.";
-
-            await SendMessage("19997834256", msg);
-        }
-    }
-
-    public async void Dispose()
-    {
-        if (_browser != null)
-        {
-            await _browserContext!.StorageStateAsync(new BrowserContextStorageStateOptions { Path = STORAGE_STATE_FILE });
-            await _browser.CloseAsync();
-        }
+        DisposeAsync().AsTask().GetAwaiter().GetResult();
+        _sendLock?.Dispose();
     }
 }
